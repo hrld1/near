@@ -62,6 +62,7 @@ export function DateRoom({
 }) {
   const [mode, setMode] = useState<"YOUTUBE" | "COMPANION">(initialMode);
   const [videoId, setVideoId] = useState(initialState.videoId);
+  const [videoTitle, setVideoTitle] = useState(initialState.videoTitle);
   const [url, setUrl] = useState("");
   const [syncFlash, setSyncFlash] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -136,6 +137,7 @@ export function DateRoom({
     setSyncFlash(state.playing ? "play" : "pausa");
     setTimeout(() => setSyncFlash(null), 2500);
 
+    setVideoTitle(state.videoTitle);
     if (state.videoId !== videoId) {
       setVideoId(state.videoId);
       return;
@@ -166,7 +168,10 @@ export function DateRoom({
         return;
       }
       setUrl("");
-      if (result.data) setVideoId(result.data.videoId);
+      if (result.data) {
+        setVideoId(result.data.videoId);
+        setVideoTitle(result.data.videoTitle);
+      }
     });
   }
 
@@ -226,6 +231,11 @@ export function DateRoom({
             <span className="absolute left-3 top-3 z-10 flex animate-fade-up items-center gap-1.5 rounded-full bg-black/60 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-sm">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
               {partner?.name ?? "Tu pareja"} sincronizo ({syncFlash})
+            </span>
+          )}
+          {videoId && videoTitle && (
+            <span className="absolute bottom-3 left-3 z-10 max-w-[80%] truncate rounded-full bg-black/60 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-sm">
+              ▶ {videoTitle}
             </span>
           )}
           {videoId ? (

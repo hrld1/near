@@ -1,6 +1,9 @@
 // Registro de minijuegos de la arcade. Cada juego es un componente cliente
 // que reporta un score numerico; aqui vive todo lo declarativo (reglas,
 // direccion del score, formato) para que anadir un juego nuevo sea trivial.
+// El quiz "Nos conocemos?" NO esta en este registro a proposito: no tiene
+// score numerico ni intentos/dia (es cooperativo y por preguntas), y meterlo
+// con calzador ensuciaria el contrato GameDef. Vive en /play/quiz.
 
 export type GameDef = {
   key: string;
@@ -73,6 +76,28 @@ export const GAMES: GameDef[] = [
     // 3 palabras x 45 s de margen maximo; el componente clampa a >= 0
     scoreBounds: { min: 0, max: 135 },
     format: (s) => `${Math.round(s)} pts`
+  },
+  {
+    key: "sprint",
+    name: "Sprint",
+    tagline: "30 segundos de calculo a toda velocidad.",
+    rules: "Operaciones rapidas con 4 opciones. Acertar suma 1, fallar resta 1. Tienes 30 segundos.",
+    lowerIsBetter: false,
+    unit: "pts",
+    maxAttemptsPerDay: 5,
+    scoreBounds: { min: 0, max: 60 },
+    format: (s) => `${Math.round(s)} pts`
+  },
+  {
+    key: "typing",
+    name: "Teclas",
+    tagline: "Escribe mas rapido de lo que piensas.",
+    rules: "Teclea la palabra y confirma con Enter o espacio. Cada palabra correcta suma 1. Tienes 45 segundos.",
+    lowerIsBetter: false,
+    unit: "palabras",
+    maxAttemptsPerDay: 5,
+    scoreBounds: { min: 0, max: 60 },
+    format: (s) => `${Math.round(s)} palabras`
   }
 ];
 

@@ -55,27 +55,43 @@ export const setMoodAction = coupleAction<[input: { mood: string; note?: string 
   }
 );
 
-export const sendNudgeAction = coupleAction(async ({ user, coupleId, partnerId }) => {
-  const recent = await prisma.nudge.findFirst({
-    where: { coupleId, fromId: user.id, createdAt: { gt: new Date(Date.now() - 60 * 1000) } }
-  });
-  if (recent) return { ok: false, error: "Acabas de enviar uno, dale un momento" };
-  const dateKey = dayKeyIn(user.timezone);
-  const { start } = dayRangeUtc(dateKey, user.timezone);
-  const sentToday = await prisma.nudge.count({
-    where: { fromId: user.id, createdAt: { gte: start } }
-  });
-  await prisma.nudge.create({ data: { coupleId, fromId: user.id } });
-  // solo el primer nudge del dia puntua (el cooldown limita el ritmo, no el total)
-  await addPoints(coupleId, user.id, sentToday === 0 ? POINTS.nudge : 0, dateKey);
-  notifyPartner(
-    coupleId,
-    partnerId,
-    { type: "nudge", payload: { fromId: user.id, fromName: user.name } },
-    { title: `${user.name} esta pensando en ti 💗`, url: "/home", tag: "nudge" }
-  );
-  return { ok: true };
-});
+export const sendNudgeAction = coupleAction<[], { id: string }>(
+  async ({ user, coupleId, partnerId }) => {
+    const recent = await prisma.nudge.findFirst({
+      where: { coupleId, fromId: user.id, createdAt: { gt: new Date(Date.now() - 60 * 1000) } }
+    });
+    if (recent) return { ok: false, error: "Acabas de enviar uno, dale un momento" };
+    const dateKey = dayKeyIn(user.timezone);
+    const { start } = dayRangeUtc(dateKey, user.timezone);
+    const sentToday = await prisma.nudge.count({
+      where: { fromId: user.id, createdAt: { gte: start } }
+    });
+    const nudge = await prisma.nudge.create({ data: { coupleId, fromId: user.id } });
+    // solo el primer nudge del dia puntua (el cooldown limita el ritmo, no el total)
+    await addPoints(coupleId, user.id, sentToday === 0 ? POINTS.nudge : 0, dateKey);
+    notifyPartner(
+      coupleId,
+      partnerId,
+      { type: "nudge", payload: { id: nudge.id, fromId: user.id, fromName: user.name } },
+      { title: `${user.name} esta pensando en ti 💗`, url: "/home", tag: "nudge" }
+    );
+    return { ok: true, data: { id: nudge.id } };
+  }
+);
+
+// El receptor marca el nudge como visto al mostrarse el toast; el emisor
+// recibe el "visto" en vivo.
+export const markNudgeSeenAction = coupleAction<[nudgeId: string]>(
+  async ({ user, coupleId }, nudgeId) => {
+    const nudge = await prisma.nudge.findFirst({
+      where: { id: nudgeId, coupleId, fromId: { not: user.id }, seenAt: null }
+    });
+    if (!nudge) return { ok: true }; // ya visto o no aplica: idempotente
+    await prisma.nudge.update({ where: { id: nudge.id }, data: { seenAt: new Date() } });
+    publish(coupleId, { type: "nudge:seen", payload: { nudgeId: nudge.id, byId: user.id } });
+    return { ok: true };
+  }
+);
 
 export const saveNoteAction = coupleFormAction(async ({ user, coupleId }, formData) => {
   const parsed = noteSchema.safeParse({ body: formData.get("body") });

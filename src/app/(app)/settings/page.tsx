@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import { requireCouple } from "@/lib/couple";
 import { Card, CardTitle } from "@/components/ui/card";
 import { PushToggle } from "@/features/settings/push-toggle";
+import { AnniversaryForm } from "@/features/settings/anniversary-form";
 
 export const metadata: Metadata = { title: "Ajustes" };
 export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
-  const { user, partner } = await requireCouple();
+  const { user, couple, partner } = await requireCouple();
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-6 md:py-10">
@@ -23,6 +24,15 @@ export default async function SettingsPage() {
           <CardTitle>Notificaciones</CardTitle>
           <div className="mt-3">
             <PushToggle />
+          </div>
+        </Card>
+
+        <Card>
+          <CardTitle>Vuestro aniversario</CardTitle>
+          <div className="mt-3">
+            <AnniversaryForm
+              current={couple.anniversary ? couple.anniversary.toISOString().slice(0, 10) : null}
+            />
           </div>
         </Card>
 

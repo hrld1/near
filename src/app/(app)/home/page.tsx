@@ -14,7 +14,7 @@ import {
 import { prisma } from "@/lib/db";
 import { requireCouple } from "@/lib/couple";
 import { moodInfo, presenceInfo } from "@/lib/utils";
-import { dayKeyIn } from "@/lib/dates";
+import { dayKeyIn, nextAnniversary } from "@/lib/dates";
 import { effectivePresence } from "@/lib/presence";
 import { agoLabel, dateLong } from "@/lib/format";
 import { getCoupleStreak, getDailyMissions, getWeeklyBonusStatus, POINTS } from "@/lib/engagement";
@@ -49,7 +49,7 @@ export default async function HomePage() {
   const userDay = dayKeyIn(user.timezone);
   const now = new Date();
 
-  const [myMood, partnerMood, nextEvents, latestMoment, notes, lastNudge, promptCount, promptAnswers, streakInfo, missionInfo, weeklyBonus, dailyBox] =
+  const [myMood, partnerMood, nextEvents, latestMoment, notes, lastNudge, myLastNudge, promptCount, promptAnswers, streakInfo, missionInfo, weeklyBonus, dailyBox] =
     await Promise.all([
       // cada mood vive en el dia local de su autor
       prisma.moodEntry.findUnique({
@@ -81,6 +81,11 @@ export default async function HomePage() {
             orderBy: { createdAt: "desc" }
           })
         : null,
+      // mi ultimo nudge (para el "visto")
+      prisma.nudge.findFirst({
+        where: { coupleId: couple.id, fromId: user.id },
+        orderBy: { createdAt: "desc" }
+      }),
       prisma.dailyPrompt.count(),
       prisma.promptAnswer.findMany({ where: { coupleId: couple.id, dateKey: coupleDay } }),
       // racha/misiones/bonus degradan sin tumbar la home
@@ -127,6 +132,7 @@ export default async function HomePage() {
   const boxOpenedBy = dailyBox
     ? couple.members.find((m) => m.id === dailyBox.openedById)?.name ?? null
     : null;
+  const milestone = couple.anniversary ? nextAnniversary(couple.anniversary, now) : null;
   const CountdownIcon = countdownEvent ? eventIcon(countdownEvent.kind) : null;
 
   const quickActions = [
@@ -204,7 +210,14 @@ export default async function HomePage() {
                   </div>
                 )}
                 <div className="mt-4 max-w-xs">
-                  <NudgeButton partnerName={partner.name} />
+                  <NudgeButton
+                    partnerName={partner.name}
+                    lastNudge={
+                      myLastNudge
+                        ? { id: myLastNudge.id, seen: !!myLastNudge.seenAt }
+                        : null
+                    }
+                  />
                 </div>
               </>
             ) : (
@@ -297,6 +310,31 @@ export default async function HomePage() {
             <MoodCheck currentMood={myMood?.mood ?? null} currentNote={myMood?.note ?? null} />
           </div>
         </Card>
+
+        {milestone && (
+          <Card>
+            <CardTitle>{milestone.isAnnual ? "Vuestro aniversario" : "Mesiversario"}</CardTitle>
+            <div className="mt-3 flex items-center gap-3">
+              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose/12 text-rose-deep">
+                <Heart className="h-6 w-6 fill-current" />
+              </span>
+              <div>
+                <p className="font-display text-xl leading-tight text-ink">
+                  {milestone.daysLeft === 0
+                    ? milestone.isAnnual
+                      ? `Hoy cumplis ${milestone.years} ${milestone.years === 1 ? "ano" : "anos"} 🎉`
+                      : `Hoy cumplis ${milestone.months} meses 🎉`
+                    : milestone.isAnnual
+                      ? `${milestone.years} ${milestone.years === 1 ? "ano" : "anos"} en ${milestone.daysLeft} ${milestone.daysLeft === 1 ? "dia" : "dias"}`
+                      : `${milestone.months} meses en ${milestone.daysLeft} ${milestone.daysLeft === 1 ? "dia" : "dias"}`}
+                </p>
+                <p className="mt-0.5 text-xs capitalize text-ink-soft">
+                  {dateLong(milestone.date)}
+                </p>
+              </div>
+            </div>
+          </Card>
+        )}
 
         <Card className="md:col-span-2">
           <CardTitle>Pregunta del dia</CardTitle>

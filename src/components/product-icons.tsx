@@ -5,6 +5,7 @@ import {
   Bookmark,
   BookOpen,
   CalendarCheck,
+  Calculator,
   Camera,
   Coffee,
   Flame,
@@ -12,6 +13,7 @@ import {
   Gift,
   Gamepad2,
   Images,
+  Keyboard,
   Layers,
   MessageCircle,
   Mic,
@@ -62,6 +64,18 @@ export const GAME_VISUALS: Record<
     accent: "from-emerald-400 to-teal-600",
     accentSoft: "bg-emerald-500/12",
     accentText: "text-emerald-600 dark:text-emerald-400"
+  },
+  sprint: {
+    icon: Calculator,
+    accent: "from-fuchsia-400 to-pink-600",
+    accentSoft: "bg-fuchsia-500/12",
+    accentText: "text-fuchsia-600 dark:text-fuchsia-400"
+  },
+  typing: {
+    icon: Keyboard,
+    accent: "from-cyan-400 to-indigo-500",
+    accentSoft: "bg-cyan-500/12",
+    accentText: "text-cyan-600 dark:text-cyan-400"
   }
 };
 

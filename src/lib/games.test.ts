@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { GAMES, compareScores, gameOfDay, scrambleWord, wordsOfDay } from "./games";
+import { shiftDayKey } from "./dates";
 
 describe("GAMES", () => {
   it("todos los juegos declaran bounds coherentes", () => {
@@ -20,13 +21,12 @@ describe("gameOfDay", () => {
     expect(gameOfDay("2026-07-04").key).toBe(gameOfDay("2026-07-04").key);
   });
 
-  it("rota de un dia al siguiente", () => {
-    const games = new Set(
-      ["2026-07-01", "2026-07-02", "2026-07-03", "2026-07-04", "2026-07-05"].map(
-        (k) => gameOfDay(k).key
-      )
+  it("rota de un dia al siguiente cubriendo todos los juegos", () => {
+    const days = Array.from({ length: GAMES.length }, (_, i) =>
+      shiftDayKey("2026-07-01", i)
     );
-    expect(games.size).toBe(GAMES.length); // 5 dias consecutivos cubren los 5 juegos
+    const games = new Set(days.map((k) => gameOfDay(k).key));
+    expect(games.size).toBe(GAMES.length); // N dias consecutivos cubren los N juegos
   });
 });
 

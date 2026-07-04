@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dayKeyIn, dayRangeUtc, mondayOfWeek, monthKeyIn, shiftDayKey } from "./dates";
+import { dayKeyIn, dayRangeUtc, mondayOfWeek, monthKeyIn, nextAnniversary, shiftDayKey } from "./dates";
 
 describe("dayKeyIn", () => {
   it("da dias distintos a la vez en zonas extremas", () => {
@@ -52,6 +52,46 @@ describe("mondayOfWeek", () => {
     expect(mondayOfWeek("2026-07-05")).toBe("2026-06-29"); // domingo pertenece a la semana del lunes 29
     expect(mondayOfWeek("2026-06-29")).toBe("2026-06-29"); // un lunes se devuelve tal cual
     expect(mondayOfWeek("2026-07-06")).toBe("2026-07-06"); // lunes siguiente
+  });
+});
+
+describe("nextAnniversary", () => {
+  const ann = new Date(2024, 1, 14); // 14 feb 2024
+
+  it("el proximo mesiversario cae el mismo dia del mes siguiente", () => {
+    const r = nextAnniversary(ann, new Date(2026, 6, 4)); // 4 jul 2026
+    expect(r.date.getMonth()).toBe(6); // julio
+    expect(r.date.getDate()).toBe(14);
+    expect(r.months).toBe(29);
+    expect(r.isAnnual).toBe(false);
+    expect(r.daysLeft).toBe(10);
+  });
+
+  it("si hoy es el dia, hoy es el hito (daysLeft 0)", () => {
+    const r = nextAnniversary(ann, new Date(2026, 6, 14));
+    expect(r.daysLeft).toBe(0);
+    expect(r.months).toBe(29);
+  });
+
+  it("detecta el aniversario anual con anyos cumplidos", () => {
+    const r = nextAnniversary(ann, new Date(2027, 1, 1)); // 1 feb 2027
+    expect(r.date.getFullYear()).toBe(2027);
+    expect(r.date.getMonth()).toBe(1);
+    expect(r.isAnnual).toBe(true);
+    expect(r.years).toBe(3);
+  });
+
+  it("clampa el dia en meses cortos (31 -> fin de mes)", () => {
+    const a31 = new Date(2026, 0, 31); // 31 enero
+    const r = nextAnniversary(a31, new Date(2026, 1, 10)); // 10 feb
+    expect(r.date.getMonth()).toBe(1);
+    expect(r.date.getDate()).toBe(28); // 2026 no es bisiesto
+  });
+
+  it("respeta el 29 de febrero en anyo bisiesto", () => {
+    const a31 = new Date(2023, 11, 31); // 31 dic
+    const r = nextAnniversary(a31, new Date(2024, 1, 15));
+    expect(r.date.getDate()).toBe(29); // feb 2024, bisiesto
   });
 });
 

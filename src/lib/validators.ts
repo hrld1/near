@@ -63,6 +63,7 @@ export const eventSchema = z.object({
   description: z.string().trim().max(500).optional(),
   kind: z.enum(["DATE", "VISIT", "ANNIVERSARY", "OTHER"]),
   startsAt: z.string().min(1, "Elige fecha y hora"),
+  endsAt: z.string().optional(),
   showCountdown: z.boolean().default(true)
 });
 

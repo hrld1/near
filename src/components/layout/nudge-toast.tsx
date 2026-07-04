@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Heart } from "lucide-react";
+import { markNudgeSeenAction } from "@/actions/presence";
 import { useCoupleStream } from "@/hooks/use-stream";
 
 export function NudgeToast({ myId }: { myId: string }) {
@@ -11,6 +12,8 @@ export function NudgeToast({ myId }: { myId: string }) {
     if (event.type !== "nudge") return;
     if (event.payload.fromId === myId) return;
     setMessage(`${event.payload.fromName} esta pensando en ti`);
+    // mostrar el toast = visto (el emisor lo ve en vivo)
+    void markNudgeSeenAction(event.payload.id);
   });
 
   useEffect(() => {

@@ -12,12 +12,20 @@ export const createEventAction = coupleFormAction(async ({ user, coupleId }, for
     description: formData.get("description") || undefined,
     kind: formData.get("kind"),
     startsAt: formData.get("startsAt"),
+    endsAt: formData.get("endsAt") || undefined,
     showCountdown: formData.get("showCountdown") === "on"
   });
   if (!parsed.success) return { error: parsed.error.issues[0].message };
 
   const startsAt = new Date(parsed.data.startsAt);
   if (Number.isNaN(startsAt.getTime())) return { error: "Fecha no valida" };
+
+  let endsAt: Date | null = null;
+  if (parsed.data.endsAt) {
+    endsAt = new Date(parsed.data.endsAt);
+    if (Number.isNaN(endsAt.getTime())) return { error: "Hora de fin no valida" };
+    if (endsAt < startsAt) return { error: "El fin no puede ser antes del inicio" };
+  }
 
   await prisma.calendarEvent.create({
     data: {
@@ -27,6 +35,7 @@ export const createEventAction = coupleFormAction(async ({ user, coupleId }, for
       description: parsed.data.description || null,
       kind: parsed.data.kind,
       startsAt,
+      endsAt,
       showCountdown: parsed.data.showCountdown
     }
   });

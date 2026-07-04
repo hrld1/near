@@ -37,6 +37,32 @@ export function mondayOfWeek(dateKey: DayKey): DayKey {
   return shiftDayKey(dateKey, -(isoDow - 1));
 }
 
+// Suma meses clampando el dia (31 de enero + 1 mes = 28/29 de febrero).
+function addMonthsClamped(date: Date, months: number): Date {
+  const y = date.getFullYear();
+  const m = date.getMonth() + months;
+  const lastDay = new Date(y, m + 1, 0).getDate();
+  return new Date(y, m, Math.min(date.getDate(), lastDay));
+}
+
+// Proximo hito del aniversario: cada mes el "mesiversario" y, cuando toca,
+// el aniversario anual. Si hoy es el dia, hoy ES el hito (no el siguiente).
+export function nextAnniversary(anniversary: Date, now: Date = new Date()) {
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  let months =
+    (today.getFullYear() - anniversary.getFullYear()) * 12 +
+    (today.getMonth() - anniversary.getMonth());
+  if (months < 0) months = 0;
+  let date = addMonthsClamped(anniversary, months);
+  if (date < today) {
+    months += 1;
+    date = addMonthsClamped(anniversary, months);
+  }
+  const isAnnual = months > 0 && months % 12 === 0;
+  const daysLeft = Math.round((date.getTime() - today.getTime()) / 86_400_000);
+  return { date, months, years: Math.floor(months / 12), isAnnual, daysLeft };
+}
+
 // Offset de una zona en un instante dado (ms). Positivo al este de UTC.
 function tzOffsetMs(timeZone: string, date: Date): number {
   const parts = new Intl.DateTimeFormat("en-US", {

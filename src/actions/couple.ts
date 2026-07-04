@@ -4,10 +4,11 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/couple";
-import { isUserOnline } from "@/lib/realtime";
+import { isUserOnline, publish } from "@/lib/realtime";
 import { sendPushToUsers } from "@/lib/push";
 import { inviteCode } from "@/lib/utils";
 import { inviteCodeSchema } from "@/lib/validators";
+import { coupleAction } from "@/lib/safe-action";
 import type { ActionResult, FormState } from "@/types";
 
 const INVITE_DAYS = 7;
@@ -76,3 +77,23 @@ export async function redeemInviteAction(_prev: FormState, formData: FormData): 
   revalidatePath("/", "layout");
   redirect("/home");
 }
+
+// Aniversario de la pareja: dato compartido, cualquiera de los dos lo edita.
+// Cadena vacia = quitarlo.
+export const setAnniversaryAction = coupleAction<[dateStr: string]>(
+  async ({ user, coupleId }, dateStr) => {
+    if (dateStr === "") {
+      await prisma.couple.update({ where: { id: coupleId }, data: { anniversary: null } });
+    } else {
+      const date = new Date(`${dateStr}T00:00:00`);
+      if (Number.isNaN(date.getTime())) return { ok: false, error: "Fecha no valida" };
+      if (date > new Date()) return { ok: false, error: "El aniversario no puede ser futuro" };
+      await prisma.couple.update({ where: { id: coupleId }, data: { anniversary: date } });
+    }
+    publish(coupleId, { type: "event", payload: { byId: user.id } });
+    revalidatePath("/home");
+    revalidatePath("/calendar");
+    revalidatePath("/settings");
+    return { ok: true };
+  }
+);

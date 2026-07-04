@@ -9,16 +9,34 @@ import type { CompanionSignalKind, DateRoomDto } from "@/types";
 
 function toDto(state: {
   videoId: string | null;
+  videoTitle: string | null;
   playing: boolean;
   positionSec: number;
   updatedAt: Date;
 }): DateRoomDto {
   return {
     videoId: state.videoId,
+    videoTitle: state.videoTitle,
     playing: state.playing,
     positionSec: state.positionSec,
     updatedAt: state.updatedAt.toISOString()
   };
+}
+
+// Titulo del video via oEmbed publico de YouTube (sin API key). Si falla,
+// null y tan contentos: es puro azucar.
+async function fetchVideoTitle(videoId: string): Promise<string | null> {
+  try {
+    const res = await fetch(
+      `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`,
+      { signal: AbortSignal.timeout(3000) }
+    );
+    if (!res.ok) return null;
+    const data = (await res.json()) as { title?: string };
+    return data.title?.slice(0, 200) ?? null;
+  } catch {
+    return null;
+  }
 }
 
 export const setVideoAction = coupleAction<[url: string], DateRoomDto>(
@@ -26,10 +44,11 @@ export const setVideoAction = coupleAction<[url: string], DateRoomDto>(
     const videoId = extractYouTubeId(url);
     if (!videoId) return { ok: false, error: "Pega un enlace de YouTube valido" };
 
+    const videoTitle = await fetchVideoTitle(videoId);
     const state = await prisma.dateRoomState.upsert({
       where: { coupleId },
-      update: { videoId, playing: false, positionSec: 0, updatedById: user.id },
-      create: { coupleId, videoId, updatedById: user.id }
+      update: { videoId, videoTitle, playing: false, positionSec: 0, updatedById: user.id },
+      create: { coupleId, videoId, videoTitle, updatedById: user.id }
     });
     const dto = toDto(state);
     publish(coupleId, { type: "dateroom:update", payload: { ...dto, byId: user.id } });

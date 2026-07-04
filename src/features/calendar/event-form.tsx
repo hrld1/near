@@ -72,13 +72,17 @@ export function EventForm() {
             required
           />
         </div>
-        <div>
-          <Label htmlFor="e-starts">Fecha y hora</Label>
-          <Input id="e-starts" name="startsAt" type="datetime-local" required />
-          <p className="mt-1.5 text-[11px] text-ink-soft">
-            Se guarda en tu zona horaria local.
-          </p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div>
+            <Label htmlFor="e-starts">Fecha y hora</Label>
+            <Input id="e-starts" name="startsAt" type="datetime-local" required />
+          </div>
+          <div>
+            <Label htmlFor="e-ends">Fin (opcional)</Label>
+            <Input id="e-ends" name="endsAt" type="datetime-local" />
+          </div>
         </div>
+        <p className="-mt-2 text-[11px] text-ink-soft">Se guarda en tu zona horaria local.</p>
         <div>
           <Label htmlFor="e-desc">Detalles (opcional)</Label>
           <Textarea id="e-desc" name="description" rows={2} maxLength={500} />

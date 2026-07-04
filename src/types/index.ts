@@ -18,6 +18,7 @@ export type MemberInfo = {
 
 export type DateRoomDto = {
   videoId: string | null;
+  videoTitle: string | null;
   playing: boolean;
   positionSec: number;
   updatedAt: string;
@@ -47,7 +48,8 @@ export type StreamEvent =
     }
   | { type: "presence"; payload: { userId: string; presence: string } }
   | { type: "mood"; payload: { userId: string; mood: string } }
-  | { type: "nudge"; payload: { fromId: string; fromName: string } }
+  | { type: "nudge"; payload: { id: string; fromId: string; fromName: string } }
+  | { type: "nudge:seen"; payload: { nudgeId: string; byId: string } }
   | { type: "note"; payload: { authorId: string } }
   | { type: "prompt"; payload: { userId: string } }
   | { type: "event"; payload: { byId: string } }

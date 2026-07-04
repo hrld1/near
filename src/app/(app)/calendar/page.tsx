@@ -5,6 +5,7 @@ import { CalendarHeart, History } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { requireCouple } from "@/lib/couple";
 import { EVENT_KINDS } from "@/lib/utils";
+import { nextAnniversary } from "@/lib/dates";
 import { dateLong, agoLabel } from "@/lib/format";
 import { eventIcon } from "@/components/product-icons";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -35,6 +36,7 @@ export default async function CalendarPage() {
   const highlight = upcoming.find((e) => e.showCountdown) ?? upcoming[0] ?? null;
   const rest = upcoming.filter((e) => e.id !== highlight?.id);
   const HighlightIcon = highlight ? eventIcon(highlight.kind) : null;
+  const milestone = couple.anniversary ? nextAnniversary(couple.anniversary, now) : null;
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-6 md:py-10">
@@ -45,6 +47,16 @@ export default async function CalendarPage() {
           <p className="mt-1 text-sm text-ink-soft">
             Lo que os espera y lo que ya habeis vivido.
           </p>
+          {milestone && (
+            <p className="mt-1.5 text-xs font-medium text-rose-deep">
+              💗{" "}
+              {milestone.daysLeft === 0
+                ? milestone.isAnnual
+                  ? `Hoy cumplis ${milestone.years} ${milestone.years === 1 ? "ano" : "anos"}`
+                  : `Hoy cumplis ${milestone.months} meses`
+                : `${milestone.isAnnual ? `${milestone.years} ${milestone.years === 1 ? "ano" : "anos"}` : `${milestone.months} meses`} el ${format(milestone.date, "d 'de' MMMM", { locale: es })}`}
+            </p>
+          )}
         </div>
         <EventForm />
       </header>
@@ -72,6 +84,9 @@ export default async function CalendarPage() {
                 </div>
                 <p className="mt-4 text-sm capitalize text-ink-soft">
                   {dateLong(highlight.startsAt)}
+                  {highlight.endsAt && (
+                    <span className="normal-case"> — hasta las {format(highlight.endsAt, "HH:mm")}</span>
+                  )}
                 </p>
                 {highlight.description && (
                   <p className="mt-2 max-w-md text-sm leading-relaxed text-ink">
@@ -112,7 +127,8 @@ export default async function CalendarPage() {
                           <span className="truncate">{event.title}</span>
                         </p>
                         <p className="text-xs text-ink-soft">
-                          {format(event.startsAt, "EEEE 'a las' HH:mm", { locale: es })} ·{" "}
+                          {format(event.startsAt, "EEEE 'a las' HH:mm", { locale: es })}
+                          {event.endsAt && <>–{format(event.endsAt, "HH:mm")}</>} ·{" "}
                           {agoLabel(event.startsAt)}
                         </p>
                         {event.description && (

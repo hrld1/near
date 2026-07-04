@@ -12,6 +12,9 @@ Un hogar digital privado para parejas a distancia: chat, presencia emocional, al
 - **SSE** para tiempo real (chat, presencia, juegos, sync de sala y **senalizacion WebRTC**)
 - **WebRTC** para videollamada P2P (STUN publico; TURN opcional)
 - **YouTube IFrame API** para reproduccion sincronizada real
+- **PWA + Web Push** (VAPID con `web-push`, sin servicios de terceros)
+- **Vitest** para la logica pura (fechas/timezone, motor de engagement, juegos)
+- **Prisma Migrate** con historial versionado en `prisma/migrations/`
 
 ## Puesta en marcha
 
@@ -49,10 +52,10 @@ npm run dev                   # 5. http://localhost:3000
 - **Caja diaria**: una por pareja y dia (reto, pregunta valiente, gesto o *flashback* de vuestros propios momentos). Quien la abre, la abre para los dos, en vivo.
 
 ### Arcade (rediseno completo)
-- **Reto del dia**: un juego rotativo, 5 intentos, mejor marca contra tu pareja, ganador del dia e historial de duelos de la semana (G/P/E).
-- **5 minijuegos reales y animados**: Reflejos (reaction), Parejas (memory), Dianas (aim), Eco (Simon) y Palabra oculta (anagramas del dia). Registro declarativo en `lib/games.ts`: anadir un juego = 1 componente + 1 entrada.
+- **Reto del dia**: un juego rotativo, 5 intentos, mejor marca contra tu pareja, ganador del dia e historial de duelos de la semana (G/P/E). **Ganar el duelo de ayer se cobra en /play (+15)** con re-verificacion en servidor.
+- **7 minijuegos reales y animados**: Reflejos (reaction), Parejas (memory), Dianas (aim), Eco (Simon), Palabra oculta (anagramas del dia), **Sprint (calculo mental)** y **Teclas (mecanografia)**. Registro declarativo en `lib/games.ts`: anadir un juego = 1 componente + 1 entrada.
 - **Quiz "Nos conocemos?"** integrado como modo cooperativo.
-- Puntuaciones persistidas (`GameScore`), puntos de temporada por participar y por ganar, confetti y feedback en cada resultado.
+- Puntuaciones persistidas (`GameScore`) con **rango plausible validado en servidor** (`scoreBounds`), puntos de temporada por participar y por ganar, confetti y feedback en cada resultado.
 
 ### Album compartido
 - Pestanas **Album** (grid) y **Diario** (timeline por meses).
@@ -80,6 +83,15 @@ npm run dev                   # 5. http://localhost:3000
 - **Dark mode completo** (tokens CSS + toggle + sin flash al cargar).
 - **Zona horaria real**: se detecta y guarda automaticamente; la home muestra **la hora local de tu pareja**.
 - Presencia, mood check, pregunta del dia, notas destacadas, "pensando en ti" con toast: igual que v1, ahora sumando puntos y racha.
+
+### Iteracion 4: correccion, calidad y PWA
+- **Integridad del motor de puntos**: cada concepto puntua maximo una vez por dia (reeditar mood/pregunta o subir 12 fotos ya no farmea); scores de juegos acotados por `scoreBounds` en servidor.
+- **Dos claves de dia con timezone real** (`src/lib/dates.ts`): el dia personal (mood, puntos) va en la zona del usuario; el dia compartido (caja, reto, pregunta, misiones, racha, temporada) en la de la pareja. Testeado con DST y husos extremos.
+- **`duelWon` y `weeklyBonus` implementados**: reclamar duelo de ayer (+15) y semana perfecta 7/7 (+40 por persona), con claim idempotente.
+- **Robustez**: error/loading boundaries en toda la app, skeletons en home y arcade, presencia con caducidad (4h/12h), logros recalculados fuera del render.
+- **Calidad**: ESLint activo en build, `StreamEvent` como union discriminada, wrapper `coupleAction` para todas las actions, chat descompuesto en piezas, 43 tests de logica pura, migraciones Prisma versionadas.
+- **PWA + push** (ver tabla de integraciones) y pagina de **Ajustes**.
+- **Producto**: aniversario de pareja con contador de mesiversarios/aniversarios (home y fechas), "visto" en los "pensando en ti", eventos con hora de fin, titulo real del video en la sala (oEmbed), pools de la caja ampliados (25 retos / 20 preguntas / 15 gestos) y 2 minijuegos nuevos.
 
 ## Integraciones: reales vs pendientes
 

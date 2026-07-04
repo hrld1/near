@@ -14,6 +14,8 @@ import { MemoryGame } from "@/features/play/games/memory";
 import { TargetsGame } from "@/features/play/games/targets";
 import { EchoGame } from "@/features/play/games/echo";
 import { AnagramGame } from "@/features/play/games/anagram";
+import { SprintGame } from "@/features/play/games/sprint";
+import { TypingGame } from "@/features/play/games/typing";
 
 export type GameHostProps = {
   gameKey: string;
@@ -147,6 +149,8 @@ export function GameHost(props: GameHostProps) {
               {props.gameKey === "anagram" && (
                 <AnagramGame onFinish={handleFinish} words={props.anagramWords ?? []} />
               )}
+              {props.gameKey === "sprint" && <SprintGame onFinish={handleFinish} />}
+              {props.gameKey === "typing" && <TypingGame onFinish={handleFinish} />}
             </div>
           )}
 

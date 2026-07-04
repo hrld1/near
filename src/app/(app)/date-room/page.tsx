@@ -37,6 +37,7 @@ export default async function DateRoomPage() {
         partner={partner ? { id: partner.id, name: partner.name, image: partner.image } : null}
         initialState={{
           videoId: state.videoId,
+          videoTitle: state.videoTitle,
           playing: state.playing,
           positionSec: state.positionSec,
           updatedAt: state.updatedAt.toISOString()
