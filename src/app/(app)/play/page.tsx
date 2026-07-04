@@ -14,14 +14,18 @@ import { dayKeyIn, shiftDayKey } from "@/lib/dates";
 import { GAMES, gameOfDay, compareScores } from "@/lib/games";
 import {
   ACHIEVEMENTS,
+  DUEL_CLAIM_TYPE,
   getCoupleStreak,
+  getDuelResult,
   getSeason,
-  syncAchievements
+  POINTS
 } from "@/lib/engagement";
 import { gameVisual, levelIcon, achievementIcon } from "@/components/product-icons";
 import { Avatar } from "@/components/ui/avatar";
 import { Card, CardTitle } from "@/components/ui/card";
 import { LiveRefresh } from "@/components/live-refresh";
+import { AchievementsSync } from "@/features/play/achievements-sync";
+import { DuelClaim } from "@/features/play/duel-claim";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Arcade" };
@@ -37,14 +41,31 @@ export default async function PlayPage() {
   const dateKey = dayKeyIn(couple.timezone); // la arcade vive en el dia de la pareja
   const daily = gameOfDay(dateKey);
   const weekKeys = Array.from({ length: 7 }, (_, i) => shiftDayKey(dateKey, -i)).reverse();
+  const duelDay = shiftDayKey(dateKey, -1);
 
-  const [todayScores, weekScores, season, streakInfo, achievementInfo] = await Promise.all([
-    prisma.gameScore.findMany({ where: { coupleId: couple.id, dateKey } }),
-    prisma.gameScore.findMany({ where: { coupleId: couple.id, dateKey: { in: weekKeys } } }),
-    getSeason(couple.id, couple.timezone),
-    getCoupleStreak(couple.id, couple.members.map((m) => m.id), couple.timezone),
-    syncAchievements(couple.id, user.id, couple.members.map((m) => m.id), couple.timezone)
-  ]);
+  // Racha, logros y duelo de ayer degradan a vacio si fallan: no tumban la pagina.
+  const [todayScores, weekScores, season, streakInfo, unlockedAchievements, yesterdayDuel, duelClaim] =
+    await Promise.all([
+      prisma.gameScore.findMany({ where: { coupleId: couple.id, dateKey } }),
+      prisma.gameScore.findMany({ where: { coupleId: couple.id, dateKey: { in: weekKeys } } }),
+      getSeason(couple.id, couple.timezone),
+      getCoupleStreak(couple.id, couple.members.map((m) => m.id), couple.timezone).catch(
+        () => ({ streak: 0, todayComplete: false })
+      ),
+      prisma.achievementUnlock
+        .findMany({ where: { userId: user.id }, orderBy: { unlockedAt: "desc" } })
+        .catch(() => []),
+      getDuelResult(couple.id, duelDay).catch(() => null),
+      prisma.dailyClaim
+        .findUnique({
+          where: {
+            userId_dateKey_type: { userId: user.id, dateKey: duelDay, type: DUEL_CLAIM_TYPE }
+          }
+        })
+        .catch(() => null)
+    ]);
+  const wonYesterdayUnclaimed =
+    !!yesterdayDuel && yesterdayDuel.winnerId === user.id && !duelClaim;
 
   const perGame = GAMES.map((def) => {
     const mine = todayScores.filter((s) => s.gameKey === def.key && s.userId === user.id);
@@ -91,7 +112,7 @@ export default async function PlayPage() {
 
   const myPoints = season.perUser.get(user.id) ?? 0;
   const partnerPoints = partner ? season.perUser.get(partner.id) ?? 0 : 0;
-  const unlockedKeys = new Set(achievementInfo.unlocked.map((u) => u.key));
+  const unlockedKeys = new Set(unlockedAchievements.map((u) => u.key));
   const DailyVisual = gameVisual(daily.key);
   const DailyIcon = DailyVisual.icon;
   const LevelIcon = levelIcon(season.level.index);
@@ -99,6 +120,7 @@ export default async function PlayPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 md:py-10">
       <LiveRefresh types={["game:score", "season"]} />
+      <AchievementsSync />
       <header className="mb-6">
         <h1 className="font-display text-3xl text-ink">Arcade</h1>
         <p className="mt-1 text-sm text-ink-soft">
@@ -157,6 +179,10 @@ export default async function PlayPage() {
           </div>
         </section>
       </Link>
+
+      {wonYesterdayUnclaimed && yesterdayDuel && (
+        <DuelClaim gameName={yesterdayDuel.def.name} points={POINTS.duelWon} />
+      )}
 
       {/* Temporada + racha */}
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -330,12 +356,10 @@ export default async function PlayPage() {
       <section className="mt-7">
         <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-ink-soft">
           Logros ({unlockedKeys.size}/{ACHIEVEMENTS.length})
-          {achievementInfo.fresh.length > 0 && " · hay nuevos"}
         </h2>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {ACHIEVEMENTS.map((achievement) => {
             const unlocked = unlockedKeys.has(achievement.key);
-            const fresh = achievementInfo.fresh.includes(achievement.key);
             const Icon = achievementIcon(achievement.key);
             return (
               <div
@@ -345,8 +369,7 @@ export default async function PlayPage() {
                   "flex items-center gap-2.5 rounded-xl border px-3 py-2.5 transition",
                   unlocked
                     ? "border-amber-300/50 bg-amber-50 dark:border-amber-700/40 dark:bg-amber-900/20"
-                    : "border-sand bg-paper opacity-50",
-                  fresh && "animate-pop-in ring-2 ring-amber-400"
+                    : "border-sand bg-paper opacity-50"
                 )}
               >
                 <Icon

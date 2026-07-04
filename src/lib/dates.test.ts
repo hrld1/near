@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dayKeyIn, dayRangeUtc, monthKeyIn, shiftDayKey } from "./dates";
+import { dayKeyIn, dayRangeUtc, mondayOfWeek, monthKeyIn, shiftDayKey } from "./dates";
 
 describe("dayKeyIn", () => {
   it("da dias distintos a la vez en zonas extremas", () => {
@@ -43,6 +43,15 @@ describe("shiftDayKey", () => {
   it("maneja anyos bisiestos", () => {
     expect(shiftDayKey("2024-02-28", 1)).toBe("2024-02-29");
     expect(shiftDayKey("2025-02-28", 1)).toBe("2025-03-01");
+  });
+});
+
+describe("mondayOfWeek", () => {
+  it("devuelve el lunes de la semana", () => {
+    expect(mondayOfWeek("2026-07-04")).toBe("2026-06-29"); // sabado -> lunes anterior
+    expect(mondayOfWeek("2026-07-05")).toBe("2026-06-29"); // domingo pertenece a la semana del lunes 29
+    expect(mondayOfWeek("2026-06-29")).toBe("2026-06-29"); // un lunes se devuelve tal cual
+    expect(mondayOfWeek("2026-07-06")).toBe("2026-07-06"); // lunes siguiente
   });
 });
 

@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { requireCouple } from "@/lib/couple";
 import { presenceInfo, moodInfo } from "@/lib/utils";
 import { dayKeyIn } from "@/lib/dates";
+import { effectivePresence } from "@/lib/presence";
 import { getCoupleStreak } from "@/lib/engagement";
 import { eventIcon } from "@/components/product-icons";
 import { Avatar } from "@/components/ui/avatar";
@@ -40,7 +41,10 @@ export default async function ChatPage() {
 
   const hasMore = rows.length > 80;
   const messages = rows.slice(0, 80).reverse().map(toChatMessage);
-  const partnerPresence = partner ? presenceInfo(partner.presence) : null;
+  const partnerEffective = partner
+    ? effectivePresence(partner.presence, partner.presenceUpdatedAt)
+    : "NONE";
+  const partnerPresence = partner ? presenceInfo(partnerEffective) : null;
   const daysToEvent = nextEvent
     ? Math.max(0, Math.ceil((nextEvent.startsAt.getTime() - Date.now()) / 86_400_000))
     : null;
@@ -54,7 +58,7 @@ export default async function ChatPage() {
           <>
             <span className="relative">
               <Avatar name={partner.name} tone={1} size="md" />
-              {partnerPresence && partner.presence !== "NONE" && (
+              {partnerPresence && partnerEffective !== "NONE" && (
                 <span
                   className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-paper ${partnerPresence.dot}`}
                 />
@@ -70,7 +74,7 @@ export default async function ChatPage() {
                 )}
               </p>
               <p className="flex items-center gap-2 text-xs text-ink-soft">
-                {partnerPresence && partner.presence !== "NONE" && (
+                {partnerPresence && partnerEffective !== "NONE" && (
                   <span>{partnerPresence.label}</span>
                 )}
                 <PartnerClock timezone={partner.timezone} name={partner.name} />

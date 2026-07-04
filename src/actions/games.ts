@@ -5,9 +5,17 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { requireCoupleAction } from "@/lib/couple";
 import { publish } from "@/lib/realtime";
-import { dayKeyIn } from "@/lib/dates";
+import { dayKeyIn, shiftDayKey } from "@/lib/dates";
 import { gameByKey, compareScores } from "@/lib/games";
-import { addPoints, POINTS } from "@/lib/engagement";
+import {
+  addPoints,
+  DUEL_CLAIM_TYPE,
+  getDuelResult,
+  getWeeklyBonusStatus,
+  POINTS,
+  syncAchievements,
+  WEEKLY_CLAIM_TYPE
+} from "@/lib/engagement";
 import type { ActionResult } from "@/types";
 
 const scoreSchema = z.object({
@@ -105,6 +113,84 @@ export async function claimMissionBonusAction(): Promise<ActionResult<{ points: 
     revalidatePath("/home");
     revalidatePath("/play");
     return { ok: true, data: { points: POINTS.missionBonus } };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Error" };
+  }
+}
+
+// Reclama la victoria del duelo de AYER (dia de pareja). El servidor
+// re-verifica el resultado; el unique de DailyClaim impide el doble cobro.
+export async function claimDuelWinAction(): Promise<ActionResult<{ points: number }>> {
+  try {
+    const { user, couple, coupleId } = await requireCoupleAction();
+    const duelDay = shiftDayKey(dayKeyIn(couple.timezone), -1);
+    const duel = await getDuelResult(coupleId, duelDay);
+    if (duel.winnerId !== user.id) {
+      return { ok: false, error: "El duelo de ayer no lo ganaste tu" };
+    }
+    const existing = await prisma.dailyClaim.findUnique({
+      where: { userId_dateKey_type: { userId: user.id, dateKey: duelDay, type: DUEL_CLAIM_TYPE } }
+    });
+    if (existing) return { ok: false, error: "Ese duelo ya esta cobrado" };
+    await prisma.dailyClaim.create({
+      data: { coupleId, userId: user.id, dateKey: duelDay, type: DUEL_CLAIM_TYPE }
+    });
+    await addPoints(coupleId, user.id, POINTS.duelWon, dayKeyIn(user.timezone));
+    publish(coupleId, { type: "season", payload: { userId: user.id } });
+    revalidatePath("/play");
+    return { ok: true, data: { points: POINTS.duelWon } };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Error" };
+  }
+}
+
+// Reclama el bonus de la semana pasada completa (7/7 dias de pareja).
+export async function claimWeeklyBonusAction(): Promise<ActionResult<{ points: number }>> {
+  try {
+    const { user, couple, coupleId } = await requireCoupleAction();
+    const members = await prisma.user.findMany({
+      where: { coupleId },
+      select: { id: true }
+    });
+    const status = await getWeeklyBonusStatus(
+      coupleId,
+      user.id,
+      members.map((m) => m.id),
+      couple.timezone
+    );
+    if (status.claimed) return { ok: false, error: "Bonus semanal ya reclamado" };
+    if (!status.lastWeekComplete) {
+      return { ok: false, error: "La semana pasada no quedo completa" };
+    }
+    await prisma.dailyClaim.create({
+      data: { coupleId, userId: user.id, dateKey: status.lastMonday, type: WEEKLY_CLAIM_TYPE }
+    });
+    await addPoints(coupleId, user.id, POINTS.weeklyBonus, dayKeyIn(user.timezone));
+    publish(coupleId, { type: "season", payload: { userId: user.id } });
+    revalidatePath("/home");
+    revalidatePath("/play");
+    return { ok: true, data: { points: POINTS.weeklyBonus } };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Error" };
+  }
+}
+
+// Recalcula logros bajo demanda (lo dispara el cliente al entrar en /play):
+// asi el render del server component queda como lectura pura.
+export async function syncAchievementsAction(): Promise<ActionResult<{ fresh: string[] }>> {
+  try {
+    const { user, couple, coupleId } = await requireCoupleAction();
+    const members = await prisma.user.findMany({
+      where: { coupleId },
+      select: { id: true }
+    });
+    const result = await syncAchievements(
+      coupleId,
+      user.id,
+      members.map((m) => m.id),
+      couple.timezone
+    );
+    return { ok: true, data: { fresh: result.fresh } };
   } catch (error) {
     return { ok: false, error: error instanceof Error ? error.message : "Error" };
   }

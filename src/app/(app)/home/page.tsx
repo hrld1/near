@@ -15,8 +15,9 @@ import { prisma } from "@/lib/db";
 import { requireCouple } from "@/lib/couple";
 import { moodInfo, presenceInfo } from "@/lib/utils";
 import { dayKeyIn } from "@/lib/dates";
+import { effectivePresence } from "@/lib/presence";
 import { agoLabel, dateLong } from "@/lib/format";
-import { getCoupleStreak, getDailyMissions, POINTS } from "@/lib/engagement";
+import { getCoupleStreak, getDailyMissions, getWeeklyBonusStatus, POINTS } from "@/lib/engagement";
 import { eventIcon } from "@/components/product-icons";
 import { Card, CardTitle } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
@@ -48,7 +49,7 @@ export default async function HomePage() {
   const userDay = dayKeyIn(user.timezone);
   const now = new Date();
 
-  const [myMood, partnerMood, nextEvents, latestMoment, notes, lastNudge, promptCount, promptAnswers, streakInfo, missionInfo, dailyBox] =
+  const [myMood, partnerMood, nextEvents, latestMoment, notes, lastNudge, promptCount, promptAnswers, streakInfo, missionInfo, weeklyBonus, dailyBox] =
     await Promise.all([
       // cada mood vive en el dia local de su autor
       prisma.moodEntry.findUnique({
@@ -82,8 +83,19 @@ export default async function HomePage() {
         : null,
       prisma.dailyPrompt.count(),
       prisma.promptAnswer.findMany({ where: { coupleId: couple.id, dateKey: coupleDay } }),
-      getCoupleStreak(couple.id, couple.members.map((m) => m.id), couple.timezone),
-      getDailyMissions(couple.id, user.id, { coupleDay, userDay, userTimezone: user.timezone }),
+      // racha/misiones/bonus degradan sin tumbar la home
+      getCoupleStreak(couple.id, couple.members.map((m) => m.id), couple.timezone).catch(
+        () => ({ streak: 0, todayComplete: false })
+      ),
+      getDailyMissions(couple.id, user.id, { coupleDay, userDay, userTimezone: user.timezone }).catch(
+        () => ({ missions: [], allDone: false, bonusClaimed: false })
+      ),
+      getWeeklyBonusStatus(
+        couple.id,
+        user.id,
+        couple.members.map((m) => m.id),
+        couple.timezone
+      ).catch(() => null),
       prisma.dailyBox.findUnique({
         where: { coupleId_dateKey: { coupleId: couple.id, dateKey: coupleDay } }
       })
@@ -107,7 +119,11 @@ export default async function HomePage() {
     ? promptAnswers.find((a) => a.userId === partner.id) ?? null
     : null;
   const countdownEvent = nextEvents.find((e) => e.showCountdown) ?? nextEvents[0] ?? null;
-  const partnerPresence = partner ? presenceInfo(partner.presence) : null;
+  // presencia con caducidad: un "Libre" antiguo vuelve a "Sin estado"
+  const partnerEffective = partner
+    ? effectivePresence(partner.presence, partner.presenceUpdatedAt)
+    : "NONE";
+  const partnerPresence = partner ? presenceInfo(partnerEffective) : null;
   const boxOpenedBy = dailyBox
     ? couple.members.find((m) => m.id === dailyBox.openedById)?.name ?? null
     : null;
@@ -133,7 +149,7 @@ export default async function HomePage() {
             {greeting()}, {user.name}
           </h1>
         </div>
-        <PresencePicker current={user.presence} />
+        <PresencePicker current={effectivePresence(user.presence, user.presenceUpdatedAt)} />
       </header>
 
       {/* HERO: la otra persona + la proxima fecha */}
@@ -151,7 +167,7 @@ export default async function HomePage() {
                 <div className="flex items-center gap-4">
                   <span className="relative">
                     <Avatar name={partner.name} size="lg" tone={1} className="h-16 w-16 text-xl" />
-                    {partnerPresence && partner.presence !== "NONE" && (
+                    {partnerPresence && partnerEffective !== "NONE" && (
                       <span
                         className={`absolute bottom-0.5 right-0.5 h-3.5 w-3.5 rounded-full border-2 border-paper ${partnerPresence.dot}`}
                       />
@@ -160,7 +176,7 @@ export default async function HomePage() {
                   <div className="min-w-0">
                     <p className="font-display text-2xl leading-tight text-ink">{partner.name}</p>
                     <p className="mt-0.5 flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-sm text-ink-soft">
-                      {partnerPresence && partner.presence !== "NONE" && (
+                      {partnerPresence && partnerEffective !== "NONE" && (
                         <span>{partnerPresence.label}</span>
                       )}
                       <PartnerClock timezone={partner.timezone} name={partner.name} />
@@ -248,6 +264,16 @@ export default async function HomePage() {
               allDone={missionInfo.allDone}
               bonusClaimed={missionInfo.bonusClaimed}
               bonusPoints={POINTS.missionBonus}
+              weekly={
+                weeklyBonus
+                  ? {
+                      claimable: weeklyBonus.claimable,
+                      claimed: weeklyBonus.claimed,
+                      thisWeekDaysComplete: weeklyBonus.thisWeekDaysComplete,
+                      points: POINTS.weeklyBonus
+                    }
+                  : null
+              }
             />
           </div>
         </Card>

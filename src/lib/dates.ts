@@ -29,6 +29,14 @@ export function shiftDayKey(dateKey: DayKey, days: number): DayKey {
   return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10);
 }
 
+// Lunes de la semana ISO a la que pertenece la clave (el propio lunes se devuelve).
+export function mondayOfWeek(dateKey: DayKey): DayKey {
+  const [y, m, d] = dateKey.split("-").map(Number);
+  const dow = new Date(Date.UTC(y, m - 1, d)).getUTCDay(); // 0=domingo..6=sabado
+  const isoDow = dow === 0 ? 7 : dow; // 1=lunes..7=domingo
+  return shiftDayKey(dateKey, -(isoDow - 1));
+}
+
 // Offset de una zona en un instante dado (ms). Positivo al este de UTC.
 function tzOffsetMs(timeZone: string, date: Date): number {
   const parts = new Intl.DateTimeFormat("en-US", {

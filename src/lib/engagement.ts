@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
-import { dayKeyIn, dayRangeUtc, monthKeyIn, shiftDayKey, type DayKey } from "@/lib/dates";
+import { dayKeyIn, dayRangeUtc, mondayOfWeek, monthKeyIn, shiftDayKey, type DayKey } from "@/lib/dates";
+import { compareScores, gameOfDay } from "@/lib/games";
 
 // ---------------------------------------------------------------------------
 // Motor de engagement de Near.
@@ -195,6 +196,84 @@ export async function getDailyMissions(
 
   const allDone = picked.every((m) => m.done);
   return { missions: picked, allDone, bonusClaimed: !!claim };
+}
+
+// ---------------------------------------------------------------------------
+// Duelo y bonus semanal: recompensas con liquidacion perezosa via claim
+// (patron DailyClaim, sin cron y sin escrituras en GET). El servidor siempre
+// re-verifica el resultado antes de pagar.
+// ---------------------------------------------------------------------------
+
+// Resultado del duelo de un dia (de pareja): mejor marca de cada miembro en
+// el reto de ese dia. winnerId null = empate o duelo incompleto.
+export async function getDuelResult(coupleId: string, dateKey: DayKey) {
+  const def = gameOfDay(dateKey);
+  const scores = await prisma.gameScore.findMany({
+    where: { coupleId, gameKey: def.key, dateKey }
+  });
+  const bestByUser = new Map<string, number>();
+  for (const row of scores) {
+    const current = bestByUser.get(row.userId);
+    const better =
+      current === undefined || compareScores(def, row.score, current) < 0;
+    if (better) bestByUser.set(row.userId, row.score);
+  }
+  let winnerId: string | null = null;
+  if (bestByUser.size === 2) {
+    const [[userA, bestA], [userB, bestB]] = [...bestByUser.entries()];
+    const cmp = compareScores(def, bestA, bestB);
+    winnerId = cmp === 0 ? null : cmp < 0 ? userA : userB;
+  }
+  return { def, dateKey, winnerId, bestByUser, complete: bestByUser.size === 2 };
+}
+
+export const DUEL_CLAIM_TYPE = "DUEL_WON";
+export const WEEKLY_CLAIM_TYPE = "WEEKLY_BONUS";
+
+// Bonus semanal: la SEMANA PASADA (ISO, en el calendario de la pareja) con
+// los 7 dias completos —ambos activos cada dia— da +40 a cada miembro.
+// Se puede reclamar durante toda la semana siguiente.
+export async function getWeeklyBonusStatus(
+  coupleId: string,
+  userId: string,
+  memberIds: string[],
+  coupleTimezone: string
+) {
+  const today = dayKeyIn(coupleTimezone);
+  const thisMonday = mondayOfWeek(today);
+  const lastMonday = shiftDayKey(thisMonday, -7);
+  const lastWeekDays = Array.from({ length: 7 }, (_, i) => shiftDayKey(lastMonday, i));
+
+  const [rows, claim] = await Promise.all([
+    prisma.activityDay.findMany({
+      where: { coupleId, dateKey: { gte: lastMonday, lt: shiftDayKey(thisMonday, 7) } },
+      select: { userId: true, dateKey: true }
+    }),
+    prisma.dailyClaim.findUnique({
+      where: { userId_dateKey_type: { userId, dateKey: lastMonday, type: WEEKLY_CLAIM_TYPE } }
+    })
+  ]);
+
+  const byDay = new Map<string, Set<string>>();
+  for (const row of rows) {
+    if (!byDay.has(row.dateKey)) byDay.set(row.dateKey, new Set());
+    byDay.get(row.dateKey)!.add(row.userId);
+  }
+  const complete = (key: string) =>
+    memberIds.length === 2 && memberIds.every((id) => byDay.get(key)?.has(id));
+
+  const lastWeekComplete = lastWeekDays.every(complete);
+  const thisWeekDaysComplete = Array.from({ length: 7 }, (_, i) =>
+    shiftDayKey(thisMonday, i)
+  ).filter((key) => key <= today && complete(key)).length;
+
+  return {
+    lastMonday,
+    lastWeekComplete,
+    claimed: !!claim,
+    claimable: lastWeekComplete && !claim,
+    thisWeekDaysComplete
+  };
 }
 
 // ---------------------------------------------------------------------------
