@@ -1,0 +1,410 @@
+// Near — modelo de datos
+// Decisiones clave:
+// - La unidad central es Couple: todo dato sensible cuelga de coupleId.
+// - Un usuario tiene como maximo una relacion activa (User.coupleId nullable).
+//   Se valida en logica de aplicacion (max 2 miembros por Couple).
+// - Countdown no es entidad propia: se deriva de CalendarEvent.startsAt
+//   (showCountdown), evitando duplicar estado.
+// - Las notas de voz son Message(kind: VOICE) + attachmentUrl, no un modelo aparte.
+// - Presence se persiste en User para que la home la muestre sin infra extra.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Presence {
+  NONE
+  FREE
+  BUSY
+  SLEEPING
+  STUDYING
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  CANCELLED
+}
+
+enum Channel {
+  MAIN
+  DATE_ROOM
+}
+
+enum MessageKind {
+  TEXT
+  IMAGE
+  VOICE
+}
+
+enum MomentKind {
+  PHOTO
+  NOTE
+  MEMORY
+}
+
+enum EventKind {
+  DATE
+  VISIT
+  ANNIVERSARY
+  OTHER
+}
+
+model User {
+  id                String    @id @default(cuid())
+  email             String    @unique
+  name              String
+  passwordHash      String
+  image             String?
+  timezone          String    @default("Europe/Madrid")
+  presence          Presence  @default(NONE)
+  presenceUpdatedAt DateTime?
+  lastChatSeenAt    DateTime?
+  coupleId          String?
+  couple            Couple?   @relation(fields: [coupleId], references: [id])
+  createdAt         DateTime  @default(now())
+
+  accounts      Account[]
+  sessions      Session[]
+  invites       Invite[]
+  messages      Message[]
+  reactions     MessageReaction[]
+  moods         MoodEntry[]
+  promptAnswers PromptAnswer[]
+  nudgesSent    Nudge[]
+  notes         Note[]
+  moments       Moment[]
+  events        CalendarEvent[]
+  quizAnswers   QuizAnswer[]
+  activityDays    ActivityDay[]
+  gameScores      GameScore[]
+  dailyClaims     DailyClaim[]
+  achievements    AchievementUnlock[]
+  momentComments  MomentComment[]
+  momentFavorites MomentFavorite[]
+}
+
+model Couple {
+  id          String    @id @default(cuid())
+  anniversary DateTime?
+  createdAt   DateTime  @default(now())
+
+  members       User[]
+  messages      Message[]
+  moods         MoodEntry[]
+  promptAnswers PromptAnswer[]
+  nudges        Nudge[]
+  notes         Note[]
+  moments       Moment[]
+  events        CalendarEvent[]
+  dateRoom      DateRoomState?
+  quizAnswers   QuizAnswer[]
+  activityDays ActivityDay[]
+  gameScores   GameScore[]
+  dailyBoxes   DailyBox[]
+  dailyClaims  DailyClaim[]
+}
+
+model Invite {
+  id        String       @id @default(cuid())
+  code      String       @unique
+  inviterId String
+  inviter   User         @relation(fields: [inviterId], references: [id], onDelete: Cascade)
+  status    InviteStatus @default(PENDING)
+  createdAt DateTime     @default(now())
+  expiresAt DateTime
+}
+
+model Message {
+  id              String            @id @default(cuid())
+  coupleId        String
+  couple          Couple            @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  senderId        String
+  sender          User              @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  channel         Channel           @default(MAIN)
+  kind            MessageKind       @default(TEXT)
+  body            String?
+  attachmentUrl   String?
+  durationSeconds Int?
+  createdAt       DateTime          @default(now())
+  reactions       MessageReaction[]
+
+  @@index([coupleId, channel, createdAt])
+}
+
+model MessageReaction {
+  id        String  @id @default(cuid())
+  messageId String
+  message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emoji     String
+
+  @@unique([messageId, userId, emoji])
+}
+
+model MoodEntry {
+  id        String   @id @default(cuid())
+  coupleId  String
+  couple    Couple   @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mood      String
+  note      String?
+  dateKey   String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, dateKey])
+  @@index([coupleId, dateKey])
+}
+
+model DailyPrompt {
+  id      Int            @id @default(autoincrement())
+  text    String
+  answers PromptAnswer[]
+}
+
+model PromptAnswer {
+  id        String      @id @default(cuid())
+  promptId  Int
+  prompt    DailyPrompt @relation(fields: [promptId], references: [id], onDelete: Cascade)
+  coupleId  String
+  couple    Couple      @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dateKey   String
+  answer    String
+  createdAt DateTime    @default(now())
+
+  @@unique([userId, dateKey])
+}
+
+model Nudge {
+  id        String    @id @default(cuid())
+  coupleId  String
+  couple    Couple    @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  fromId    String
+  from      User      @relation(fields: [fromId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  seenAt    DateTime?
+
+  @@index([coupleId, createdAt])
+}
+
+model Note {
+  id        String   @id @default(cuid())
+  coupleId  String
+  couple    Couple   @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  body      String
+  updatedAt DateTime @updatedAt
+
+  @@unique([coupleId, authorId])
+}
+
+model Moment {
+  id         String     @id @default(cuid())
+  coupleId   String
+  couple     Couple     @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  authorId   String
+  author     User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  kind       MomentKind
+  title      String?
+  body       String?
+  imageUrl   String?
+  featured   Boolean    @default(false)
+  tags       String[]   @default([])
+  happenedAt DateTime   @default(now())
+  createdAt  DateTime   @default(now())
+  comments   MomentComment[]
+  favorites  MomentFavorite[]
+
+  @@index([coupleId, happenedAt])
+}
+
+model CalendarEvent {
+  id            String    @id @default(cuid())
+  coupleId      String
+  couple        Couple    @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  createdById   String
+  createdBy     User      @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  title         String
+  description   String?
+  kind          EventKind @default(DATE)
+  startsAt      DateTime
+  endsAt        DateTime?
+  showCountdown Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+
+  @@index([coupleId, startsAt])
+}
+
+model DateRoomState {
+  id          String   @id @default(cuid())
+  coupleId    String   @unique
+  couple      Couple   @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  mode        String   @default("YOUTUBE")
+  platform    String?
+  sessionTitle String?
+  videoId     String?
+  videoTitle  String?
+  playing     Boolean  @default(false)
+  positionSec Float    @default(0)
+  updatedById String?
+  updatedAt   DateTime @updatedAt
+}
+
+model QuizQuestion {
+  id      Int          @id @default(autoincrement())
+  text    String
+  options String[]
+  answers QuizAnswer[]
+}
+
+model QuizAnswer {
+  id         String       @id @default(cuid())
+  questionId Int
+  question   QuizQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  coupleId   String
+  couple     Couple       @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  selfIndex  Int
+  guessIndex Int
+  createdAt  DateTime     @default(now())
+
+  @@unique([questionId, userId])
+}
+
+// ---- Engagement ----
+// ActivityDay es el libro mayor de puntos: cada accion relevante suma puntos
+// al dia del usuario. Racha, misiones y temporada se derivan de datos reales
+// (no hay contadores duplicados que puedan desincronizarse).
+
+model ActivityDay {
+  id       String @id @default(cuid())
+  coupleId String
+  couple   Couple @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dateKey  String
+  points   Int    @default(0)
+
+  @@unique([userId, dateKey])
+  @@index([coupleId, dateKey])
+}
+
+model GameScore {
+  id        String   @id @default(cuid())
+  coupleId  String
+  couple    Couple   @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gameKey   String
+  dateKey   String
+  score     Float
+  createdAt DateTime @default(now())
+
+  @@index([coupleId, gameKey, dateKey])
+  @@index([coupleId, dateKey])
+}
+
+model DailyBox {
+  id         String   @id @default(cuid())
+  coupleId   String
+  couple     Couple   @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  dateKey    String
+  openedById String
+  kind       String
+  content    String
+  createdAt  DateTime @default(now())
+
+  @@unique([coupleId, dateKey])
+}
+
+model DailyClaim {
+  id       String @id @default(cuid())
+  coupleId String
+  couple   Couple @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dateKey  String
+  type     String
+
+  @@unique([userId, dateKey, type])
+}
+
+model AchievementUnlock {
+  id         String   @id @default(cuid())
+  coupleId   String
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  key        String
+  unlockedAt DateTime @default(now())
+
+  @@unique([userId, key])
+}
+
+// ---- Album ----
+
+model MomentComment {
+  id        String   @id @default(cuid())
+  momentId  String
+  moment    Moment   @relation(fields: [momentId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  body      String
+  createdAt DateTime @default(now())
+
+  @@index([momentId, createdAt])
+}
+
+model MomentFavorite {
+  id       String @id @default(cuid())
+  momentId String
+  moment   Moment @relation(fields: [momentId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([momentId, userId])
+}
+
+// ---- Modelos estandar de Auth.js (Prisma Adapter) ----
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @id
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}

@@ -1,0 +1,118 @@
+// Registro de minijuegos de la arcade. Cada juego es un componente cliente
+// que reporta un score numerico; aqui vive todo lo declarativo (reglas,
+// direccion del score, formato) para que anadir un juego nuevo sea trivial.
+
+export type GameDef = {
+  key: string;
+  name: string;
+  tagline: string;
+  rules: string;
+  lowerIsBetter: boolean;
+  unit: string;
+  maxAttemptsPerDay: number;
+  format: (score: number) => string;
+};
+
+export const GAMES: GameDef[] = [
+  {
+    key: "reaction",
+    name: "Reflejos",
+    tagline: "Toca cuando se encienda. Ni antes ni tarde.",
+    rules: "5 rondas. Espera al color y toca lo mas rapido posible. Si te adelantas, ronda penalizada. Cuenta la media en milisegundos.",
+    lowerIsBetter: true,
+    unit: "ms",
+    maxAttemptsPerDay: 5,
+    format: (s) => `${Math.round(s)} ms`
+  },
+  {
+    key: "memory",
+    name: "Parejas",
+    tagline: "Encuentra los 8 pares antes de que el reloj te coma.",
+    rules: "16 cartas, 8 parejas. Tu puntuacion es el tiempo en segundos mas medio punto por cada giro. Menos es mejor.",
+    lowerIsBetter: true,
+    unit: "s",
+    maxAttemptsPerDay: 5,
+    format: (s) => `${s.toFixed(1)} s`
+  },
+  {
+    key: "targets",
+    name: "Dianas",
+    tagline: "30 segundos. Todas las dianas que puedas.",
+    rules: "Aparecen dianas que encogen. Cada acierto suma 1; las dianas pequenas valen 2. Tienes 30 segundos.",
+    lowerIsBetter: false,
+    unit: "pts",
+    maxAttemptsPerDay: 5,
+    format: (s) => `${Math.round(s)} pts`
+  },
+  {
+    key: "echo",
+    name: "Eco",
+    tagline: "Repite la secuencia. Cada ronda, un paso mas.",
+    rules: "Observa la secuencia de colores y repitela. Cada ronda anade un paso. Tu puntuacion es la ronda mas larga completada.",
+    lowerIsBetter: false,
+    unit: "rondas",
+    maxAttemptsPerDay: 5,
+    format: (s) => `${Math.round(s)} rondas`
+  },
+  {
+    key: "anagram",
+    name: "Palabra oculta",
+    tagline: "Desordena tu cabeza, ordena las letras.",
+    rules: "3 palabras desordenadas, 45 segundos cada una. Puntuas los segundos que te sobren, acumulados. Pasar resta 10.",
+    lowerIsBetter: false,
+    unit: "pts",
+    maxAttemptsPerDay: 5,
+    format: (s) => `${Math.round(s)} pts`
+  }
+];
+
+export function gameByKey(key: string) {
+  return GAMES.find((g) => g.key === key) ?? null;
+}
+
+// Reto del dia: rota de forma determinista.
+export function gameOfDay(dateKey: string): GameDef {
+  const [y, m, d] = dateKey.split("-").map(Number);
+  const dayNumber = Math.floor(Date.UTC(y, m - 1, d) / 86_400_000);
+  return GAMES[dayNumber % GAMES.length];
+}
+
+export function compareScores(def: GameDef, a: number, b: number) {
+  if (a === b) return 0;
+  const better = def.lowerIsBetter ? a < b : a > b;
+  return better ? -1 : 1;
+}
+
+// Palabras para "Palabra oculta" (es-ES, 5-7 letras, sin tildes para simplificar input)
+export const WORDS = [
+  "abrazo", "besos", "carino", "cartas", "cielo", "citas", "corazon", "cuerpo",
+  "destino", "dulce", "espera", "estrella", "fuego", "futuro", "regalo", "hogar",
+  "ilusion", "lejos", "luna", "maleta", "manos", "mapa", "memoria", "mimos",
+  "nube", "pareja", "peli", "planes", "playa", "promesa", "puente", "risas",
+  "secreto", "sueno", "tren", "viaje", "vuelo", "juntos", "siempre", "camino",
+  "aviones", "andenes", "susurro", "acento", "guino", "fotos", "musica", "baile"
+];
+
+export function wordsOfDay(dateKey: string, count = 3): string[] {
+  const [y, m, d] = dateKey.split("-").map(Number);
+  let seed = Math.floor(Date.UTC(y, m - 1, d) / 86_400_000);
+  const picked: string[] = [];
+  const pool = [...WORDS];
+  for (let i = 0; i < count && pool.length > 0; i++) {
+    seed = (seed * 9301 + 49297) % 233280;
+    picked.push(pool.splice(seed % pool.length, 1)[0]);
+  }
+  return picked;
+}
+
+export function scrambleWord(word: string, salt: number): string {
+  const letters = word.split("");
+  let seed = salt + word.length * 7;
+  for (let i = letters.length - 1; i > 0; i--) {
+    seed = (seed * 9301 + 49297) % 233280;
+    const j = seed % (i + 1);
+    [letters[i], letters[j]] = [letters[j], letters[i]];
+  }
+  const result = letters.join("");
+  return result === word ? letters.reverse().join("") : result;
+}

@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --c-cream: 250 246 240;
+  --c-paper: 255 255 255;
+  --c-sand: 240 232 221;
+  --c-sand-deep: 227 215 200;
+  --c-ink: 55 49 43;
+  --c-ink-soft: 122 111 99;
+  --c-rose: 196 117 107;
+  --c-rose-deep: 168 93 84;
+  --c-rose-soft: 243 226 223;
+  --c-rose-faint: 250 240 238;
+  --c-plum: 110 90 114;
+  --c-shadow: 55 49 43;
+}
+
+.dark {
+  --c-cream: 22 20 26;
+  --c-paper: 33 30 39;
+  --c-sand: 44 40 51;
+  --c-sand-deep: 60 54 68;
+  --c-ink: 237 231 224;
+  --c-ink-soft: 168 157 175;
+  --c-rose: 217 138 128;
+  --c-rose-deep: 228 164 156;
+  --c-rose-soft: 74 50 47;
+  --c-rose-faint: 50 36 40;
+  --c-plum: 179 157 184;
+  --c-shadow: 0 0 0;
+}
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+  body {
+    @apply bg-cream text-ink antialiased;
+  }
+  ::selection {
+    @apply bg-rose-soft text-rose-deep;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgb(var(--c-sand-deep));
+    border-radius: 9999px;
+  }
+}
