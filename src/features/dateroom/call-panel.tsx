@@ -104,14 +104,8 @@ export function CallPanel({ me, partnerName }: { me: MemberInfo; partnerName: st
 
   useCoupleStream((event) => {
     if (event.type !== "call:signal") return;
-    const signal = event.payload as {
-      fromId: string;
-      fromName: string;
-      kind: string;
-      data: string | null;
-    };
-    if (signal.fromId === me.id) return;
-    void handleSignal(signal);
+    if (event.payload.fromId === me.id) return;
+    void handleSignal(event.payload);
   });
 
   async function handleSignal(signal: { kind: string; data: string | null }) {

@@ -3,7 +3,7 @@
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Heart, X } from "lucide-react";
-import { answerQuizAction } from "@/actions/game";
+import { answerQuizAction } from "@/actions/quiz";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";

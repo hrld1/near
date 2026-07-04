@@ -87,10 +87,16 @@ export function gameOfDay(dateKey: string): GameDef {
   return GAMES[dayNumber % GAMES.length];
 }
 
-export function compareScores(def: GameDef, a: number, b: number) {
+export function compareScores(def: Pick<GameDef, "lowerIsBetter">, a: number, b: number) {
   if (a === b) return 0;
   const better = def.lowerIsBetter ? a < b : a > b;
   return better ? -1 : 1;
+}
+
+// Mejor marca segun la direccion del juego; null sin scores.
+export function bestOf(def: Pick<GameDef, "lowerIsBetter">, scores: number[]): number | null {
+  if (scores.length === 0) return null;
+  return def.lowerIsBetter ? Math.min(...scores) : Math.max(...scores);
 }
 
 // Palabras para "Palabra oculta" (es-ES, 5-7 letras, sin tildes para simplificar input)

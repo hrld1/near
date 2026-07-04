@@ -45,7 +45,7 @@ export function CompanionRoom({
 
   useCoupleStream((event) => {
     if (event.type === "room:mode") {
-      const payload = event.payload as { mode: string; platform?: string; sessionTitle?: string | null; byId: string };
+      const payload = event.payload;
       if (payload.byId === myId) return;
       if (payload.mode === "COMPANION") {
         setPlatform(payload.platform ?? "NETFLIX");
@@ -56,7 +56,7 @@ export function CompanionRoom({
       }
     }
     if (event.type === "companion:signal") {
-      const payload = event.payload as { kind: string; byId: string; byName: string; at: number };
+      const payload = event.payload;
       const own = payload.byId === myId;
       if (payload.kind === "ready" && !own) {
         setPartnerReady(true);

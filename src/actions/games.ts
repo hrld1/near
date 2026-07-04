@@ -3,100 +3,86 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
-import { requireCoupleAction } from "@/lib/couple";
 import { publish } from "@/lib/realtime";
 import { dayKeyIn, shiftDayKey } from "@/lib/dates";
-import { gameByKey, compareScores } from "@/lib/games";
+import { bestOf, compareScores, gameByKey } from "@/lib/games";
 import {
   addPoints,
   DUEL_CLAIM_TYPE,
+  getDailyMissions,
   getDuelResult,
   getWeeklyBonusStatus,
   POINTS,
   syncAchievements,
   WEEKLY_CLAIM_TYPE
 } from "@/lib/engagement";
-import type { ActionResult } from "@/types";
+import { coupleAction } from "@/lib/safe-action";
 
 const scoreSchema = z.object({
   gameKey: z.string().min(1),
   score: z.number().finite()
 });
 
-export async function submitScoreAction(input: {
-  gameKey: string;
-  score: number;
-}): Promise<ActionResult<{ best: number; attemptsLeft: number; beatPartner: boolean | null }>> {
-  try {
-    const { user, couple, coupleId } = await requireCoupleAction();
-    const parsed = scoreSchema.safeParse(input);
-    if (!parsed.success) return { ok: false, error: "Puntuacion no valida" };
-    const def = gameByKey(parsed.data.gameKey);
-    if (!def) return { ok: false, error: "Juego desconocido" };
-    if (parsed.data.score < def.scoreBounds.min || parsed.data.score > def.scoreBounds.max) {
-      return { ok: false, error: "Puntuacion no valida" };
-    }
-
-    // dia de la PAREJA: el duelo compara los scores de ambos bajo la misma clave
-    const dateKey = dayKeyIn(couple.timezone);
-    const previous = await prisma.gameScore.findMany({
-      where: { userId: user.id, gameKey: def.key, dateKey }
-    });
-    if (previous.length >= def.maxAttemptsPerDay) {
-      return { ok: false, error: `Sin intentos hoy (max ${def.maxAttemptsPerDay})` };
-    }
-
-    await prisma.gameScore.create({
-      data: {
-        coupleId,
-        userId: user.id,
-        gameKey: def.key,
-        dateKey,
-        score: parsed.data.score
-      }
-    });
-
-    // puntos de temporada: participar (1a vez del dia en este juego) + mejorar
-    if (previous.length === 0) {
-      await addPoints(coupleId, user.id, POINTS.gamePlayed, dayKeyIn(user.timezone));
-    }
-
-    const myScores = [...previous.map((p) => p.score), parsed.data.score];
-    const best = def.lowerIsBetter ? Math.min(...myScores) : Math.max(...myScores);
-
-    // comparar con la pareja (mejor marca de hoy)
-    const partnerBestRow = await prisma.gameScore.findMany({
-      where: { coupleId, gameKey: def.key, dateKey, userId: { not: user.id } }
-    });
-    let beatPartner: boolean | null = null;
-    if (partnerBestRow.length > 0) {
-      const partnerScores = partnerBestRow.map((p) => p.score);
-      const partnerBest = def.lowerIsBetter
-        ? Math.min(...partnerScores)
-        : Math.max(...partnerScores);
-      beatPartner = compareScores(def, best, partnerBest) < 0;
-    }
-
-    publish(coupleId, {
-      type: "game:score",
-      payload: { userId: user.id, gameKey: def.key, score: parsed.data.score }
-    });
-    revalidatePath("/play");
-    return {
-      ok: true,
-      data: { best, attemptsLeft: def.maxAttemptsPerDay - previous.length - 1, beatPartner }
-    };
-  } catch (error) {
-    return { ok: false, error: error instanceof Error ? error.message : "Error" };
+export const submitScoreAction = coupleAction<
+  [input: { gameKey: string; score: number }],
+  { best: number; attemptsLeft: number; beatPartner: boolean | null }
+>(async ({ user, couple, coupleId }, input) => {
+  const parsed = scoreSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "Puntuacion no valida" };
+  const def = gameByKey(parsed.data.gameKey);
+  if (!def) return { ok: false, error: "Juego desconocido" };
+  if (parsed.data.score < def.scoreBounds.min || parsed.data.score > def.scoreBounds.max) {
+    return { ok: false, error: "Puntuacion no valida" };
   }
-}
 
-export async function claimMissionBonusAction(): Promise<ActionResult<{ points: number }>> {
-  try {
-    const { user, couple, coupleId } = await requireCoupleAction();
+  // dia de la PAREJA: el duelo compara los scores de ambos bajo la misma clave
+  const dateKey = dayKeyIn(couple.timezone);
+  const previous = await prisma.gameScore.findMany({
+    where: { userId: user.id, gameKey: def.key, dateKey }
+  });
+  if (previous.length >= def.maxAttemptsPerDay) {
+    return { ok: false, error: `Sin intentos hoy (max ${def.maxAttemptsPerDay})` };
+  }
+
+  await prisma.gameScore.create({
+    data: {
+      coupleId,
+      userId: user.id,
+      gameKey: def.key,
+      dateKey,
+      score: parsed.data.score
+    }
+  });
+
+  // puntos de temporada: participar (1a vez del dia en este juego) + mejorar
+  if (previous.length === 0) {
+    await addPoints(coupleId, user.id, POINTS.gamePlayed, dayKeyIn(user.timezone));
+  }
+
+  const best = bestOf(def, [...previous.map((p) => p.score), parsed.data.score])!;
+
+  // comparar con la pareja (mejor marca de hoy)
+  const partnerRows = await prisma.gameScore.findMany({
+    where: { coupleId, gameKey: def.key, dateKey, userId: { not: user.id } }
+  });
+  const partnerBest = bestOf(def, partnerRows.map((p) => p.score));
+  const beatPartner = partnerBest === null ? null : compareScores(def, best, partnerBest) < 0;
+
+  publish(coupleId, {
+    type: "game:score",
+    payload: { userId: user.id, gameKey: def.key, score: parsed.data.score }
+  });
+  revalidatePath("/play");
+  return {
+    ok: true,
+    data: { best, attemptsLeft: def.maxAttemptsPerDay - previous.length - 1, beatPartner }
+  };
+});
+
+export const claimMissionBonusAction = coupleAction<[], { points: number }>(
+  async ({ user, couple, coupleId }) => {
     const coupleDay = dayKeyIn(couple.timezone);
     const userDay = dayKeyIn(user.timezone);
-    const { getDailyMissions } = await import("@/lib/engagement");
     const { allDone, bonusClaimed } = await getDailyMissions(coupleId, user.id, {
       coupleDay,
       userDay,
@@ -113,16 +99,13 @@ export async function claimMissionBonusAction(): Promise<ActionResult<{ points: 
     revalidatePath("/home");
     revalidatePath("/play");
     return { ok: true, data: { points: POINTS.missionBonus } };
-  } catch (error) {
-    return { ok: false, error: error instanceof Error ? error.message : "Error" };
   }
-}
+);
 
 // Reclama la victoria del duelo de AYER (dia de pareja). El servidor
 // re-verifica el resultado; el unique de DailyClaim impide el doble cobro.
-export async function claimDuelWinAction(): Promise<ActionResult<{ points: number }>> {
-  try {
-    const { user, couple, coupleId } = await requireCoupleAction();
+export const claimDuelWinAction = coupleAction<[], { points: number }>(
+  async ({ user, couple, coupleId }) => {
     const duelDay = shiftDayKey(dayKeyIn(couple.timezone), -1);
     const duel = await getDuelResult(coupleId, duelDay);
     if (duel.winnerId !== user.id) {
@@ -139,15 +122,12 @@ export async function claimDuelWinAction(): Promise<ActionResult<{ points: numbe
     publish(coupleId, { type: "season", payload: { userId: user.id } });
     revalidatePath("/play");
     return { ok: true, data: { points: POINTS.duelWon } };
-  } catch (error) {
-    return { ok: false, error: error instanceof Error ? error.message : "Error" };
   }
-}
+);
 
 // Reclama el bonus de la semana pasada completa (7/7 dias de pareja).
-export async function claimWeeklyBonusAction(): Promise<ActionResult<{ points: number }>> {
-  try {
-    const { user, couple, coupleId } = await requireCoupleAction();
+export const claimWeeklyBonusAction = coupleAction<[], { points: number }>(
+  async ({ user, couple, coupleId }) => {
     const members = await prisma.user.findMany({
       where: { coupleId },
       select: { id: true }
@@ -170,16 +150,13 @@ export async function claimWeeklyBonusAction(): Promise<ActionResult<{ points: n
     revalidatePath("/home");
     revalidatePath("/play");
     return { ok: true, data: { points: POINTS.weeklyBonus } };
-  } catch (error) {
-    return { ok: false, error: error instanceof Error ? error.message : "Error" };
   }
-}
+);
 
 // Recalcula logros bajo demanda (lo dispara el cliente al entrar en /play):
 // asi el render del server component queda como lectura pura.
-export async function syncAchievementsAction(): Promise<ActionResult<{ fresh: string[] }>> {
-  try {
-    const { user, couple, coupleId } = await requireCoupleAction();
+export const syncAchievementsAction = coupleAction<[], { fresh: string[] }>(
+  async ({ user, couple, coupleId }) => {
     const members = await prisma.user.findMany({
       where: { coupleId },
       select: { id: true }
@@ -191,7 +168,5 @@ export async function syncAchievementsAction(): Promise<ActionResult<{ fresh: st
       couple.timezone
     );
     return { ok: true, data: { fresh: result.fresh } };
-  } catch (error) {
-    return { ok: false, error: error instanceof Error ? error.message : "Error" };
   }
-}
+);

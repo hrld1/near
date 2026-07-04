@@ -11,7 +11,7 @@ import {
 import { prisma } from "@/lib/db";
 import { requireCouple } from "@/lib/couple";
 import { dayKeyIn, shiftDayKey } from "@/lib/dates";
-import { GAMES, gameOfDay, compareScores } from "@/lib/games";
+import { GAMES, bestOf, compareScores, gameOfDay } from "@/lib/games";
 import {
   ACHIEVEMENTS,
   DUEL_CLAIM_TYPE,
@@ -30,11 +30,6 @@ import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Arcade" };
 export const dynamic = "force-dynamic";
-
-function bestOf(scores: number[], lowerIsBetter: boolean): number | null {
-  if (scores.length === 0) return null;
-  return lowerIsBetter ? Math.min(...scores) : Math.max(...scores);
-}
 
 export default async function PlayPage() {
   const { user, couple, partner } = await requireCouple();
@@ -74,8 +69,8 @@ export default async function PlayPage() {
       : [];
     return {
       def,
-      myBest: bestOf(mine.map((s) => s.score), def.lowerIsBetter),
-      partnerBest: bestOf(theirs.map((s) => s.score), def.lowerIsBetter),
+      myBest: bestOf(def, mine.map((s) => s.score)),
+      partnerBest: bestOf(def, theirs.map((s) => s.score)),
       myAttempts: mine.length
     };
   });
@@ -93,13 +88,13 @@ export default async function PlayPage() {
     const def = gameOfDay(key);
     const Visual = gameVisual(def.key);
     const mine = bestOf(
-      weekScores.filter((s) => s.dateKey === key && s.gameKey === def.key && s.userId === user.id).map((s) => s.score),
-      def.lowerIsBetter
+      def,
+      weekScores.filter((s) => s.dateKey === key && s.gameKey === def.key && s.userId === user.id).map((s) => s.score)
     );
     const theirs = partner
       ? bestOf(
-          weekScores.filter((s) => s.dateKey === key && s.gameKey === def.key && s.userId === partner.id).map((s) => s.score),
-          def.lowerIsBetter
+          def,
+          weekScores.filter((s) => s.dateKey === key && s.gameKey === def.key && s.userId === partner.id).map((s) => s.score)
         )
       : null;
     let result: "me" | "partner" | "tie" | "none" = "none";

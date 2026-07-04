@@ -1,6 +1,15 @@
 import { prisma } from "@/lib/db";
 import { dayKeyIn, dayRangeUtc, mondayOfWeek, monthKeyIn, shiftDayKey, type DayKey } from "@/lib/dates";
 import { compareScores, gameOfDay } from "@/lib/games";
+import {
+  computeStreak,
+  hashString,
+  pickDailyMissions,
+  seasonLevel,
+  type Mission
+} from "@/lib/engagement-core";
+
+export { SEASON_LEVELS, seasonLevel, type Mission } from "@/lib/engagement-core";
 
 // ---------------------------------------------------------------------------
 // Motor de engagement de Near.
@@ -40,10 +49,9 @@ export async function touchActivity(coupleId: string, userId: string, dateKey: D
 }
 
 // Racha de PAREJA: dias consecutivos en los que AMBOS estuvieron activos.
-// El dia de hoy cuenta si ambos ya entraron; si no, la racha sigue viva
-// mientras ayer fuera completo. Se recorre el calendario de la pareja
-// (couple.timezone); cada miembro marca actividad en su propio dia local,
-// asi que "dia completo" = ambos activos en su dia X.
+// Se recorre el calendario de la pareja (couple.timezone); cada miembro
+// marca actividad en su propio dia local, asi que "dia completo" = ambos
+// activos en su dia X. El calculo puro vive en engagement-core.
 export async function getCoupleStreak(coupleId: string, memberIds: string[], coupleTimezone: string) {
   const today = dayKeyIn(coupleTimezone);
   const since = shiftDayKey(today, -120);
@@ -56,47 +64,12 @@ export async function getCoupleStreak(coupleId: string, memberIds: string[], cou
     if (!byDay.has(row.dateKey)) byDay.set(row.dateKey, new Set());
     byDay.get(row.dateKey)!.add(row.userId);
   }
-  const complete = (key: string) =>
-    memberIds.length === 2 && memberIds.every((id) => byDay.get(key)?.has(id));
-
-  let streak = 0;
-  let cursor = complete(today) ? 0 : 1; // si hoy aun no esta completo, empezamos en ayer
-  while (cursor <= 120) {
-    if (complete(shiftDayKey(today, -cursor))) {
-      streak++;
-      cursor++;
-    } else {
-      break;
-    }
-  }
-  const todayComplete = complete(today);
-  return { streak, todayComplete };
+  return computeStreak(byDay, memberIds, today);
 }
 
 // ---------------------------------------------------------------------------
 // Temporada: mes natural en la zona de la pareja. Puntos por miembro y total.
 // ---------------------------------------------------------------------------
-
-export const SEASON_LEVELS: { min: number; name: string }[] = [
-  { min: 0, name: "Chispa" },
-  { min: 120, name: "Llama" },
-  { min: 320, name: "Hoguera" },
-  { min: 640, name: "Constelacion" },
-  { min: 1100, name: "Supernova" }
-];
-
-export function seasonLevel(points: number) {
-  let level = SEASON_LEVELS[0];
-  let index = 0;
-  SEASON_LEVELS.forEach((l, i) => {
-    if (points >= l.min) {
-      level = l;
-      index = i;
-    }
-  });
-  const next = SEASON_LEVELS[index + 1] ?? null;
-  return { ...level, index, next };
-}
 
 export async function getSeason(coupleId: string, coupleTimezone: string) {
   const prefix = monthKeyIn(coupleTimezone);
@@ -119,23 +92,6 @@ export async function getSeason(coupleId: string, coupleTimezone: string) {
 // Misiones: se calculan sobre datos reales del dia. 3 diarias rotativas
 // (deterministas por fecha+pareja) + bonus reclamable al completarlas.
 // ---------------------------------------------------------------------------
-
-export type Mission = {
-  id: string;
-  label: string;
-  points: number;
-  done: boolean;
-  href: string;
-};
-
-function hashString(input: string) {
-  let h = 2166136261;
-  for (let i = 0; i < input.length; i++) {
-    h ^= input.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return Math.abs(h);
-}
 
 // Las misiones rotan con el dia de la PAREJA (coupleDay: misma lista para
 // ambos). Cada item se comprueba contra la clave de su dato subyacente:
@@ -178,21 +134,7 @@ export async function getDailyMissions(
   ];
 
   // 3 misiones deterministas por dia y pareja (el reto diario siempre entra)
-  const seed = hashString(`${coupleDay}:${coupleId}`);
-  const rest = pool.filter((m) => m.id !== "duel");
-  const picked = [pool.find((m) => m.id === "duel")!];
-  for (let i = 0; picked.length < 3 && i < rest.length; i++) {
-    picked.push(rest[(seed + i * 3) % rest.length]);
-    // evita duplicados
-    const unique = [...new Map(picked.map((m) => [m.id, m])).values()];
-    picked.length = 0;
-    picked.push(...unique);
-  }
-  let cursor = 0;
-  while (picked.length < 3 && cursor < rest.length) {
-    if (!picked.some((m) => m.id === rest[cursor].id)) picked.push(rest[cursor]);
-    cursor++;
-  }
+  const picked = pickDailyMissions(hashString(`${coupleDay}:${coupleId}`), pool);
 
   const allDone = picked.every((m) => m.done);
   return { missions: picked, allDone, bonusClaimed: !!claim };

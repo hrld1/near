@@ -127,11 +127,10 @@ export function DateRoom({
 
   useCoupleStream((event) => {
     if (event.type === "room:mode") {
-      const payload = event.payload as { mode: "YOUTUBE" | "COMPANION" };
-      setMode(payload.mode);
+      setMode(event.payload.mode);
     }
     if (event.type !== "dateroom:update") return;
-    const state = event.payload as RemoteState;
+    const state = event.payload;
     if (state.byId === me.id) return;
 
     setSyncFlash(state.playing ? "play" : "pausa");

@@ -1,9 +1,9 @@
 "use server";
 
 import { z } from "zod";
-import { requireCoupleAction } from "@/lib/couple";
 import { publish } from "@/lib/realtime";
-import type { ActionResult } from "@/types";
+import { coupleAction } from "@/lib/safe-action";
+import type { CallSignalKind } from "@/types";
 
 // Senalizacion WebRTC sobre el bus SSE existente: sin infraestructura extra.
 // Los payloads (SDP/ICE) son opacos para el servidor; solo se retransmiten
@@ -14,12 +14,8 @@ const signalSchema = z.object({
   data: z.string().max(50_000).optional()
 });
 
-export async function callSignalAction(input: {
-  kind: "ring" | "accept" | "decline" | "offer" | "answer" | "ice" | "hangup";
-  data?: string;
-}): Promise<ActionResult> {
-  try {
-    const { user, coupleId } = await requireCoupleAction();
+export const callSignalAction = coupleAction<[input: { kind: CallSignalKind; data?: string }]>(
+  async ({ user, coupleId }, input) => {
     const parsed = signalSchema.safeParse(input);
     if (!parsed.success) return { ok: false, error: "Senal no valida" };
     publish(coupleId, {
@@ -32,7 +28,5 @@ export async function callSignalAction(input: {
       }
     });
     return { ok: true };
-  } catch (error) {
-    return { ok: false, error: error instanceof Error ? error.message : "Error" };
   }
-}
+);

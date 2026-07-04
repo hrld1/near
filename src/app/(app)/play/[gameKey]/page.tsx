@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { requireCouple } from "@/lib/couple";
 import { dayKeyIn } from "@/lib/dates";
-import { gameByKey, gameOfDay, wordsOfDay, scrambleWord } from "@/lib/games";
+import { bestOf, gameByKey, gameOfDay, wordsOfDay, scrambleWord } from "@/lib/games";
 import { GameHost } from "@/features/play/game-host";
 
 export const dynamic = "force-dynamic";
@@ -27,8 +27,6 @@ export default async function GamePage({ params }: { params: { gameKey: string }
   const theirs = partner
     ? scores.filter((s) => s.userId === partner.id).map((s) => s.score)
     : [];
-  const best = (list: number[]) =>
-    list.length === 0 ? null : def.lowerIsBetter ? Math.min(...list) : Math.max(...list);
 
   const anagramWords =
     def.key === "anagram"
@@ -47,8 +45,8 @@ export default async function GamePage({ params }: { params: { gameKey: string }
         unit={def.unit}
         lowerIsBetter={def.lowerIsBetter}
         attemptsLeft={Math.max(0, def.maxAttemptsPerDay - mine.length)}
-        myBest={best(mine)}
-        partnerBest={best(theirs)}
+        myBest={bestOf(def, mine)}
+        partnerBest={bestOf(def, theirs)}
         partnerName={partner?.name ?? "tu pareja"}
         formatHint={def.unit === "s" ? "s" : def.unit === "ms" ? "ms" : "int"}
         isDaily={gameOfDay(dateKey).key === def.key}

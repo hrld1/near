@@ -9,9 +9,8 @@ export function NudgeToast({ myId }: { myId: string }) {
 
   useCoupleStream((event) => {
     if (event.type !== "nudge") return;
-    const payload = event.payload as { fromId: string; fromName: string };
-    if (payload.fromId === myId) return;
-    setMessage(`${payload.fromName} esta pensando en ti`);
+    if (event.payload.fromId === myId) return;
+    setMessage(`${event.payload.fromName} esta pensando en ti`);
   });
 
   useEffect(() => {
