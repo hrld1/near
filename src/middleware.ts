@@ -20,5 +20,9 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|ico)).*)"]
+  // Excluye estaticos y los recursos de la PWA (sw.js y manifest deben ser
+  // publicos: sin ello, el navegador recibiria un redirect a /login).
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|sw\\.js|manifest\\.webmanifest|icons/|.*\\.(?:svg|png|jpg|ico)).*)"
+  ]
 };

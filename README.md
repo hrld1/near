@@ -37,6 +37,7 @@ npm run dev                   # 5. http://localhost:3000
 | `AUTH_SECRET` | si | Firma de sesiones |
 | `AUTH_TRUST_HOST` | dev | `true` en desarrollo |
 | `NEXT_PUBLIC_TURN_URL` / `_USERNAME` / `_CREDENTIAL` | no | TURN para videollamada tras NAT estricto (CGNAT, wifi de universidad). Sin ello, STUN publico funciona en la mayoria de redes domesticas |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT` | no | Notificaciones push (genera las claves con `npx web-push generate-vapid-keys`). Sin ellas la app funciona igual, solo sin push |
 
 ## Que hay dentro
 
@@ -88,7 +89,7 @@ npm run dev                   # 5. http://localhost:3000
 | Videollamada | ✅ Real | WebRTC P2P + SSE signaling. TURN opcional (env) para NAT estricto |
 | Netflix/HBO/Prime/Disney+ | ⚠️ Companion honesto | No existe API publica de control de reproduccion; Near coordina a las personas, no a los players |
 | Spotify | ❌ Pendiente | El sync real exige crear una app en developer.spotify.com (Client ID/Secret), OAuth con scopes `user-read-playback-state`/`user-modify-playback-state` y **cuentas Premium**. El companion actual ya cubre "escuchar a la vez". Si quieres que lo implemente: crea la app, anade `SPOTIFY_CLIENT_ID/SECRET` al `.env` y pidemelo |
-| Push notifications | ❌ Pendiente | Requiere claves VAPID (`npx web-push generate-vapid-keys`) + service worker. Los no-leidos in-app ya funcionan |
+| Push notifications | ✅ Real (v4) | PWA instalable + Web Push (VAPID, sin terceros). Push solo si el otro esta offline: mensajes, latidos, caja del dia e invitacion aceptada. Opt-in por dispositivo en Ajustes. iOS: requiere 16.4+ y anadir a pantalla de inicio |
 | E2EE del chat | ❌ Pendiente | Documentado honestamente; TLS + acceso restringido por pareja |
 | Realtime multi-nodo | ⚠️ Interfaz lista | Bus en memoria (perfecto dev/single-node). Para varias instancias: sustituir `lib/realtime.ts` por Redis pub/sub manteniendo `publish/subscribe` |
 

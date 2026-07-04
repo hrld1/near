@@ -128,14 +128,10 @@ export const claimDuelWinAction = coupleAction<[], { points: number }>(
 // Reclama el bonus de la semana pasada completa (7/7 dias de pareja).
 export const claimWeeklyBonusAction = coupleAction<[], { points: number }>(
   async ({ user, couple, coupleId }) => {
-    const members = await prisma.user.findMany({
-      where: { coupleId },
-      select: { id: true }
-    });
     const status = await getWeeklyBonusStatus(
       coupleId,
       user.id,
-      members.map((m) => m.id),
+      couple.members.map((m) => m.id),
       couple.timezone
     );
     if (status.claimed) return { ok: false, error: "Bonus semanal ya reclamado" };
@@ -157,14 +153,10 @@ export const claimWeeklyBonusAction = coupleAction<[], { points: number }>(
 // asi el render del server component queda como lectura pura.
 export const syncAchievementsAction = coupleAction<[], { fresh: string[] }>(
   async ({ user, couple, coupleId }) => {
-    const members = await prisma.user.findMany({
-      where: { coupleId },
-      select: { id: true }
-    });
     const result = await syncAchievements(
       coupleId,
       user.id,
-      members.map((m) => m.id),
+      couple.members.map((m) => m.id),
       couple.timezone
     );
     return { ok: true, data: { fresh: result.fresh } };

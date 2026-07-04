@@ -10,7 +10,8 @@ import {
   LogOut,
   MessageCircle,
   MonitorPlay,
-  BookHeart
+  BookHeart,
+  Settings
 } from "lucide-react";
 import { logoutAction } from "@/actions/auth";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -71,6 +72,16 @@ export function Sidebar({ userName, unreadChat = 0 }: { userName: string; unread
             <Avatar name={userName} size="sm" />
             <span className="truncate text-sm font-medium text-ink">{userName}</span>
           </div>
+          <Link
+            href="/settings"
+            title="Ajustes"
+            className={cn(
+              "rounded-lg p-2 transition hover:bg-sand hover:text-ink",
+              pathname.startsWith("/settings") ? "text-rose-deep" : "text-ink-soft"
+            )}
+          >
+            <Settings className="h-4 w-4" />
+          </Link>
           <ThemeToggle />
           <form action={logoutAction}>
             <button
@@ -86,7 +97,7 @@ export function Sidebar({ userName, unreadChat = 0 }: { userName: string; unread
 
       {/* Mobile bottom nav */}
       <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t border-sand bg-paper/90 backdrop-blur md:hidden">
-        {NAV.map((item) => {
+        {[...NAV, { href: "/settings", label: "Ajustes", icon: Settings }].map((item) => {
           const active = pathname.startsWith(item.href);
           return (
             <Link

@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/couple";
+import { isUserOnline } from "@/lib/realtime";
+import { sendPushToUsers } from "@/lib/push";
 import { inviteCode } from "@/lib/utils";
 import { inviteCodeSchema } from "@/lib/validators";
 import type { ActionResult, FormState } from "@/types";
@@ -60,6 +62,16 @@ export async function redeemInviteAction(_prev: FormState, formData: FormData): 
     await tx.invite.update({ where: { id: invite.id }, data: { status: "ACCEPTED" } });
     await tx.dateRoomState.create({ data: { coupleId: couple.id } });
   });
+
+  // quien invito aun no tenia pareja, asi que no tiene stream SSE abierto:
+  // si no esta con la app delante, el push es la unica forma de enterarse
+  if (!isUserOnline(invite.inviterId)) {
+    void sendPushToUsers([invite.inviterId], {
+      title: `${user.name} ha aceptado tu invitacion 💞`,
+      body: "Vuestro hogar en Near ya esta listo.",
+      url: "/home"
+    });
+  }
 
   revalidatePath("/", "layout");
   redirect("/home");

@@ -1,5 +1,5 @@
 import { getCurrentUser } from "@/lib/couple";
-import { subscribe } from "@/lib/realtime";
+import { subscribe, trackOnline } from "@/lib/realtime";
 import type { StreamEvent } from "@/types";
 
 export const runtime = "nodejs";
@@ -26,11 +26,13 @@ export async function GET(req: Request) {
       };
       send({ type: "connected" });
       const unsubscribe = subscribe(coupleId, send);
+      const untrack = trackOnline(user.id);
       const ping = setInterval(() => send({ type: "ping" }), 25000);
       req.signal.addEventListener("abort", () => {
         closed = true;
         clearInterval(ping);
         unsubscribe();
+        untrack();
         try {
           controller.close();
         } catch {

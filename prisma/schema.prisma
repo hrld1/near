@@ -88,6 +88,7 @@ model User {
   momentComments  MomentComment[]
   momentFavorites MomentFavorite[]
   boxesOpened     DailyBox[]
+  pushSubscriptions PushSubscription[]
 
   @@index([coupleId])
 }
@@ -389,6 +390,23 @@ model MomentFavorite {
   user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([momentId, userId])
+}
+
+// ---- Push ----
+// Una suscripcion Web Push por dispositivo/navegador. El endpoint es unico
+// globalmente (lo emite el push service del navegador).
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 // ---- Modelos estandar de Auth.js (Prisma Adapter) ----

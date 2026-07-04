@@ -9,9 +9,28 @@ type Listener = (event: StreamEvent) => void;
 
 const globalForBus = globalThis as unknown as {
   nearBus?: Map<string, Set<Listener>>;
+  nearOnline?: Map<string, number>;
 };
 
 const bus = (globalForBus.nearBus ??= new Map<string, Set<Listener>>());
+
+// Conexiones SSE vivas por usuario: si tiene alguna, esta "online" y no
+// hace falta push. Misma limitacion single-process que el bus (con varias
+// instancias, esto tambien iria a Redis).
+const online = (globalForBus.nearOnline ??= new Map<string, number>());
+
+export function trackOnline(userId: string): () => void {
+  online.set(userId, (online.get(userId) ?? 0) + 1);
+  return () => {
+    const next = (online.get(userId) ?? 1) - 1;
+    if (next <= 0) online.delete(userId);
+    else online.set(userId, next);
+  };
+}
+
+export function isUserOnline(userId: string) {
+  return (online.get(userId) ?? 0) > 0;
+}
 
 export function subscribe(coupleId: string, listener: Listener): () => void {
   let set = bus.get(coupleId);

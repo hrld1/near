@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { publish } from "@/lib/realtime";
+import { notifyPartner } from "@/lib/notify";
 import { dayKeyIn, dayRangeUtc } from "@/lib/dates";
 import { moodSchema, noteSchema, promptAnswerSchema } from "@/lib/validators";
 import { coupleAction, coupleFormAction } from "@/lib/safe-action";
@@ -54,7 +55,7 @@ export const setMoodAction = coupleAction<[input: { mood: string; note?: string 
   }
 );
 
-export const sendNudgeAction = coupleAction(async ({ user, coupleId }) => {
+export const sendNudgeAction = coupleAction(async ({ user, coupleId, partnerId }) => {
   const recent = await prisma.nudge.findFirst({
     where: { coupleId, fromId: user.id, createdAt: { gt: new Date(Date.now() - 60 * 1000) } }
   });
@@ -67,7 +68,12 @@ export const sendNudgeAction = coupleAction(async ({ user, coupleId }) => {
   await prisma.nudge.create({ data: { coupleId, fromId: user.id } });
   // solo el primer nudge del dia puntua (el cooldown limita el ritmo, no el total)
   await addPoints(coupleId, user.id, sentToday === 0 ? POINTS.nudge : 0, dateKey);
-  publish(coupleId, { type: "nudge", payload: { fromId: user.id, fromName: user.name } });
+  notifyPartner(
+    coupleId,
+    partnerId,
+    { type: "nudge", payload: { fromId: user.id, fromName: user.name } },
+    { title: `${user.name} esta pensando en ti 💗`, url: "/home", tag: "nudge" }
+  );
   return { ok: true };
 });
 

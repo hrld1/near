@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
-import { publish } from "@/lib/realtime";
+import { notifyPartner } from "@/lib/notify";
 import { dayKeyIn } from "@/lib/dates";
 import { pickBox } from "@/lib/box";
 import { addPoints, POINTS } from "@/lib/engagement";
@@ -12,7 +12,7 @@ import { agoLabel } from "@/lib/format";
 export const openDailyBoxAction = coupleAction<
   [],
   { kind: string; content: string; openedByMe: boolean }
->(async ({ user, couple, coupleId }) => {
+>(async ({ user, couple, coupleId, partnerId }) => {
   const dateKey = dayKeyIn(couple.timezone); // la caja es de la pareja: su dia
 
   const existing = await prisma.dailyBox.findUnique({
@@ -55,10 +55,12 @@ export const openDailyBoxAction = coupleAction<
     data: { coupleId, dateKey, openedById: user.id, kind: content.kind, content: content.text }
   });
   await addPoints(coupleId, user.id, POINTS.boxOpened, dayKeyIn(user.timezone));
-  publish(coupleId, {
-    type: "box:opened",
-    payload: { by: user.name, kind: box.kind, content: box.content }
-  });
+  notifyPartner(
+    coupleId,
+    partnerId,
+    { type: "box:opened", payload: { by: user.name, kind: box.kind, content: box.content } },
+    { title: `${user.name} ha abierto la caja del dia 🎁`, url: "/home", tag: "box" }
+  );
   revalidatePath("/home");
   return { ok: true, data: { kind: box.kind, content: box.content, openedByMe: true } };
 });

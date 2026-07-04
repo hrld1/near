@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/db";
 import { publish } from "@/lib/realtime";
+import { notifyPartner } from "@/lib/notify";
 import { messageSchema } from "@/lib/validators";
 import { addPoints, POINTS } from "@/lib/engagement";
 import { dayKeyIn, dayRangeUtc } from "@/lib/dates";
@@ -20,7 +21,7 @@ export const sendMessageAction = coupleAction<
     }
   ],
   { message: ChatMessage }
->(async ({ user, coupleId }, input) => {
+>(async ({ user, coupleId, partnerId }, input) => {
   const parsed = messageSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0].message };
 
@@ -46,7 +47,19 @@ export const sendMessageAction = coupleAction<
   await addPoints(coupleId, user.id, todayCount <= 1 ? POINTS.firstMessageOfDay : 0, dateKey);
 
   const dto = toChatMessage(message);
-  publish(coupleId, { type: "message:new", payload: dto });
+  const preview =
+    dto.kind === "IMAGE" ? "📷 Foto" : dto.kind === "VOICE" ? "🎤 Nota de voz" : dto.body ?? "";
+  notifyPartner(
+    coupleId,
+    partnerId,
+    { type: "message:new", payload: dto },
+    {
+      title: user.name,
+      body: preview.slice(0, 90),
+      url: dto.channel === "DATE_ROOM" ? "/date-room" : "/chat",
+      tag: "chat" // una rafaga de mensajes colapsa en una sola notificacion
+    }
+  );
   return { ok: true, data: { message: dto } };
 });
 
