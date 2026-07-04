@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { requireCouple } from "@/lib/couple";
-import { todayKey } from "@/lib/utils";
+import { dayKeyIn, shiftDayKey } from "@/lib/dates";
 import { GAMES, gameOfDay, compareScores } from "@/lib/games";
 import {
   ACHIEVEMENTS,
@@ -32,24 +32,18 @@ function bestOf(scores: number[], lowerIsBetter: boolean): number | null {
   return lowerIsBetter ? Math.min(...scores) : Math.max(...scores);
 }
 
-function shiftKey(days: number) {
-  const d = new Date();
-  d.setDate(d.getDate() - days);
-  return d.toISOString().slice(0, 10);
-}
-
 export default async function PlayPage() {
   const { user, couple, partner } = await requireCouple();
-  const dateKey = todayKey();
+  const dateKey = dayKeyIn(couple.timezone); // la arcade vive en el dia de la pareja
   const daily = gameOfDay(dateKey);
-  const weekKeys = Array.from({ length: 7 }, (_, i) => shiftKey(i)).reverse();
+  const weekKeys = Array.from({ length: 7 }, (_, i) => shiftDayKey(dateKey, -i)).reverse();
 
   const [todayScores, weekScores, season, streakInfo, achievementInfo] = await Promise.all([
     prisma.gameScore.findMany({ where: { coupleId: couple.id, dateKey } }),
     prisma.gameScore.findMany({ where: { coupleId: couple.id, dateKey: { in: weekKeys } } }),
-    getSeason(couple.id),
-    getCoupleStreak(couple.id, couple.members.map((m) => m.id)),
-    syncAchievements(couple.id, user.id, couple.members.map((m) => m.id))
+    getSeason(couple.id, couple.timezone),
+    getCoupleStreak(couple.id, couple.members.map((m) => m.id), couple.timezone),
+    syncAchievements(couple.id, user.id, couple.members.map((m) => m.id), couple.timezone)
   ]);
 
   const perGame = GAMES.map((def) => {

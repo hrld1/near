@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireCoupleAction } from "@/lib/couple";
 import { publish } from "@/lib/realtime";
-import { todayKey } from "@/lib/utils";
+import { dayKeyIn, dayRangeUtc } from "@/lib/dates";
 import { moodSchema, noteSchema, promptAnswerSchema } from "@/lib/validators";
 import type { ActionResult, FormState } from "@/types";
 import type { Presence } from "@prisma/client";
@@ -22,7 +22,7 @@ export async function setPresenceAction(presence: string): Promise<ActionResult>
       where: { id: user.id },
       data: { presence: presence as Presence, presenceUpdatedAt: new Date() }
     });
-    await touchActivity(coupleId, user.id);
+    await touchActivity(coupleId, user.id, dayKeyIn(user.timezone));
     publish(coupleId, { type: "presence", payload: { userId: user.id, presence } });
     revalidatePath("/home");
     return { ok: true };
@@ -36,13 +36,17 @@ export async function setMoodAction(input: { mood: string; note?: string }): Pro
     const { user, coupleId } = await requireCoupleAction();
     const parsed = moodSchema.safeParse(input);
     if (!parsed.success) return { ok: false, error: parsed.error.issues[0].message };
-    const dateKey = todayKey();
+    const dateKey = dayKeyIn(user.timezone); // el mood es personal: tu dia
+    const existing = await prisma.moodEntry.findUnique({
+      where: { userId_dateKey: { userId: user.id, dateKey } }
+    });
     await prisma.moodEntry.upsert({
       where: { userId_dateKey: { userId: user.id, dateKey } },
       update: { mood: parsed.data.mood, note: parsed.data.note || null },
       create: { coupleId, userId: user.id, mood: parsed.data.mood, note: parsed.data.note || null, dateKey }
     });
-    await addPoints(coupleId, user.id, POINTS.mood);
+    // reeditar el mood no vuelve a puntuar
+    await addPoints(coupleId, user.id, existing ? 0 : POINTS.mood, dateKey);
     publish(coupleId, { type: "mood", payload: { userId: user.id, mood: parsed.data.mood } });
     revalidatePath("/home");
     return { ok: true };
@@ -58,8 +62,14 @@ export async function sendNudgeAction(): Promise<ActionResult> {
       where: { coupleId, fromId: user.id, createdAt: { gt: new Date(Date.now() - 60 * 1000) } }
     });
     if (recent) return { ok: false, error: "Acabas de enviar uno, dale un momento" };
+    const dateKey = dayKeyIn(user.timezone);
+    const { start } = dayRangeUtc(dateKey, user.timezone);
+    const sentToday = await prisma.nudge.count({
+      where: { fromId: user.id, createdAt: { gte: start } }
+    });
     await prisma.nudge.create({ data: { coupleId, fromId: user.id } });
-    await addPoints(coupleId, user.id, POINTS.nudge);
+    // solo el primer nudge del dia puntua (el cooldown limita el ritmo, no el total)
+    await addPoints(coupleId, user.id, sentToday === 0 ? POINTS.nudge : 0, dateKey);
     publish(coupleId, { type: "nudge", payload: { fromId: user.id, fromName: user.name } });
     return { ok: true };
   } catch (error) {
@@ -87,13 +97,18 @@ export async function saveNoteAction(_prev: FormState, formData: FormData): Prom
 
 export async function answerPromptAction(_prev: FormState, formData: FormData): Promise<FormState> {
   try {
-    const { user, coupleId } = await requireCoupleAction();
+    const { user, couple, coupleId } = await requireCoupleAction();
     const parsed = promptAnswerSchema.safeParse({
       promptId: formData.get("promptId"),
       answer: formData.get("answer")
     });
     if (!parsed.success) return { error: parsed.error.issues[0].message };
-    const dateKey = todayKey();
+    // la pregunta del dia es un ritual compartido: ambas respuestas se
+    // emparejan bajo el dia de la PAREJA (si no, la revelacion se descuadra)
+    const dateKey = dayKeyIn(couple.timezone);
+    const existing = await prisma.promptAnswer.findUnique({
+      where: { userId_dateKey: { userId: user.id, dateKey } }
+    });
     await prisma.promptAnswer.upsert({
       where: { userId_dateKey: { userId: user.id, dateKey } },
       update: { answer: parsed.data.answer },
@@ -105,7 +120,8 @@ export async function answerPromptAction(_prev: FormState, formData: FormData): 
         answer: parsed.data.answer
       }
     });
-    await addPoints(coupleId, user.id, POINTS.prompt);
+    // reeditar la respuesta no vuelve a puntuar
+    await addPoints(coupleId, user.id, existing ? 0 : POINTS.prompt, dayKeyIn(user.timezone));
     publish(coupleId, { type: "prompt", payload: { userId: user.id } });
     revalidatePath("/home");
     return { success: "Respuesta guardada" };

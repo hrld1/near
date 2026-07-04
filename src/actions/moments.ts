@@ -6,6 +6,7 @@ import { requireCoupleAction } from "@/lib/couple";
 import { publish } from "@/lib/realtime";
 import { momentSchema } from "@/lib/validators";
 import { addPoints, POINTS } from "@/lib/engagement";
+import { dayKeyIn, dayRangeUtc } from "@/lib/dates";
 import type { ActionResult } from "@/types";
 
 export async function createMomentAction(input: {
@@ -24,6 +25,11 @@ export async function createMomentAction(input: {
     const happenedAt = parsed.data.happenedAt ? new Date(parsed.data.happenedAt) : new Date();
     if (Number.isNaN(happenedAt.getTime())) return { ok: false, error: "Fecha no valida" };
 
+    const dateKey = dayKeyIn(user.timezone);
+    const { start } = dayRangeUtc(dateKey, user.timezone);
+    const createdToday = await prisma.moment.count({
+      where: { authorId: user.id, createdAt: { gte: start } }
+    });
     await prisma.moment.create({
       data: {
         coupleId,
@@ -36,7 +42,8 @@ export async function createMomentAction(input: {
         happenedAt
       }
     });
-    await addPoints(coupleId, user.id, POINTS.moment);
+    // solo el primer momento del dia puntua (subir 12 fotos no da 60 puntos)
+    await addPoints(coupleId, user.id, createdToday === 0 ? POINTS.moment : 0, dateKey);
     publish(coupleId, { type: "moment", payload: { authorId: user.id } });
     revalidatePath("/moments");
     revalidatePath("/home");

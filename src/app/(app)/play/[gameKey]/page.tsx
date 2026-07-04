@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { requireCouple } from "@/lib/couple";
-import { todayKey } from "@/lib/utils";
+import { dayKeyIn } from "@/lib/dates";
 import { gameByKey, gameOfDay, wordsOfDay, scrambleWord } from "@/lib/games";
 import { GameHost } from "@/features/play/game-host";
 
@@ -18,7 +18,7 @@ export default async function GamePage({ params }: { params: { gameKey: string }
   if (!def) notFound();
 
   const { user, couple, partner } = await requireCouple();
-  const dateKey = todayKey();
+  const dateKey = dayKeyIn(couple.timezone);
 
   const scores = await prisma.gameScore.findMany({
     where: { coupleId: couple.id, gameKey: def.key, dateKey }

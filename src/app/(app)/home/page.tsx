@@ -13,7 +13,8 @@ import {
 } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { requireCouple } from "@/lib/couple";
-import { todayKey, moodInfo, presenceInfo } from "@/lib/utils";
+import { moodInfo, presenceInfo } from "@/lib/utils";
+import { dayKeyIn } from "@/lib/dates";
 import { agoLabel, dateLong } from "@/lib/format";
 import { getCoupleStreak, getDailyMissions, POINTS } from "@/lib/engagement";
 import { eventIcon } from "@/components/product-icons";
@@ -43,12 +44,21 @@ function greeting() {
 
 export default async function HomePage() {
   const { user, couple, partner } = await requireCouple();
-  const dateKey = todayKey();
+  const coupleDay = dayKeyIn(couple.timezone);
+  const userDay = dayKeyIn(user.timezone);
   const now = new Date();
 
-  const [moods, nextEvents, latestMoment, notes, lastNudge, promptCount, promptAnswers, streakInfo, missionInfo, dailyBox] =
+  const [myMood, partnerMood, nextEvents, latestMoment, notes, lastNudge, promptCount, promptAnswers, streakInfo, missionInfo, dailyBox] =
     await Promise.all([
-      prisma.moodEntry.findMany({ where: { coupleId: couple.id, dateKey } }),
+      // cada mood vive en el dia local de su autor
+      prisma.moodEntry.findUnique({
+        where: { userId_dateKey: { userId: user.id, dateKey: userDay } }
+      }),
+      partner
+        ? prisma.moodEntry.findUnique({
+            where: { userId_dateKey: { userId: partner.id, dateKey: dayKeyIn(partner.timezone) } }
+          })
+        : null,
       prisma.calendarEvent.findMany({
         where: { coupleId: couple.id, startsAt: { gt: now } },
         orderBy: { startsAt: "asc" },
@@ -71,17 +81,17 @@ export default async function HomePage() {
           })
         : null,
       prisma.dailyPrompt.count(),
-      prisma.promptAnswer.findMany({ where: { coupleId: couple.id, dateKey } }),
-      getCoupleStreak(couple.id, couple.members.map((m) => m.id)),
-      getDailyMissions(couple.id, user.id, dateKey),
+      prisma.promptAnswer.findMany({ where: { coupleId: couple.id, dateKey: coupleDay } }),
+      getCoupleStreak(couple.id, couple.members.map((m) => m.id), couple.timezone),
+      getDailyMissions(couple.id, user.id, { coupleDay, userDay, userTimezone: user.timezone }),
       prisma.dailyBox.findUnique({
-        where: { coupleId_dateKey: { coupleId: couple.id, dateKey } }
+        where: { coupleId_dateKey: { coupleId: couple.id, dateKey: coupleDay } }
       })
     ]);
 
-  const dayOfYear = Math.floor(
-    (now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86_400_000
-  );
+  // la pregunta rota con el dia de la pareja: ambos ven la misma
+  const [cy, cm, cd] = coupleDay.split("-").map(Number);
+  const dayOfYear = Math.floor((Date.UTC(cy, cm - 1, cd) - Date.UTC(cy, 0, 0)) / 86_400_000);
   const prompt =
     promptCount > 0
       ? await prisma.dailyPrompt.findFirst({
@@ -90,8 +100,6 @@ export default async function HomePage() {
         })
       : null;
 
-  const myMood = moods.find((m) => m.userId === user.id) ?? null;
-  const partnerMood = partner ? moods.find((m) => m.userId === partner.id) ?? null : null;
   const partnerNote = partner ? notes.find((n) => n.authorId === partner.id) ?? null : null;
   const myNote = notes.find((n) => n.authorId === user.id) ?? null;
   const myPromptAnswer = promptAnswers.find((a) => a.userId === user.id) ?? null;

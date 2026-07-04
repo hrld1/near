@@ -1,7 +1,11 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { dayKeyIn, shiftDayKey } from "../src/lib/dates";
 
 const prisma = new PrismaClient();
+
+// La pareja demo vive en Europe/Madrid: sus claves de dia se generan ahi.
+const DEMO_TZ = "Europe/Madrid";
 
 const PROMPTS = [
   "Que es lo primero que haremos la proxima vez que nos veamos?",
@@ -90,7 +94,7 @@ async function main() {
     ]
   });
 
-  const dateKey = new Date().toISOString().slice(0, 10);
+  const dateKey = dayKeyIn(DEMO_TZ);
   await prisma.moodEntry.createMany({
     data: [
       { coupleId: couple.id, userId: ana.id, mood: "enamorada", note: "Dia largo pero contenta", dateKey },
@@ -124,10 +128,7 @@ async function main() {
   await prisma.nudge.create({ data: { coupleId: couple.id, fromId: leo.id, createdAt: new Date(now - 20 * min) } });
 
   // actividad y duelos de ejemplo (racha viva + temporada con puntos)
-  const dayKeys = [0, 1, 2].map((offset) => {
-    const d = new Date(now - offset * day);
-    return d.toISOString().slice(0, 10);
-  });
+  const dayKeys = [0, 1, 2].map((offset) => shiftDayKey(dateKey, -offset));
   for (const [index, key] of dayKeys.entries()) {
     await prisma.activityDay.createMany({
       data: [

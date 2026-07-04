@@ -21,11 +21,11 @@ Requisitos: Node 18+, Docker (o PostgreSQL propio).
 docker compose up -d          # 1. PostgreSQL
 cp .env.example .env          # 2. edita AUTH_SECRET (openssl rand -base64 32)
 npm install                   # 3. dependencias + prisma generate
-npm run db:setup              # 4. esquema + seed (prompts, quiz, pareja demo)
+npm run db:setup              # 4. migraciones + seed (prompts, quiz, pareja demo)
 npm run dev                   # 5. http://localhost:3000
 ```
 
-> **Si vienes de la v1:** el esquema tiene modelos nuevos. Ejecuta `npm run db:push` (o `npm run db:setup` en BD nueva).
+> **Desde la iteracion 4 el esquema evoluciona con migraciones** (`prisma migrate`), no con `db push`: hay historial en `prisma/migrations/` y los despliegues son reproducibles (`npm run db:deploy`). Si vienes de una BD anterior a la iteracion 4, con la BD al dia basta marcar el baseline: `npx prisma migrate resolve --applied 0_init` y despues `npm run db:deploy`.
 
 **Pareja demo**: `ana@near.demo` y `leo@near.demo`, contrasena `neardemo123`. Abre dos navegadores (uno incognito) para probar chat, duelos y videollamada en tiempo real.
 
@@ -113,7 +113,9 @@ src/
     image-client.ts     compresion de imagenes en cliente
 ```
 
-Decisiones de modelado: `ActivityDay` como unica fuente de puntos (todo lo demas se deriva); countdowns derivados de eventos; notas de voz como `Message(kind: VOICE)`; la respuesta del otro (pregunta/quiz) solo se revela tras responder tu (filtrado en servidor); limite de intentos por juego/dia validado en servidor.
+Decisiones de modelado: `ActivityDay` como unica fuente de puntos (todo lo demas se deriva); countdowns derivados de eventos; notas de voz como `Message(kind: VOICE)`; la respuesta del otro (pregunta/quiz) solo se revela tras responder tu (filtrado en servidor); limite de intentos por juego/dia y rango plausible del score (`scoreBounds`) validados en servidor.
+
+**Dos claves de dia con zona horaria real** (`src/lib/dates.ts`): lo personal (mood, puntos de `ActivityDay`) vive en el dia local del usuario (`User.timezone`); lo compartido-determinista (caja diaria, reto del dia, pregunta del dia, misiones, racha, temporada) vive en el dia de la pareja (`Couple.timezone`, fijada al vincular). Asi ambos ven la misma caja/reto aunque esten en husos distintos. Regla de integridad de puntos: cada concepto puntua como maximo una vez por dia (reeditar el mood o reenviar no vuelve a sumar).
 
 ## Privacidad y seguridad
 
@@ -121,4 +123,4 @@ Sin GPS ni presencia involuntaria (todo voluntario y editable). Adjuntos accesib
 
 ## Scripts
 
-`npm run dev` · `npm run build` / `npm start` · `npm run db:push` · `npm run db:seed` · `npm run db:setup` · `npm run db:studio`
+`npm run dev` · `npm run build` / `npm start` · `npm test` · `npm run db:migrate` (dev) · `npm run db:deploy` · `npm run db:seed` · `npm run db:setup` · `npm run db:studio`

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireCoupleAction } from "@/lib/couple";
 import { publish } from "@/lib/realtime";
-import { todayKey } from "@/lib/utils";
+import { dayKeyIn } from "@/lib/dates";
 import { pickBox } from "@/lib/box";
 import { addPoints, POINTS } from "@/lib/engagement";
 import type { ActionResult } from "@/types";
@@ -14,8 +14,8 @@ export async function openDailyBoxAction(): Promise<
   ActionResult<{ kind: string; content: string; openedByMe: boolean }>
 > {
   try {
-    const { user, coupleId } = await requireCoupleAction();
-    const dateKey = todayKey();
+    const { user, couple, coupleId } = await requireCoupleAction();
+    const dateKey = dayKeyIn(couple.timezone); // la caja es de la pareja: su dia
 
     const existing = await prisma.dailyBox.findUnique({
       where: { coupleId_dateKey: { coupleId, dateKey } }
@@ -56,7 +56,7 @@ export async function openDailyBoxAction(): Promise<
     const box = await prisma.dailyBox.create({
       data: { coupleId, dateKey, openedById: user.id, kind: content.kind, content: content.text }
     });
-    await addPoints(coupleId, user.id, POINTS.boxOpened);
+    await addPoints(coupleId, user.id, POINTS.boxOpened, dayKeyIn(user.timezone));
     publish(coupleId, {
       type: "box:opened",
       payload: { by: user.name, kind: box.kind, content: box.content }

@@ -3,7 +3,8 @@ import Link from "next/link";
 import { Flame, Video } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { requireCouple } from "@/lib/couple";
-import { presenceInfo, todayKey, moodInfo } from "@/lib/utils";
+import { presenceInfo, moodInfo } from "@/lib/utils";
+import { dayKeyIn } from "@/lib/dates";
 import { getCoupleStreak } from "@/lib/engagement";
 import { eventIcon } from "@/components/product-icons";
 import { Avatar } from "@/components/ui/avatar";
@@ -17,7 +18,6 @@ export const dynamic = "force-dynamic";
 
 export default async function ChatPage() {
   const { user, couple, partner } = await requireCouple();
-  const dateKey = todayKey();
 
   const [rows, nextEvent, streakInfo, partnerMood] = await Promise.all([
     prisma.message.findMany({
@@ -30,9 +30,11 @@ export default async function ChatPage() {
       where: { coupleId: couple.id, startsAt: { gt: new Date() }, showCountdown: true },
       orderBy: { startsAt: "asc" }
     }),
-    getCoupleStreak(couple.id, couple.members.map((m) => m.id)),
+    getCoupleStreak(couple.id, couple.members.map((m) => m.id), couple.timezone),
     partner
-      ? prisma.moodEntry.findFirst({ where: { userId: partner.id, dateKey } })
+      ? prisma.moodEntry.findFirst({
+          where: { userId: partner.id, dateKey: dayKeyIn(partner.timezone) }
+        })
       : null
   ]);
 

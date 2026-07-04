@@ -53,7 +53,8 @@ export async function redeemInviteAction(_prev: FormState, formData: FormData): 
   if (invite.inviter.coupleId) return { error: "Esa persona ya esta vinculada con alguien" };
 
   await prisma.$transaction(async (tx) => {
-    const couple = await tx.couple.create({ data: {} });
+    // el dia compartido de la pareja arranca en la zona de quien invito
+    const couple = await tx.couple.create({ data: { timezone: invite.inviter.timezone } });
     await tx.user.update({ where: { id: invite.inviterId }, data: { coupleId: couple.id } });
     await tx.user.update({ where: { id: user.id }, data: { coupleId: couple.id } });
     await tx.invite.update({ where: { id: invite.id }, data: { status: "ACCEPTED" } });

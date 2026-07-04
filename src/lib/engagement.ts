@@ -1,11 +1,14 @@
 import { prisma } from "@/lib/db";
-import { todayKey } from "@/lib/utils";
+import { dayKeyIn, dayRangeUtc, monthKeyIn, shiftDayKey, type DayKey } from "@/lib/dates";
 
 // ---------------------------------------------------------------------------
 // Motor de engagement de Near.
 // ActivityDay es la unica fuente de verdad de puntos. Racha, misiones,
 // temporada y logros se DERIVAN de datos reales (mensajes, moods, juegos...):
 // no hay contadores paralelos que mantener sincronizados.
+// Regla de integridad: cada concepto puntua COMO MAXIMO una vez por dia
+// (reeditar el mood o reenviar no vuelve a sumar). El dateKey lo decide el
+// caller: dia del usuario para lo personal, dia de pareja para lo compartido.
 // ---------------------------------------------------------------------------
 
 export const POINTS = {
@@ -21,8 +24,8 @@ export const POINTS = {
   weeklyBonus: 40
 } as const;
 
-export async function addPoints(coupleId: string, userId: string, points: number) {
-  const dateKey = todayKey();
+// dateKey = dia del usuario (su timezone): el libro mayor es personal.
+export async function addPoints(coupleId: string, userId: string, points: number, dateKey: DayKey) {
   await prisma.activityDay.upsert({
     where: { userId_dateKey: { userId, dateKey } },
     update: { points: { increment: points } },
@@ -31,21 +34,18 @@ export async function addPoints(coupleId: string, userId: string, points: number
 }
 
 // Marca actividad sin puntos (cuenta para la racha)
-export async function touchActivity(coupleId: string, userId: string) {
-  await addPoints(coupleId, userId, 0);
-}
-
-function shiftKey(base: Date, days: number) {
-  const d = new Date(base);
-  d.setDate(d.getDate() - days);
-  return d.toISOString().slice(0, 10);
+export async function touchActivity(coupleId: string, userId: string, dateKey: DayKey) {
+  await addPoints(coupleId, userId, 0, dateKey);
 }
 
 // Racha de PAREJA: dias consecutivos en los que AMBOS estuvieron activos.
 // El dia de hoy cuenta si ambos ya entraron; si no, la racha sigue viva
-// mientras ayer fuera completo.
-export async function getCoupleStreak(coupleId: string, memberIds: string[]) {
-  const since = shiftKey(new Date(), 120);
+// mientras ayer fuera completo. Se recorre el calendario de la pareja
+// (couple.timezone); cada miembro marca actividad en su propio dia local,
+// asi que "dia completo" = ambos activos en su dia X.
+export async function getCoupleStreak(coupleId: string, memberIds: string[], coupleTimezone: string) {
+  const today = dayKeyIn(coupleTimezone);
+  const since = shiftDayKey(today, -120);
   const rows = await prisma.activityDay.findMany({
     where: { coupleId, dateKey: { gte: since } },
     select: { userId: true, dateKey: true }
@@ -58,12 +58,10 @@ export async function getCoupleStreak(coupleId: string, memberIds: string[]) {
   const complete = (key: string) =>
     memberIds.length === 2 && memberIds.every((id) => byDay.get(key)?.has(id));
 
-  const now = new Date();
-  const today = todayKey(now);
   let streak = 0;
   let cursor = complete(today) ? 0 : 1; // si hoy aun no esta completo, empezamos en ayer
   while (cursor <= 120) {
-    if (complete(shiftKey(now, cursor))) {
+    if (complete(shiftDayKey(today, -cursor))) {
       streak++;
       cursor++;
     } else {
@@ -75,12 +73,8 @@ export async function getCoupleStreak(coupleId: string, memberIds: string[]) {
 }
 
 // ---------------------------------------------------------------------------
-// Temporada: mes natural. Puntos por miembro y total de pareja.
+// Temporada: mes natural en la zona de la pareja. Puntos por miembro y total.
 // ---------------------------------------------------------------------------
-
-export function seasonKey(date = new Date()) {
-  return date.toISOString().slice(0, 7); // YYYY-MM
-}
 
 export const SEASON_LEVELS: { min: number; name: string }[] = [
   { min: 0, name: "Chispa" },
@@ -103,8 +97,8 @@ export function seasonLevel(points: number) {
   return { ...level, index, next };
 }
 
-export async function getSeason(coupleId: string) {
-  const prefix = seasonKey();
+export async function getSeason(coupleId: string, coupleTimezone: string) {
+  const prefix = monthKeyIn(coupleTimezone);
   const rows = await prisma.activityDay.groupBy({
     by: ["userId"],
     where: { coupleId, dateKey: { startsWith: prefix } },
@@ -113,9 +107,9 @@ export async function getSeason(coupleId: string) {
   const perUser = new Map(rows.map((r) => [r.userId, r._sum.points ?? 0]));
   const total = rows.reduce((acc, r) => acc + (r._sum.points ?? 0), 0);
   const daysLeft = (() => {
-    const now = new Date();
-    const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    return Math.max(0, end.getDate() - now.getDate());
+    const [y, m, d] = dayKeyIn(coupleTimezone).split("-").map(Number);
+    const lastDay = new Date(Date.UTC(y, m, 0)).getUTCDate();
+    return Math.max(0, lastDay - d);
   })();
   return { key: prefix, perUser, total, level: seasonLevel(total), daysLeft };
 }
@@ -142,24 +136,33 @@ function hashString(input: string) {
   return Math.abs(h);
 }
 
+// Las misiones rotan con el dia de la PAREJA (coupleDay: misma lista para
+// ambos). Cada item se comprueba contra la clave de su dato subyacente:
+// mood en el dia del usuario; pregunta/juegos/caja/claim en el de pareja;
+// los contadores por createdAt usan el rango UTC del dia local del usuario.
 export async function getDailyMissions(
   coupleId: string,
   userId: string,
-  dateKey = todayKey()
+  keys: { coupleDay: DayKey; userDay: DayKey; userTimezone: string }
 ): Promise<{ missions: Mission[]; allDone: boolean; bonusClaimed: boolean }> {
-  const startOfDay = new Date(`${dateKey}T00:00:00`);
+  const { coupleDay, userDay, userTimezone } = keys;
+  const range = dayRangeUtc(userDay, userTimezone);
   const [mood, prompt, moments, photoMsg, nudges, games, boxOpen, claim] = await Promise.all([
-    prisma.moodEntry.findFirst({ where: { userId, dateKey } }),
-    prisma.promptAnswer.findFirst({ where: { userId, dateKey } }),
-    prisma.moment.count({ where: { authorId: userId, createdAt: { gte: startOfDay } } }),
-    prisma.message.count({
-      where: { senderId: userId, kind: "IMAGE", createdAt: { gte: startOfDay } }
+    prisma.moodEntry.findFirst({ where: { userId, dateKey: userDay } }),
+    prisma.promptAnswer.findFirst({ where: { userId, dateKey: coupleDay } }),
+    prisma.moment.count({
+      where: { authorId: userId, createdAt: { gte: range.start, lt: range.end } }
     }),
-    prisma.nudge.count({ where: { fromId: userId, createdAt: { gte: startOfDay } } }),
-    prisma.gameScore.count({ where: { userId, dateKey } }),
-    prisma.dailyBox.findUnique({ where: { coupleId_dateKey: { coupleId, dateKey } } }),
+    prisma.message.count({
+      where: { senderId: userId, kind: "IMAGE", createdAt: { gte: range.start, lt: range.end } }
+    }),
+    prisma.nudge.count({
+      where: { fromId: userId, createdAt: { gte: range.start, lt: range.end } }
+    }),
+    prisma.gameScore.count({ where: { userId, dateKey: coupleDay } }),
+    prisma.dailyBox.findUnique({ where: { coupleId_dateKey: { coupleId, dateKey: coupleDay } } }),
     prisma.dailyClaim.findUnique({
-      where: { userId_dateKey_type: { userId, dateKey, type: "DAILY_MISSIONS" } }
+      where: { userId_dateKey_type: { userId, dateKey: coupleDay, type: "DAILY_MISSIONS" } }
     })
   ]);
 
@@ -174,7 +177,7 @@ export async function getDailyMissions(
   ];
 
   // 3 misiones deterministas por dia y pareja (el reto diario siempre entra)
-  const seed = hashString(`${dateKey}:${coupleId}`);
+  const seed = hashString(`${coupleDay}:${coupleId}`);
   const rest = pool.filter((m) => m.id !== "duel");
   const picked = [pool.find((m) => m.id === "duel")!];
   for (let i = 0; picked.length < 3 && i < rest.length; i++) {
@@ -213,10 +216,15 @@ export const ACHIEVEMENTS: { key: string; name: string; description: string }[] 
   { key: "voice1", name: "Tu voz", description: "Primera nota de voz enviada" }
 ];
 
-export async function syncAchievements(coupleId: string, userId: string, memberIds: string[]) {
+export async function syncAchievements(
+  coupleId: string,
+  userId: string,
+  memberIds: string[],
+  coupleTimezone: string
+) {
   const [{ streak }, momentCount, photoCount, messageCount, duelDays, boxCount, voiceCount, unlocked] =
     await Promise.all([
-      getCoupleStreak(coupleId, memberIds),
+      getCoupleStreak(coupleId, memberIds, coupleTimezone),
       prisma.moment.count({ where: { coupleId } }),
       prisma.moment.count({ where: { coupleId, kind: "PHOTO" } }),
       prisma.message.count({ where: { coupleId } }),

@@ -5,7 +5,7 @@ import { requireCoupleAction } from "@/lib/couple";
 import { publish } from "@/lib/realtime";
 import { messageSchema } from "@/lib/validators";
 import { addPoints, POINTS } from "@/lib/engagement";
-import { todayKey } from "@/lib/utils";
+import { dayKeyIn, dayRangeUtc } from "@/lib/dates";
 import { toChatMessage } from "@/lib/chat";
 import type { ActionResult, ChatMessage } from "@/types";
 
@@ -34,12 +34,13 @@ export async function sendMessageAction(input: {
       include: { reactions: true }
     });
 
-    // primer mensaje del dia: cuenta para racha y suma puntos
-    const startOfDay = new Date(`${todayKey()}T00:00:00`);
+    // primer mensaje del dia (local del usuario): cuenta para racha y suma puntos
+    const dateKey = dayKeyIn(user.timezone);
+    const { start } = dayRangeUtc(dateKey, user.timezone);
     const todayCount = await prisma.message.count({
-      where: { senderId: user.id, createdAt: { gte: startOfDay } }
+      where: { senderId: user.id, createdAt: { gte: start } }
     });
-    await addPoints(coupleId, user.id, todayCount <= 1 ? POINTS.firstMessageOfDay : 0);
+    await addPoints(coupleId, user.id, todayCount <= 1 ? POINTS.firstMessageOfDay : 0, dateKey);
 
     const dto = toChatMessage(message);
     publish(coupleId, { type: "message:new", payload: dto });

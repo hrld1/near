@@ -10,6 +10,10 @@ export type GameDef = {
   lowerIsBetter: boolean;
   unit: string;
   maxAttemptsPerDay: number;
+  // Rango fisicamente plausible del score; el servidor rechaza lo que quede
+  // fuera. No impide el cheating fino (el gameplay es del cliente), pero
+  // elimina los valores absurdos.
+  scoreBounds: { min: number; max: number };
   format: (score: number) => string;
 };
 
@@ -22,6 +26,7 @@ export const GAMES: GameDef[] = [
     lowerIsBetter: true,
     unit: "ms",
     maxAttemptsPerDay: 5,
+    scoreBounds: { min: 60, max: 10_000 },
     format: (s) => `${Math.round(s)} ms`
   },
   {
@@ -32,6 +37,7 @@ export const GAMES: GameDef[] = [
     lowerIsBetter: true,
     unit: "s",
     maxAttemptsPerDay: 5,
+    scoreBounds: { min: 5, max: 900 },
     format: (s) => `${s.toFixed(1)} s`
   },
   {
@@ -42,6 +48,7 @@ export const GAMES: GameDef[] = [
     lowerIsBetter: false,
     unit: "pts",
     maxAttemptsPerDay: 5,
+    scoreBounds: { min: 0, max: 200 },
     format: (s) => `${Math.round(s)} pts`
   },
   {
@@ -52,6 +59,7 @@ export const GAMES: GameDef[] = [
     lowerIsBetter: false,
     unit: "rondas",
     maxAttemptsPerDay: 5,
+    scoreBounds: { min: 0, max: 100 },
     format: (s) => `${Math.round(s)} rondas`
   },
   {
@@ -62,6 +70,8 @@ export const GAMES: GameDef[] = [
     lowerIsBetter: false,
     unit: "pts",
     maxAttemptsPerDay: 5,
+    // 3 palabras x 45 s de margen maximo; el componente clampa a >= 0
+    scoreBounds: { min: 0, max: 135 },
     format: (s) => `${Math.round(s)} pts`
   }
 ];

@@ -2,10 +2,6 @@ export function cn(...classes: Array<string | undefined | null | false>) {
   return classes.filter(Boolean).join(" ");
 }
 
-export function todayKey(date = new Date()) {
-  return date.toISOString().slice(0, 10);
-}
-
 export function inviteCode() {
   const alphabet = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
   let code = "";

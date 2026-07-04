@@ -28,9 +28,13 @@ export async function requireCouple() {
 }
 
 // Variante para server actions: lanza error en vez de redirigir.
+// Devuelve tambien el Couple: las actions necesitan couple.timezone para
+// calcular el dia compartido (ver src/lib/dates.ts).
 export async function requireCoupleAction() {
   const user = await getCurrentUser();
   if (!user) throw new Error("No has iniciado sesion");
   if (!user.coupleId) throw new Error("Aun no tienes pareja vinculada");
-  return { user, coupleId: user.coupleId };
+  const couple = await prisma.couple.findUnique({ where: { id: user.coupleId } });
+  if (!couple) throw new Error("Aun no tienes pareja vinculada");
+  return { user, couple, coupleId: user.coupleId };
 }
