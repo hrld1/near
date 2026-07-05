@@ -1,5 +1,5 @@
 import { getCurrentUser } from "@/lib/couple";
-import { subscribe, trackOnline } from "@/lib/realtime";
+import { isUserOnline, publish, subscribe, trackOnline } from "@/lib/realtime";
 import type { StreamEvent } from "@/types";
 
 export const runtime = "nodejs";
@@ -26,13 +26,19 @@ export async function GET(req: Request) {
       };
       send({ type: "connected" });
       const unsubscribe = subscribe(coupleId, send);
+      // transiciones 0<->1 conexiones: la pareja ve "en Near ahora" en vivo
+      const wasOnline = isUserOnline(user.id);
       const untrack = trackOnline(user.id);
+      if (!wasOnline) publish(coupleId, { type: "online", payload: { userId: user.id, online: true } });
       const ping = setInterval(() => send({ type: "ping" }), 25000);
       req.signal.addEventListener("abort", () => {
         closed = true;
         clearInterval(ping);
         unsubscribe();
         untrack();
+        if (!isUserOnline(user.id)) {
+          publish(coupleId, { type: "online", payload: { userId: user.id, online: false } });
+        }
         try {
           controller.close();
         } catch {

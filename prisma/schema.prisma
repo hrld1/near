@@ -55,6 +55,11 @@ enum EventKind {
   OTHER
 }
 
+enum LetterKind {
+  SLOW
+  CAPSULE
+}
+
 model User {
   id                String    @id @default(cuid())
   email             String    @unique
@@ -62,6 +67,11 @@ model User {
   passwordHash      String
   image             String?
   timezone          String    @default("Europe/Madrid")
+  // Ciudad voluntaria (sin GPS): para el cielo de la distancia y el clima.
+  // Editable y borrable en Ajustes; nunca se actualiza sola.
+  city              String?
+  latitude          Float?
+  longitude         Float?
   presence          Presence  @default(NONE)
   presenceUpdatedAt DateTime?
   lastChatSeenAt    DateTime?
@@ -89,6 +99,9 @@ model User {
   momentFavorites MomentFavorite[]
   boxesOpened     DailyBox[]
   pushSubscriptions PushSubscription[]
+  dailyPhotos     DailyPhoto[]
+  lettersSent     Letter[]
+  spotify         SpotifyAccount?
 
   @@index([coupleId])
 }
@@ -117,6 +130,8 @@ model Couple {
   dailyBoxes   DailyBox[]
   dailyClaims  DailyClaim[]
   achievementUnlocks AchievementUnlock[]
+  dailyPhotos  DailyPhoto[]
+  letters      Letter[]
 }
 
 model Invite {
@@ -125,6 +140,9 @@ model Invite {
   inviterId String
   inviter   User         @relation(fields: [inviterId], references: [id], onDelete: Cascade)
   status    InviteStatus @default(PENDING)
+  // Preparativos del hogar hechos mientras se espera (aniversario, nota,
+  // carta de bienvenida). Se aplican al canjear el codigo.
+  prep      Json?
   createdAt DateTime     @default(now())
   expiresAt DateTime
 
@@ -390,6 +408,58 @@ model MomentFavorite {
   user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([momentId, userId])
+}
+
+// ---- Rituales (iteracion 6) ----
+
+// Foto del dia estilo Locket: una por persona y dia (dia local del autor).
+// No entra al album automaticamente; se puede "guardar" como Moment.
+model DailyPhoto {
+  id        String   @id @default(cuid())
+  coupleId  String
+  couple    Couple   @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dateKey   String
+  imageUrl  String
+  caption   String?
+  createdAt DateTime @default(now())
+
+  @@unique([userId, dateKey])
+  @@index([coupleId, createdAt])
+}
+
+// Carta lenta: se escribe hoy y se entrega en deliverAt (manana a las 8:00
+// en la zona del receptor, o una fecha elegida si es CAPSULE). La entrega es
+// on-read (no hay cron): pushSentAt evita duplicar el push de "ha llegado".
+model Letter {
+  id         String     @id @default(cuid())
+  coupleId   String
+  couple     Couple     @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  authorId   String
+  author     User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  kind       LetterKind @default(SLOW)
+  body       String
+  deliverAt  DateTime
+  openedAt   DateTime?
+  pushSentAt DateTime?
+  createdAt  DateTime   @default(now())
+
+  @@index([coupleId, deliverAt])
+}
+
+// ---- Spotify (opcional, activado por env) ----
+// Tokens OAuth por usuario; solo se usan en servidor. Sin claves en env la
+// app ni siquiera ofrece conectar.
+model SpotifyAccount {
+  userId       String   @id
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  spotifyId    String
+  product      String?
+  accessToken  String
+  refreshToken String
+  expiresAt    DateTime
+  updatedAt    DateTime @updatedAt
 }
 
 // ---- Push ----

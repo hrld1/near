@@ -31,7 +31,24 @@ export type CallSignalKind =
   | "offer"
   | "answer"
   | "ice"
-  | "hangup";
+  | "hangup"
+  // modo dormir juntos: informativo (la pantalla se atenua en local) y
+  // "goodnight" cierra la llamada con un latido en ambos lados
+  | "sleep"
+  | "wake"
+  | "goodnight";
+
+// Trazo del lienzo compartido: puntos normalizados 0..1 intercalados x,y.
+export type CanvasStroke = {
+  id: string;
+  color: string;
+  size: number;
+  points: number[];
+};
+
+export type CanvasOp =
+  | { kind: "stroke"; stroke: CanvasStroke }
+  | { kind: "clear" };
 
 export type CompanionSignalKind = "ready" | "go" | "pause" | "resume";
 
@@ -84,6 +101,45 @@ export type StreamEvent =
         byName: string;
         seed?: number;
         col?: number;
+      };
+    }
+  // --- iteracion 6 ---
+  // efimero: "esta escribiendo" en el chat (no se persiste)
+  | { type: "chat:typing"; payload: { userId: string; channel: "MAIN" | "DATE_ROOM" } }
+  // el receptor abrio el chat: el emisor pinta "Visto"
+  | { type: "chat:seen"; payload: { userId: string; at: string } }
+  // transicion de conexion SSE (0<->1 conexiones): punto "en Near ahora"
+  | { type: "online"; payload: { userId: string; online: boolean } }
+  // beso de pulgar: presencia y posicion del dedo (normalizada 0..1)
+  | {
+      type: "touch:signal";
+      payload: {
+        kind: "join" | "leave" | "move" | "invite";
+        userId: string;
+        name: string;
+        x?: number;
+        y?: number;
+        pressing?: boolean;
+      };
+    }
+  // lienzo compartido: trazos y limpiado
+  | { type: "canvas:op"; payload: { byId: string; op: CanvasOp } }
+  // foto del dia nueva
+  | { type: "photo:new"; payload: { userId: string; imageUrl: string; caption: string | null } }
+  // una carta ha quedado entregada para toId
+  | { type: "letter:delivered"; payload: { toId: string } }
+  // sync de musica (Spotify): estado del lider hacia el seguidor
+  | {
+      type: "music:sync";
+      payload: {
+        byId: string;
+        trackUri: string | null;
+        trackName: string | null;
+        artists: string | null;
+        albumArt: string | null;
+        positionMs: number;
+        playing: boolean;
+        at: number;
       };
     };
 
