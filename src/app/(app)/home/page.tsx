@@ -16,6 +16,7 @@ import { requireCouple } from "@/lib/couple";
 import { moodInfo, presenceInfo } from "@/lib/utils";
 import { dayKeyIn, nextAnniversary } from "@/lib/dates";
 import { effectivePresence } from "@/lib/presence";
+import { isUserOnline } from "@/lib/realtime";
 import { agoLabel, dateLong } from "@/lib/format";
 import { getCoupleStreak, getDailyMissions, getWeeklyBonusStatus, POINTS } from "@/lib/engagement";
 import { eventIcon } from "@/components/product-icons";
@@ -27,6 +28,7 @@ import { PresencePicker } from "@/features/home/presence-picker";
 import { MoodCheck } from "@/features/home/mood-check";
 import { NudgeButton } from "@/features/home/nudge-button";
 import { TouchButton } from "@/features/home/touch-button";
+import { PartnerOnline } from "@/features/presence/partner-online";
 import { PromptCard } from "@/features/home/prompt-card";
 import { NoteForm } from "@/features/home/note-form";
 import { StreakMissions } from "@/features/home/streak-missions";
@@ -183,6 +185,7 @@ export default async function HomePage() {
                   <div className="min-w-0">
                     <p className="font-display text-2xl leading-tight text-ink">{partner.name}</p>
                     <p className="mt-0.5 flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-sm text-ink-soft">
+                      <PartnerOnline partnerId={partner.id} initialOnline={isUserOnline(partner.id)} />
                       {partnerPresence && partnerEffective !== "NONE" && (
                         <span>{partnerPresence.label}</span>
                       )}

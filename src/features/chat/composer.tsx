@@ -13,12 +13,14 @@ export function Composer({
   partnerName,
   compact,
   send,
-  onError
+  onError,
+  onTyping
 }: {
   partnerName: string | null;
   compact?: boolean;
   send: (partial: Partial<ChatMessage> & { kind: ChatMessage["kind"] }) => void;
   onError: (message: string | null) => void;
+  onTyping?: () => void;
 }) {
   const [text, setText] = useState("");
   const [uploading, setUploading] = useState(false);
@@ -121,7 +123,10 @@ export function Composer({
           <textarea
             ref={textareaRef}
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={(e) => {
+              setText(e.target.value);
+              if (e.target.value.trim()) onTyping?.();
+            }}
             onInput={autoGrow}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {

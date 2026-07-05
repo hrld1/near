@@ -116,10 +116,23 @@ export const loadOlderMessagesAction = coupleAction<
   return { ok: true, data: { messages: page, hasMore } };
 });
 
-export const markChatSeenAction = coupleAction(async ({ user }) => {
+export const markChatSeenAction = coupleAction(async ({ user, coupleId }) => {
+  const at = new Date();
   await prisma.user.update({
     where: { id: user.id },
-    data: { lastChatSeenAt: new Date() }
+    data: { lastChatSeenAt: at }
   });
+  // el emisor pinta "Visto" en vivo bajo su ultimo mensaje
+  publish(coupleId, { type: "chat:seen", payload: { userId: user.id, at: at.toISOString() } });
   return { ok: true };
 });
+
+// "Escribiendo…": efimero, no se persiste. El cliente lo lanza con freno
+// (~1 cada 2,5s) mientras se teclea; el receptor lo apaga solo por timeout.
+export const setTypingAction = coupleAction<[input: { channel: "MAIN" | "DATE_ROOM" }]>(
+  async ({ user, coupleId }, input) => {
+    const channel = input.channel === "DATE_ROOM" ? "DATE_ROOM" : "MAIN";
+    publish(coupleId, { type: "chat:typing", payload: { userId: user.id, channel } });
+    return { ok: true };
+  }
+);

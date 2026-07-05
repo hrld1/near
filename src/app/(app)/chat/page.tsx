@@ -7,9 +7,11 @@ import { presenceInfo, moodInfo } from "@/lib/utils";
 import { dayKeyIn } from "@/lib/dates";
 import { effectivePresence } from "@/lib/presence";
 import { getCoupleStreak } from "@/lib/engagement";
+import { isUserOnline } from "@/lib/realtime";
 import { eventIcon } from "@/components/product-icons";
 import { Avatar } from "@/components/ui/avatar";
 import { ChatRoom } from "@/features/chat/chat-room";
+import { PartnerOnline } from "@/features/presence/partner-online";
 import { PartnerClock } from "@/features/home/partner-clock";
 import { toChatMessage } from "@/lib/chat";
 import { LiveRefresh } from "@/components/live-refresh";
@@ -74,6 +76,7 @@ export default async function ChatPage() {
                 )}
               </p>
               <p className="flex items-center gap-2 text-xs text-ink-soft">
+                <PartnerOnline partnerId={partner.id} initialOnline={isUserOnline(partner.id)} />
                 {partnerPresence && partnerEffective !== "NONE" && (
                   <span>{partnerPresence.label}</span>
                 )}
@@ -120,6 +123,7 @@ export default async function ChatPage() {
         channel="MAIN"
         initialHasMore={hasMore}
         trackSeen
+        initialPartnerSeenAt={partner?.lastChatSeenAt ? partner.lastChatSeenAt.toISOString() : null}
       />
     </div>
   );

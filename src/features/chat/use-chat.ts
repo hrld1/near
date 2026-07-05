@@ -5,6 +5,7 @@ import {
   loadOlderMessagesAction,
   markChatSeenAction,
   sendMessageAction,
+  setTypingAction,
   toggleReactionAction
 } from "@/actions/messages";
 import { useCoupleStream } from "@/hooks/use-stream";
@@ -18,22 +19,28 @@ export function useChat({
   channel,
   initialMessages,
   initialHasMore,
-  trackSeen
+  trackSeen,
+  initialPartnerSeenAt
 }: {
   me: MemberInfo;
   channel: "MAIN" | "DATE_ROOM";
   initialMessages: ChatMessage[];
   initialHasMore?: boolean;
   trackSeen?: boolean;
+  initialPartnerSeenAt?: string | null;
 }) {
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(initialHasMore ?? false);
   const [loadingOlder, setLoadingOlder] = useState(false);
+  const [partnerTyping, setPartnerTyping] = useState(false);
+  const [partnerSeenAt, setPartnerSeenAt] = useState<string | null>(initialPartnerSeenAt ?? null);
   const [, startTransition] = useTransition();
 
   const listRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const typingClearRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastTypingSentRef = useRef(0);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ block: "end" });
@@ -51,6 +58,7 @@ export function useChat({
       const message = event.payload;
       if (message.channel !== channel) return;
       if (message.senderId === me.id) return;
+      setPartnerTyping(false); // ha mandado: ya no escribe
       setMessages((prev) => {
         if (prev.some((m) => m.id === message.id)) return prev;
         sfx.message();
@@ -64,7 +72,30 @@ export function useChat({
         prev.map((m) => (m.id === messageId ? { ...m, reactions } : m))
       );
     }
+    if (event.type === "chat:typing") {
+      if (event.payload.userId === me.id) return;
+      if (event.payload.channel !== channel) return;
+      setPartnerTyping(true);
+      if (typingClearRef.current) clearTimeout(typingClearRef.current);
+      typingClearRef.current = setTimeout(() => setPartnerTyping(false), 4000);
+    }
+    if (event.type === "chat:seen") {
+      if (event.payload.userId === me.id) return;
+      setPartnerSeenAt(event.payload.at);
+    }
   });
+
+  useEffect(() => () => {
+    if (typingClearRef.current) clearTimeout(typingClearRef.current);
+  }, []);
+
+  // Aviso "estoy escribiendo" con freno: como mucho uno cada 2,5s.
+  function notifyTyping() {
+    const now = Date.now();
+    if (now - lastTypingSentRef.current < 2500) return;
+    lastTypingSentRef.current = now;
+    void setTypingAction({ channel });
+  }
 
   async function loadOlder() {
     const first = messages.find((m) => !m.id.startsWith("tmp-"));
@@ -141,5 +172,19 @@ export function useChat({
     });
   }
 
-  return { messages, error, setError, hasMore, loadingOlder, listRef, bottomRef, loadOlder, send, react };
+  return {
+    messages,
+    error,
+    setError,
+    hasMore,
+    loadingOlder,
+    partnerTyping,
+    partnerSeenAt,
+    notifyTyping,
+    listRef,
+    bottomRef,
+    loadOlder,
+    send,
+    react
+  };
 }

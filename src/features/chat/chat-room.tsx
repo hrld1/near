@@ -22,6 +22,7 @@ type Props = {
   compact?: boolean;
   initialHasMore?: boolean;
   trackSeen?: boolean;
+  initialPartnerSeenAt?: string | null;
 };
 
 // Orquesta el chat: lista con agrupacion por autor/tiempo, estado vacio,
@@ -33,9 +34,26 @@ export function ChatRoom({
   channel,
   compact,
   initialHasMore,
-  trackSeen
+  trackSeen,
+  initialPartnerSeenAt
 }: Props) {
-  const chat = useChat({ me, channel, initialMessages, initialHasMore, trackSeen });
+  const chat = useChat({
+    me,
+    channel,
+    initialMessages,
+    initialHasMore,
+    trackSeen,
+    initialPartnerSeenAt
+  });
+
+  // "Visto" bajo mi ultimo mensaje ya confirmado, si la pareja lo abrio despues
+  const lastOwn = [...chat.messages]
+    .reverse()
+    .find((m) => m.senderId === me.id && !m.id.startsWith("tmp-"));
+  const lastOwnSeen =
+    !!lastOwn &&
+    !!chat.partnerSeenAt &&
+    new Date(chat.partnerSeenAt).getTime() >= new Date(lastOwn.createdAt).getTime();
   const [pickerFor, setPickerFor] = useState<string | null>(null);
   const [lightbox, setLightbox] = useState<string | null>(null);
   const [nudgeSent, setNudgeSent] = useState(false);
@@ -157,9 +175,33 @@ export function ChatRoom({
                   onOpenImage={setLightbox}
                 />
               </div>
+              {own && message.id === lastOwn?.id && lastOwnSeen && (
+                <p className="mt-1 pr-1 text-right text-[11px] font-medium text-ink-soft">
+                  Visto
+                </p>
+              )}
             </div>
           );
         })}
+
+        {chat.partnerTyping && partner && (
+          <div className="mt-3.5 flex items-end gap-2">
+            {!compact && (
+              <span className="w-7 shrink-0">
+                <Avatar name={partner.name} tone={1} size="sm" className="h-7 w-7 text-[10px]" />
+              </span>
+            )}
+            <div className="flex items-center gap-1 rounded-2xl rounded-bl-md bg-sand px-3.5 py-3">
+              {[0, 1, 2].map((i) => (
+                <span
+                  key={i}
+                  className="h-1.5 w-1.5 rounded-full bg-ink-soft/60 motion-safe:animate-bounce"
+                  style={{ animationDelay: `${i * 0.15}s` }}
+                />
+              ))}
+            </div>
+          </div>
+        )}
         <div ref={chat.bottomRef} />
       </div>
 
@@ -177,6 +219,7 @@ export function ChatRoom({
         compact={compact}
         send={chat.send}
         onError={chat.setError}
+        onTyping={chat.notifyTyping}
       />
 
       {lightbox && <ImageLightbox url={lightbox} onClose={() => setLightbox(null)} />}
