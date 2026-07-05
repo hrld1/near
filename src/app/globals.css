@@ -54,3 +54,16 @@
     border-radius: 9999px;
   }
 }
+
+/* Ficha del 4 en raya: cae desde arriba con un pequeno rebote. */
+.c4-disc {
+  animation: c4-drop 0.45s cubic-bezier(0.55, 0, 0.65, 1.35) both;
+}
+@keyframes c4-drop {
+  from {
+    transform: translateY(var(--drop-from, -300px));
+  }
+  to {
+    transform: translateY(0);
+  }
+}

@@ -75,6 +75,16 @@ export type StreamEvent =
   | {
       type: "call:signal";
       payload: { fromId: string; fromName: string; kind: CallSignalKind; data: string | null };
+    }
+  | {
+      type: "c4:signal";
+      payload: {
+        kind: "invite" | "accept" | "move" | "quit";
+        byId: string;
+        byName: string;
+        seed?: number;
+        col?: number;
+      };
     };
 
 export type StreamEventType = StreamEvent["type"];

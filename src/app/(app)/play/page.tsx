@@ -332,6 +332,23 @@ export default async function PlayPage() {
               </Link>
             );
           })}
+          <Link href="/play/connect4" className="group">
+            <Card className="relative h-full overflow-hidden transition group-hover:-translate-y-0.5 group-hover:shadow-lift">
+              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-indigo-400 to-violet-600 opacity-80" />
+              <div className="flex items-start justify-between">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-500/12 text-indigo-600 dark:text-indigo-400">
+                  <Swords className="h-5 w-5" />
+                </span>
+                <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
+                  En vivo
+                </span>
+              </div>
+              <h3 className="mt-2.5 font-display text-lg text-ink">4 en raya</h3>
+              <p className="mt-0.5 text-xs leading-relaxed text-ink-soft">
+                Duelo por turnos en directo: retale y que caigan las fichas.
+              </p>
+            </Card>
+          </Link>
           <Link href="/play/quiz" className="group">
             <Card className="relative h-full overflow-hidden transition group-hover:-translate-y-0.5 group-hover:shadow-lift">
               <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-rose to-plum opacity-80" />
