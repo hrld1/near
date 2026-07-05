@@ -26,6 +26,7 @@ import { Countdown } from "@/features/home/countdown";
 import { PresencePicker } from "@/features/home/presence-picker";
 import { MoodCheck } from "@/features/home/mood-check";
 import { NudgeButton } from "@/features/home/nudge-button";
+import { TouchButton } from "@/features/home/touch-button";
 import { PromptCard } from "@/features/home/prompt-card";
 import { NoteForm } from "@/features/home/note-form";
 import { StreakMissions } from "@/features/home/streak-missions";
@@ -209,7 +210,7 @@ export default async function HomePage() {
                     </div>
                   </div>
                 )}
-                <div className="mt-4 max-w-xs">
+                <div className="mt-4 flex max-w-xs flex-col gap-2">
                   <NudgeButton
                     partnerName={partner.name}
                     lastNudge={
@@ -218,6 +219,7 @@ export default async function HomePage() {
                         : null
                     }
                   />
+                  <TouchButton partnerName={partner.name} />
                 </div>
               </>
             ) : (

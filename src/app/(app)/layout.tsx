@@ -4,6 +4,7 @@ import { CallProvider } from "@/features/call/call-context";
 import { LiveRefresh } from "@/components/live-refresh";
 import { Sidebar } from "@/components/layout/sidebar";
 import { NudgeToast } from "@/components/layout/nudge-toast";
+import { TouchInvite } from "@/features/touch/touch-invite";
 import { TimezoneSync } from "@/components/timezone-sync";
 import type { MemberInfo } from "@/types";
 
@@ -38,6 +39,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <Sidebar userName={user.name} unreadChat={unreadChat} />
       <main className="min-w-0 flex-1 pb-24 md:pb-0">{children}</main>
       {user.coupleId && <NudgeToast myId={user.id} />}
+      {user.coupleId && <TouchInvite myId={user.id} />}
       {user.coupleId && <LiveRefresh types={["message:new"]} />}
       <TimezoneSync current={user.timezone} />
     </div>
