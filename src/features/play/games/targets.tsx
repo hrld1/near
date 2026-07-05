@@ -13,6 +13,7 @@ export function TargetsGame({ onFinish }: { onFinish: (score: number) => void })
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(DURATION);
   const [pops, setPops] = useState<{ id: number; x: number; y: number; value: number }[]>([]);
+  const [ripples, setRipples] = useState<{ id: number; x: number; y: number }[]>([]);
   const idRef = useRef(0);
   const scoreRef = useRef(0);
   const doneRef = useRef(false);
@@ -65,6 +66,9 @@ export function TargetsGame({ onFinish }: { onFinish: (score: number) => void })
     const pop = { id: target.id, x: target.x, y: target.y, value };
     setPops((prev) => [...prev.slice(-6), pop]);
     setTimeout(() => setPops((prev) => prev.filter((p) => p.id !== pop.id)), 500);
+    const ripple = { id: target.id, x: target.x, y: target.y };
+    setRipples((prev) => [...prev.slice(-6), ripple]);
+    setTimeout(() => setRipples((prev) => prev.filter((r) => r.id !== ripple.id)), 450);
   }
 
   return (
@@ -82,7 +86,13 @@ export function TargetsGame({ onFinish }: { onFinish: (score: number) => void })
           {timeLeft.toFixed(0)}s
         </span>
       </div>
-      <div className="relative h-[340px] w-full touch-none select-none overflow-hidden rounded-xl bg-plum/10">
+      <div
+        className="relative h-[340px] w-full touch-none select-none overflow-hidden rounded-xl"
+        style={{
+          background:
+            "radial-gradient(ellipse at 50% 30%, rgb(var(--c-plum) / 0.16), rgb(var(--c-plum) / 0.05) 65%), repeating-linear-gradient(45deg, rgb(var(--c-plum) / 0.04) 0 14px, transparent 14px 28px)"
+        }}
+      >
         {targets.map((target) => {
           const age = (Date.now() - target.bornAt) / TARGET_LIFE;
           const size = Math.max(24, 58 * (1 - age * 0.7));
@@ -90,18 +100,27 @@ export function TargetsGame({ onFinish }: { onFinish: (score: number) => void })
             <button
               key={target.id}
               onPointerDown={(e) => hit(target, e)}
-              className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full border-4 border-rose bg-rose-faint shadow-card transition-transform active:scale-90"
+              className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full shadow-lift transition-transform active:scale-90"
               style={{
                 left: `${target.x}%`,
                 top: `${target.y}%`,
                 width: size,
-                height: size
+                height: size,
+                // diana real: anillos concentricos blanco/rojo
+                background:
+                  "radial-gradient(circle, #ef4444 0 19%, #ffffff 19% 40%, #ef4444 40% 61%, #ffffff 61% 80%, #dc2626 80% 100%)",
+                boxShadow: "0 3px 10px rgba(0,0,0,0.25), inset 0 -2px 4px rgba(0,0,0,0.15)"
               }}
-            >
-              <span className="absolute inset-[22%] rounded-full bg-rose/70" />
-            </button>
+            />
           );
         })}
+        {ripples.map((ripple) => (
+          <span
+            key={ripple.id}
+            className="pointer-events-none absolute h-14 w-14 -translate-x-1/2 -translate-y-1/2 animate-ping rounded-full border-4 border-rose"
+            style={{ left: `${ripple.x}%`, top: `${ripple.y}%`, animationDuration: "0.45s" }}
+          />
+        ))}
         {pops.map((pop) => (
           <span
             key={pop.id}

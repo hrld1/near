@@ -53,7 +53,8 @@ npm run dev                   # 5. http://localhost:3000
 
 ### Arcade (rediseno completo)
 - **Reto del dia**: un juego rotativo, 5 intentos, mejor marca contra tu pareja, ganador del dia e historial de duelos de la semana (G/P/E). **Ganar el duelo de ayer se cobra en /play (+15)** con re-verificacion en servidor.
-- **7 minijuegos reales y animados**: Reflejos (reaction), Parejas (memory), Dianas (aim), Eco (Simon), Palabra oculta (anagramas del dia), **Sprint (calculo mental)** y **Teclas (mecanografia)**. Registro declarativo en `lib/games.ts`: anadir un juego = 1 componente + 1 entrada.
+- **9 minijuegos reales y animados**: Reflejos, Parejas, Dianas, Eco, Palabra oculta, Sprint (calculo), Teclas (mecanografia) y, en **canvas con fisica y particulas a 60fps**, **Minigolf** (5 hoyos con rebotes y apuntado tirachinas) y **Chapas** (deslizar a la diana con colisiones entre chapas). Registro declarativo en `lib/games.ts`: anadir un juego = 1 componente + 1 entrada.
+- **4 en raya EN VIVO**: duelo por turnos en directo sobre el bus SSE (reto, fichas con caida animada, revancha). Sin persistencia: partida en vivo entre los dos.
 - **Quiz "Nos conocemos?"** integrado como modo cooperativo.
 - Puntuaciones persistidas (`GameScore`) con **rango plausible validado en servidor** (`scoreBounds`), puntos de temporada por participar y por ganar, confetti y feedback en cada resultado.
 
@@ -93,12 +94,17 @@ npm run dev                   # 5. http://localhost:3000
 - **PWA + push** (ver tabla de integraciones) y pagina de **Ajustes**.
 - **Producto**: aniversario de pareja con contador de mesiversarios/aniversarios (home y fechas), "visto" en los "pensando en ti", eventos con hora de fin, titulo real del video en la sala (oEmbed), pools de la caja ampliados (25 retos / 20 preguntas / 15 gestos) y 2 minijuegos nuevos.
 
+### Iteracion 5: llamada robusta y arcade inmersiva
+- **Videollamada que no revienta**: si la camara esta en uso (el caso tipico al probar con dos navegadores en un mismo PC) se entra con solo-audio o como espectador (transceivers `recvonly`); errores especificos, guardas de negociacion y 7s de gracia ante cortes transitorios.
+- **Juegos con gorra de videojuego movil**: mini-motor canvas propio (`games/engine.ts`: HiDPI, particulas, apuntado tirachinas) y dos juegos fisicos: **Minigolf** y **Chapas**. Dianas rediseñadas con anillos reales y ondas al acertar.
+- **4 en raya en vivo**: primer juego cabeza-a-cabeza por turnos de Near, serializado por el bus SSE.
+
 ## Integraciones: reales vs pendientes
 
 | Integracion | Estado | Detalle |
 |---|---|---|
 | YouTube sync | ✅ Real | IFrame API, sin claves |
-| Videollamada | ✅ Real | WebRTC P2P + SSE signaling. TURN opcional (env) para NAT estricto |
+| Videollamada | ✅ Real | WebRTC P2P + SSE signaling. TURN opcional (env) para NAT estricto. Si la camara esta ocupada (p.ej. dos navegadores en el mismo PC) degrada a solo-audio o espectador en vez de fallar |
 | Netflix/HBO/Prime/Disney+ | ⚠️ Companion honesto | No existe API publica de control de reproduccion; Near coordina a las personas, no a los players |
 | Spotify | ❌ Pendiente | El sync real exige crear una app en developer.spotify.com (Client ID/Secret), OAuth con scopes `user-read-playback-state`/`user-modify-playback-state` y **cuentas Premium**. El companion actual ya cubre "escuchar a la vez". Si quieres que lo implemente: crea la app, anade `SPOTIFY_CLIENT_ID/SECRET` al `.env` y pidemelo |
 | Push notifications | ✅ Real (v4) | PWA instalable + Web Push (VAPID, sin terceros). Push solo si el otro esta offline: mensajes, latidos, caja del dia e invitacion aceptada. Opt-in por dispositivo en Ajustes. iOS: requiere 16.4+ y anadir a pantalla de inicio |
