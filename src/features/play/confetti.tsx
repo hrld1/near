@@ -1,5 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
+import { sfx, vibrate } from "@/lib/sound";
+
 const COLORS = [
   "bg-rose",
   "bg-amber-400",
@@ -9,6 +12,12 @@ const COLORS = [
 ];
 
 export function Confetti() {
+  // el confetti solo aparece en celebraciones: suena y vibra a juego
+  useEffect(() => {
+    sfx.success();
+    vibrate([25, 60, 25]);
+  }, []);
+
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex justify-around overflow-hidden">
       {Array.from({ length: 16 }).map((_, i) => (

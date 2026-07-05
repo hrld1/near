@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { requireCouple } from "@/lib/couple";
 import { Card, CardTitle } from "@/components/ui/card";
 import { PushToggle } from "@/features/settings/push-toggle";
+import { SoundToggle } from "@/features/settings/sound-toggle";
 import { AnniversaryForm } from "@/features/settings/anniversary-form";
 
 export const metadata: Metadata = { title: "Ajustes" };
@@ -24,6 +25,13 @@ export default async function SettingsPage() {
           <CardTitle>Notificaciones</CardTitle>
           <div className="mt-3">
             <PushToggle />
+          </div>
+        </Card>
+
+        <Card>
+          <CardTitle>Sonido y vibración</CardTitle>
+          <div className="mt-3">
+            <SoundToggle />
           </div>
         </Card>
 

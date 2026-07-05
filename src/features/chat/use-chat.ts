@@ -8,6 +8,7 @@ import {
   toggleReactionAction
 } from "@/actions/messages";
 import { useCoupleStream } from "@/hooks/use-stream";
+import { sfx, vibrate } from "@/lib/sound";
 import type { ChatMessage, MemberInfo } from "@/types";
 
 // Estado y flujos del chat (mensajes, envio optimista, paginacion, stream,
@@ -50,9 +51,12 @@ export function useChat({
       const message = event.payload;
       if (message.channel !== channel) return;
       if (message.senderId === me.id) return;
-      setMessages((prev) =>
-        prev.some((m) => m.id === message.id) ? prev : [...prev, message]
-      );
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === message.id)) return prev;
+        sfx.message();
+        vibrate(18);
+        return [...prev, message];
+      });
     }
     if (event.type === "message:reaction") {
       const { messageId, reactions } = event.payload;
