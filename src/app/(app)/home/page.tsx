@@ -33,6 +33,7 @@ import { PromptCard } from "@/features/home/prompt-card";
 import { NoteForm } from "@/features/home/note-form";
 import { StreakMissions } from "@/features/home/streak-missions";
 import { DailyBox } from "@/features/home/daily-box";
+import { DailyPhoto } from "@/features/home/daily-photo";
 import { PartnerClock } from "@/features/home/partner-clock";
 
 export const metadata: Metadata = { title: "Inicio" };
@@ -52,7 +53,7 @@ export default async function HomePage() {
   const userDay = dayKeyIn(user.timezone);
   const now = new Date();
 
-  const [myMood, partnerMood, nextEvents, latestMoment, notes, lastNudge, myLastNudge, promptCount, promptAnswers, streakInfo, missionInfo, weeklyBonus, dailyBox] =
+  const [myMood, partnerMood, nextEvents, latestMoment, notes, lastNudge, myLastNudge, promptCount, promptAnswers, streakInfo, missionInfo, weeklyBonus, dailyBox, myPhotoRow, partnerPhotoRow] =
     await Promise.all([
       // cada mood vive en el dia local de su autor
       prisma.moodEntry.findUnique({
@@ -106,7 +107,18 @@ export default async function HomePage() {
       ).catch(() => null),
       prisma.dailyBox.findUnique({
         where: { coupleId_dateKey: { coupleId: couple.id, dateKey: coupleDay } }
-      })
+      }),
+      // foto del dia: la mia (mi dia local) y la de mi pareja (su dia local)
+      prisma.dailyPhoto.findUnique({
+        where: { userId_dateKey: { userId: user.id, dateKey: userDay } }
+      }),
+      partner
+        ? prisma.dailyPhoto.findUnique({
+            where: {
+              userId_dateKey: { userId: partner.id, dateKey: dayKeyIn(partner.timezone) }
+            }
+          })
+        : null
     ]);
 
   // la pregunta rota con el dia de la pareja: ambos ven la misma
@@ -137,6 +149,10 @@ export default async function HomePage() {
     : null;
   const milestone = couple.anniversary ? nextAnniversary(couple.anniversary, now) : null;
   const CountdownIcon = countdownEvent ? eventIcon(countdownEvent.kind) : null;
+  const myPhoto = myPhotoRow ? { imageUrl: myPhotoRow.imageUrl, caption: myPhotoRow.caption } : null;
+  const partnerPhoto = partnerPhotoRow
+    ? { imageUrl: partnerPhotoRow.imageUrl, caption: partnerPhotoRow.caption }
+    : null;
 
   const quickActions = [
     { href: "/chat", label: "Chat", icon: MessageCircle },
@@ -315,6 +331,19 @@ export default async function HomePage() {
             <MoodCheck currentMood={myMood?.mood ?? null} currentNote={myMood?.note ?? null} />
           </div>
         </Card>
+
+        {partner && (
+          <Card className="md:row-span-2">
+            <CardTitle>La foto de hoy</CardTitle>
+            <div className="mt-3">
+              <DailyPhoto
+                partnerName={partner.name}
+                initialPartnerPhoto={partnerPhoto}
+                initialMyPhoto={myPhoto}
+              />
+            </div>
+          </Card>
+        )}
 
         {milestone && (
           <Card>
