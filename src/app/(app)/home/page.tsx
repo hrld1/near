@@ -7,6 +7,7 @@ import {
   BookHeart,
   CalendarHeart,
   Heart,
+  Mail,
   MessageCircle,
   MonitorPlay,
   StickyNote
@@ -158,6 +159,7 @@ export default async function HomePage() {
     { href: "/chat", label: "Chat", icon: MessageCircle },
     { href: "/moments", label: "Momento", icon: BookHeart },
     { href: "/date-room", label: "Sala", icon: MonitorPlay },
+    { href: "/letters", label: "Cartas", icon: Mail },
     { href: "/calendar", label: "Fechas", icon: CalendarHeart }
   ];
 
