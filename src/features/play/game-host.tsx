@@ -16,6 +16,8 @@ import { EchoGame } from "@/features/play/games/echo";
 import { AnagramGame } from "@/features/play/games/anagram";
 import { SprintGame } from "@/features/play/games/sprint";
 import { TypingGame } from "@/features/play/games/typing";
+import { GolfGame } from "@/features/play/games/golf";
+import { CapsGame } from "@/features/play/games/caps";
 
 export type GameHostProps = {
   gameKey: string;
@@ -151,6 +153,8 @@ export function GameHost(props: GameHostProps) {
               )}
               {props.gameKey === "sprint" && <SprintGame onFinish={handleFinish} />}
               {props.gameKey === "typing" && <TypingGame onFinish={handleFinish} />}
+              {props.gameKey === "golf" && <GolfGame onFinish={handleFinish} />}
+              {props.gameKey === "caps" && <CapsGame onFinish={handleFinish} />}
             </div>
           )}
 

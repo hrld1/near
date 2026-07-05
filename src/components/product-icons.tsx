@@ -8,12 +8,14 @@ import {
   Calculator,
   Camera,
   Coffee,
+  Disc,
   Flame,
   Gem,
   Gift,
   Gamepad2,
   Images,
   Keyboard,
+  LandPlot,
   Layers,
   MessageCircle,
   Mic,
@@ -76,6 +78,18 @@ export const GAME_VISUALS: Record<
     accent: "from-cyan-400 to-indigo-500",
     accentSoft: "bg-cyan-500/12",
     accentText: "text-cyan-600 dark:text-cyan-400"
+  },
+  golf: {
+    icon: LandPlot,
+    accent: "from-lime-400 to-green-600",
+    accentSoft: "bg-lime-500/12",
+    accentText: "text-lime-700 dark:text-lime-400"
+  },
+  caps: {
+    icon: Disc,
+    accent: "from-orange-400 to-red-500",
+    accentSoft: "bg-orange-500/12",
+    accentText: "text-orange-600 dark:text-orange-400"
   }
 };
 

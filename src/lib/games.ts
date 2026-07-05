@@ -98,6 +98,28 @@ export const GAMES: GameDef[] = [
     maxAttemptsPerDay: 5,
     scoreBounds: { min: 0, max: 60 },
     format: (s) => `${Math.round(s)} palabras`
+  },
+  {
+    key: "golf",
+    name: "Minigolf",
+    tagline: "5 hoyos, un dedo y buen pulso.",
+    rules: "Arrastra y suelta para golpear: mas arrastre, mas fuerza. 5 hoyos con rebotes, maximo 8 golpes por hoyo. Menos golpes es mejor.",
+    lowerIsBetter: true,
+    unit: "golpes",
+    maxAttemptsPerDay: 5,
+    scoreBounds: { min: 5, max: 45 },
+    format: (s) => `${Math.round(s)} golpes`
+  },
+  {
+    key: "caps",
+    name: "Chapas",
+    tagline: "Desliza tus chapas al centro de la diana.",
+    rules: "Arrastra cada chapa y suelta para lanzarla. 5 chapas que puntuan segun el anillo donde queden... y pueden empujarse entre si.",
+    lowerIsBetter: false,
+    unit: "pts",
+    maxAttemptsPerDay: 5,
+    scoreBounds: { min: 0, max: 125 },
+    format: (s) => `${Math.round(s)} pts`
   }
 ];
 
