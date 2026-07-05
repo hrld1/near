@@ -1,24 +1,34 @@
 "use server";
 
 import { z } from "zod";
-import { publish } from "@/lib/realtime";
+import { notifyPartner } from "@/lib/notify";
 import { coupleAction } from "@/lib/safe-action";
 import type { CallSignalKind } from "@/types";
 
 // Senalizacion WebRTC sobre el bus SSE existente: sin infraestructura extra.
 // Los payloads (SDP/ICE) son opacos para el servidor; solo se retransmiten
 // al otro miembro de la pareja. No se persisten.
+//
+// El primer "ring" viaja con initial=true: si la pareja tiene la app cerrada
+// (sin conexion SSE abierta) le llega un push "te esta llamando". Los re-rings
+// posteriores no lo llevan, asi que solo hay una notificacion por llamada.
 
 const signalSchema = z.object({
   kind: z.enum(["ring", "accept", "decline", "offer", "answer", "ice", "hangup"]),
-  data: z.string().max(50_000).optional()
+  data: z.string().max(50_000).optional(),
+  initial: z.boolean().optional()
 });
 
-export const callSignalAction = coupleAction<[input: { kind: CallSignalKind; data?: string }]>(
-  async ({ user, coupleId }, input) => {
-    const parsed = signalSchema.safeParse(input);
-    if (!parsed.success) return { ok: false, error: "Senal no valida" };
-    publish(coupleId, {
+export const callSignalAction = coupleAction<
+  [input: { kind: CallSignalKind; data?: string; initial?: boolean }]
+>(async ({ user, coupleId, partnerId }, input) => {
+  const parsed = signalSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "Senal no valida" };
+  const isInitialRing = parsed.data.kind === "ring" && parsed.data.initial === true;
+  notifyPartner(
+    coupleId,
+    partnerId,
+    {
       type: "call:signal",
       payload: {
         fromId: user.id,
@@ -26,7 +36,15 @@ export const callSignalAction = coupleAction<[input: { kind: CallSignalKind; dat
         kind: parsed.data.kind,
         data: parsed.data.data ?? null
       }
-    });
-    return { ok: true };
-  }
-);
+    },
+    isInitialRing
+      ? {
+          title: `${user.name} te está llamando`,
+          body: "Toca para contestar la videollamada",
+          url: "/date-room",
+          tag: "near-call"
+        }
+      : undefined
+  );
+  return { ok: true };
+});

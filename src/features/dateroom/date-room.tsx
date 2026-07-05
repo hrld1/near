@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { Clapperboard, MonitorPlay, Popcorn } from "lucide-react";
 import { setVideoAction, updatePlaybackAction } from "@/actions/dateroom";
 import { setRoomModeAction } from "@/actions/dateroom";
-import { CallPanel } from "@/features/dateroom/call-panel";
+import { CallStage } from "@/features/dateroom/call-stage";
 import { CompanionRoom } from "@/features/dateroom/companion";
 import { cn } from "@/lib/utils";
 import { ChatRoom } from "@/features/chat/chat-room";
@@ -178,7 +178,7 @@ export function DateRoom({
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row">
       <div className="flex min-w-0 flex-[1.6] flex-col gap-3">
-        <CallPanel me={me} partnerName={partner?.name ?? "tu pareja"} />
+        <CallStage />
 
         <div className="flex gap-1 rounded-full bg-sand p-1">
           <button
