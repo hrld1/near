@@ -9,10 +9,10 @@ import {
   type ReactNode
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Mic, MicOff, Phone, PhoneOff } from "lucide-react";
+import { Mic, MicOff, Moon, Phone, PhoneOff, Sun } from "lucide-react";
 import { callSignalAction } from "@/actions/call";
 import { useCoupleStream } from "@/hooks/use-stream";
-import { sfx, vibrate } from "@/lib/sound";
+import { heartbeat, sfx, vibrate } from "@/lib/sound";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -41,6 +41,7 @@ type CallContextValue = {
   elapsed: number;
   notice: string | null;
   mediaMode: MediaMode;
+  sleeping: boolean;
   partner: MemberInfo | null;
   localStream: MediaStream | null;
   remoteStream: MediaStream | null;
@@ -50,6 +51,9 @@ type CallContextValue = {
   hangup: () => void;
   toggleMute: () => void;
   toggleCamera: () => void;
+  startSleep: () => void;
+  wakeUp: () => void;
+  goodnight: () => void;
   clearNotice: () => void;
 };
 
@@ -77,10 +81,14 @@ function iceServers(): RTCIceServer[] {
 export function CallProvider({
   me,
   partner,
+  myTimezone,
+  partnerTimezone,
   children
 }: {
   me: MemberInfo;
   partner: MemberInfo | null;
+  myTimezone: string;
+  partnerTimezone: string | null;
   children: ReactNode;
 }) {
   const router = useRouter();
@@ -90,6 +98,7 @@ export function CallProvider({
   const [elapsed, setElapsed] = useState(0);
   const [notice, setNotice] = useState<string | null>(null);
   const [mediaMode, setMediaMode] = useState<MediaMode>("full");
+  const [sleeping, setSleeping] = useState(false);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
 
@@ -313,6 +322,20 @@ export function CallProvider({
         case "hangup":
           if (stateRef.current !== "idle") cleanup(false, "Llamada terminada");
           break;
+        // modo dormir juntos: atenuar es informativo (se refleja en ambos)
+        case "sleep":
+          if (stateRef.current === "active") setSleeping(true);
+          break;
+        case "wake":
+          setSleeping(false);
+          break;
+        case "goodnight":
+          if (stateRef.current !== "idle") {
+            heartbeat();
+            sfx.goodnight();
+            cleanup(false, "Buenas noches 🌙");
+          }
+          break;
         default:
           break;
       }
@@ -417,6 +440,7 @@ export function CallProvider({
     setMuted(false);
     setCameraOff(false);
     setElapsed(0);
+    setSleeping(false);
     setCallState("idle");
     if (!silent && message) setNotice(message);
   }
@@ -433,6 +457,25 @@ export function CallProvider({
     setCameraOff(next);
   }
 
+  // --- modo dormir juntos ---
+  function startSleep() {
+    if (stateRef.current !== "active") return;
+    setSleeping(true);
+    void callSignalAction({ kind: "sleep" });
+  }
+
+  function wakeUp() {
+    setSleeping(false);
+    void callSignalAction({ kind: "wake" });
+  }
+
+  function goodnight() {
+    void callSignalAction({ kind: "goodnight" });
+    heartbeat();
+    sfx.goodnight();
+    cleanup(false, "Buenas noches 🌙");
+  }
+
   const value: CallContextValue = {
     state,
     muted,
@@ -440,6 +483,7 @@ export function CallProvider({
     elapsed,
     notice,
     mediaMode,
+    sleeping,
     partner,
     localStream,
     remoteStream,
@@ -449,6 +493,9 @@ export function CallProvider({
     hangup,
     toggleMute,
     toggleCamera,
+    startSleep,
+    wakeUp,
+    goodnight,
     clearNotice: () => setNotice(null)
   };
 
@@ -467,7 +514,106 @@ export function CallProvider({
         onDecline={declineCall}
       />
       <ActiveCallBar />
+      <SleepOverlay
+        visible={sleeping && state === "active"}
+        partnerName={partner?.name ?? "tu pareja"}
+        myTimezone={myTimezone}
+        partnerTimezone={partnerTimezone}
+        elapsed={elapsed}
+        onWake={wakeUp}
+        onGoodnight={goodnight}
+      />
     </CallContext.Provider>
+  );
+}
+
+// Reloj grande y tenue para el modo dormir. Sin dependencias: Intl directo.
+function NightClock({ timezone, label }: { timezone: string | null; label: string }) {
+  const [time, setTime] = useState<string | null>(null);
+  useEffect(() => {
+    if (!timezone) return;
+    const tick = () => {
+      try {
+        setTime(
+          new Intl.DateTimeFormat("es", {
+            hour: "2-digit",
+            minute: "2-digit",
+            timeZone: timezone
+          }).format(new Date())
+        );
+      } catch {
+        setTime(null);
+      }
+    };
+    tick();
+    const id = setInterval(tick, 15_000);
+    return () => clearInterval(id);
+  }, [timezone]);
+
+  return (
+    <div className="text-center">
+      <p className="font-display text-5xl tabular-nums text-white/90 sm:text-6xl">
+        {time ?? "--:--"}
+      </p>
+      <p className="mt-1 text-xs uppercase tracking-widest text-white/40">{label}</p>
+    </div>
+  );
+}
+
+// Pantalla atenuada de "dormir juntos": la llamada de audio sigue abierta,
+// los dos relojes presentes, y "Buenas noches" cierra con un latido.
+function SleepOverlay({
+  visible,
+  partnerName,
+  myTimezone,
+  partnerTimezone,
+  elapsed,
+  onWake,
+  onGoodnight
+}: {
+  visible: boolean;
+  partnerName: string;
+  myTimezone: string;
+  partnerTimezone: string | null;
+  elapsed: number;
+  onWake: () => void;
+  onGoodnight: () => void;
+}) {
+  if (!visible) return null;
+  return (
+    <div className="fixed inset-0 z-[70] flex flex-col items-center justify-center gap-10 bg-[#080510] px-6 text-white">
+      <p className="flex items-center gap-2 text-sm text-white/50">
+        <Moon className="h-4 w-4" />
+        Durmiendo con {partnerName} · {Math.floor(elapsed / 60)}:
+        {String(elapsed % 60).padStart(2, "0")}
+      </p>
+
+      <div className="flex items-center gap-10 sm:gap-16">
+        <NightClock timezone={myTimezone} label="Tú" />
+        <span className="h-16 w-px bg-white/10" />
+        <NightClock timezone={partnerTimezone} label={partnerName} />
+      </div>
+
+      <p className="max-w-xs text-center text-sm text-white/40">
+        Seguís conectados. Cerrad los ojos; el audio sigue abierto hasta que
+        alguno diga buenas noches.
+      </p>
+
+      <div className="flex items-center gap-3">
+        <button
+          onClick={onWake}
+          className="flex items-center gap-2 rounded-full border border-white/20 px-5 py-2.5 text-sm font-medium text-white/80 transition hover:bg-white/10"
+        >
+          <Sun className="h-4 w-4" /> Despertar
+        </button>
+        <button
+          onClick={onGoodnight}
+          className="flex items-center gap-2 rounded-full bg-rose px-5 py-2.5 text-sm font-medium text-white transition hover:bg-rose-deep"
+        >
+          <Moon className="h-4 w-4" /> Buenas noches
+        </button>
+      </div>
+    </div>
   );
 }
 

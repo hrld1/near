@@ -13,6 +13,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   let unreadChat = 0;
   let partner: MemberInfo | null = null;
+  let partnerTimezone: string | null = null;
   if (user.coupleId) {
     const [count, couple] = await Promise.all([
       prisma.message.count({
@@ -25,11 +26,15 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       }),
       prisma.couple.findUnique({
         where: { id: user.coupleId },
-        include: { members: { select: { id: true, name: true, image: true } } }
+        include: { members: { select: { id: true, name: true, image: true, timezone: true } } }
       })
     ]);
     unreadChat = count;
-    partner = couple?.members.find((m) => m.id !== user.id) ?? null;
+    const partnerMember = couple?.members.find((m) => m.id !== user.id) ?? null;
+    partner = partnerMember
+      ? { id: partnerMember.id, name: partnerMember.name, image: partnerMember.image }
+      : null;
+    partnerTimezone = partnerMember?.timezone ?? null;
   }
 
   const me: MemberInfo = { id: user.id, name: user.name, image: user.image };
@@ -49,7 +54,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // sobrevive a la navegacion. Sin pareja (onboarding) no hace falta.
   if (!user.coupleId) return content;
   return (
-    <CallProvider me={me} partner={partner}>
+    <CallProvider
+      me={me}
+      partner={partner}
+      myTimezone={user.timezone}
+      partnerTimezone={partnerTimezone}
+    >
       {content}
     </CallProvider>
   );

@@ -14,7 +14,19 @@ import type { CallSignalKind } from "@/types";
 // posteriores no lo llevan, asi que solo hay una notificacion por llamada.
 
 const signalSchema = z.object({
-  kind: z.enum(["ring", "accept", "decline", "offer", "answer", "ice", "hangup"]),
+  // sleep/wake/goodnight: modo "dormir juntos" sobre una llamada activa
+  kind: z.enum([
+    "ring",
+    "accept",
+    "decline",
+    "offer",
+    "answer",
+    "ice",
+    "hangup",
+    "sleep",
+    "wake",
+    "goodnight"
+  ]),
   data: z.string().max(50_000).optional(),
   initial: z.boolean().optional()
 });

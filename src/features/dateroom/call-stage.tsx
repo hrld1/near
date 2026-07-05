@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { Mic, MicOff, Phone, PhoneOff, Video, VideoOff } from "lucide-react";
+import { Mic, MicOff, Moon, Phone, PhoneOff, Video, VideoOff } from "lucide-react";
 import { useCall } from "@/features/call/call-context";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -24,6 +24,7 @@ export function CallStage() {
     startCall,
     toggleMute,
     toggleCamera,
+    startSleep,
     hangup,
     clearNotice
   } = useCall();
@@ -139,6 +140,15 @@ export function CallStage() {
         >
           {cameraOff ? <VideoOff className="h-4 w-4" /> : <Video className="h-4 w-4" />}
         </button>
+        {state === "active" && (
+          <button
+            onClick={startSleep}
+            className="rounded-full bg-sand p-3 text-ink transition hover:bg-sand-deep"
+            title="Dormir juntos"
+          >
+            <Moon className="h-4 w-4" />
+          </button>
+        )}
         <button
           onClick={hangup}
           className="rounded-full bg-red-500 p-3 text-white transition hover:bg-red-600"
