@@ -6,6 +6,7 @@ import { setVideoAction, updatePlaybackAction } from "@/actions/dateroom";
 import { setRoomModeAction } from "@/actions/dateroom";
 import { CallStage } from "@/features/dateroom/call-stage";
 import { CompanionRoom } from "@/features/dateroom/companion";
+import { MusicTogether } from "@/features/dateroom/music-together";
 import { cn } from "@/lib/utils";
 import { ChatRoom } from "@/features/chat/chat-room";
 import { useCoupleStream } from "@/hooks/use-stream";
@@ -50,7 +51,8 @@ export function DateRoom({
   initialMessages,
   initialMode,
   initialPlatform,
-  initialTitle
+  initialTitle,
+  music
 }: {
   me: MemberInfo;
   partner: MemberInfo | null;
@@ -59,6 +61,7 @@ export function DateRoom({
   initialMode: "YOUTUBE" | "COMPANION";
   initialPlatform: string | null;
   initialTitle: string | null;
+  music: { connected: boolean; partnerConnected: boolean } | null;
 }) {
   const [mode, setMode] = useState<"YOUTUBE" | "COMPANION">(initialMode);
   const [videoId, setVideoId] = useState(initialState.videoId);
@@ -179,6 +182,15 @@ export function DateRoom({
     <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row">
       <div className="flex min-w-0 flex-[1.6] flex-col gap-3">
         <CallStage />
+
+        {music && (
+          <MusicTogether
+            myId={me.id}
+            partnerName={partner?.name ?? "tu pareja"}
+            connected={music.connected}
+            partnerConnected={music.partnerConnected}
+          />
+        )}
 
         <div className="flex gap-1 rounded-full bg-sand p-1">
           <button

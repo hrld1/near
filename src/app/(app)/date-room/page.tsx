@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import { requireCouple } from "@/lib/couple";
 import { toChatMessage } from "@/lib/chat";
+import { spotifyEnabled, isSpotifyConnected } from "@/lib/spotify";
 import { DateRoom } from "@/features/dateroom/date-room";
 
 export const metadata: Metadata = { title: "Date Room" };
@@ -10,7 +11,8 @@ export const dynamic = "force-dynamic";
 export default async function DateRoomPage() {
   const { user, couple, partner } = await requireCouple();
 
-  const [state, rows] = await Promise.all([
+  const musicOn = spotifyEnabled();
+  const [state, rows, myConnected, partnerConnected] = await Promise.all([
     prisma.dateRoomState.upsert({
       where: { coupleId: couple.id },
       update: {},
@@ -21,7 +23,9 @@ export default async function DateRoomPage() {
       orderBy: { createdAt: "desc" },
       take: 50,
       include: { reactions: true }
-    })
+    }),
+    musicOn ? isSpotifyConnected(user.id) : Promise.resolve(false),
+    musicOn && partner ? isSpotifyConnected(partner.id) : Promise.resolve(false)
   ]);
 
   return (
@@ -46,6 +50,7 @@ export default async function DateRoomPage() {
         initialMode={state.mode === "COMPANION" ? "COMPANION" : "YOUTUBE"}
         initialPlatform={state.platform}
         initialTitle={state.sessionTitle}
+        music={musicOn ? { connected: myConnected, partnerConnected } : null}
       />
     </div>
   );
