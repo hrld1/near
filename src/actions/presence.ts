@@ -136,6 +136,17 @@ export const answerPromptAction = coupleFormAction(async ({ user, couple, couple
   return { success: "Respuesta guardada" };
 });
 
+// Ciudad voluntaria para el mapa de la distancia (sin GPS): solo un texto.
+// Las coordenadas y el clima se resuelven en cliente con Open-Meteo (sin key).
+export const setCityAction = coupleAction<[city: string]>(async ({ user, coupleId }, city) => {
+  const trimmed = city.trim().slice(0, 80);
+  await prisma.user.update({ where: { id: user.id }, data: { city: trimmed || null } });
+  publish(coupleId, { type: "presence", payload: { userId: user.id, presence: user.presence } });
+  revalidatePath("/map");
+  revalidatePath("/home");
+  return { ok: true };
+});
+
 export const saveTimezoneAction = coupleAction<[timezone: string]>(
   async ({ user }, timezone) => {
     if (!/^[A-Za-z_/+-]{2,60}$/.test(timezone)) return { ok: false, error: "Zona no valida" };
