@@ -5,6 +5,7 @@ import { Heart, CalendarHeart, StickyNote, Mail } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/couple";
 import { JoinRedeem } from "@/features/onboarding/join-redeem";
+import { TrustNote } from "@/features/onboarding/trust-note";
 
 export const metadata: Metadata = { title: "Únete en Near" };
 export const dynamic = "force-dynamic";
@@ -79,6 +80,12 @@ export default async function JoinPage({ params }: { params: { code: string } })
               <Mail className="h-4 w-4 shrink-0 text-rose" /> Una carta de bienvenida
             </p>
           )}
+        </div>
+      )}
+
+      {valid && (
+        <div className="mt-6">
+          <TrustNote />
         </div>
       )}
 

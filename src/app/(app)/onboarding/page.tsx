@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/couple";
 import { LinkPartner } from "@/features/onboarding/link-partner";
+import { TrustNote } from "@/features/onboarding/trust-note";
 
 export const metadata: Metadata = { title: "Vincular pareja" };
 export const dynamic = "force-dynamic";
@@ -15,11 +16,15 @@ export default async function OnboardingPage() {
       <div className="mb-8 text-center animate-fade-up">
         <h1 className="font-display text-3xl text-ink">Hola, {user.name}</h1>
         <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-ink-soft">
-          Near es un espacio para dos. Para empezar, vincula tu cuenta con la
-          de tu pareja.
+          Near es vuestro rincón cuando la distancia se interpone: hablar, veros,
+          jugar y guardar recuerdos, solo para los dos. Para empezar, vincula tu
+          cuenta con la de tu pareja.
         </p>
       </div>
       <LinkPartner />
+      <div className="mt-4">
+        <TrustNote />
+      </div>
     </div>
   );
 }
