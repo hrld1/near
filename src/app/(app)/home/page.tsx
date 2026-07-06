@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { ArrowRight, BookHeart, Heart, StickyNote } from "lucide-react";
+import { ArrowRight, BookHeart, Heart, Moon, StickyNote } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { requireCouple } from "@/lib/couple";
 import { moodInfo, presenceInfo } from "@/lib/utils";
@@ -223,7 +223,17 @@ export default async function HomePage() {
                         : null
                     }
                   />
-                  <TouchButton partnerName={partner.name} />
+                  <div className="flex gap-2">
+                    <div className="flex-1">
+                      <TouchButton partnerName={partner.name} />
+                    </div>
+                    <Link
+                      href="/together"
+                      className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-indigo-400/40 bg-indigo-500/5 px-4 py-3 text-sm font-medium text-indigo-700 transition hover:bg-indigo-500/10 dark:text-indigo-300"
+                    >
+                      <Moon className="h-4 w-4" /> Estar juntos
+                    </Link>
+                  </div>
                 </div>
               </>
             ) : (

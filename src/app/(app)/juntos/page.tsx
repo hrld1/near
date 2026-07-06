@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Gamepad2, MonitorPlay, Paintbrush, Sparkles } from "lucide-react";
+import { Gamepad2, MonitorPlay, Moon, Paintbrush, Sparkles } from "lucide-react";
 import { requireCouple } from "@/lib/couple";
 import { isUserOnline } from "@/lib/realtime";
 import { PartnerOnline } from "@/features/presence/partner-online";
@@ -15,6 +15,15 @@ export default async function JuntosPage() {
   const partnerOnline = partner ? isUserOnline(partner.id) : false;
 
   const items: HubItem[] = [
+    {
+      href: "/together",
+      title: "Estar juntos",
+      description: "Su cielo, su hora y cómo está ahora mismo. Para dejarla abierta.",
+      icon: Moon,
+      accent: "from-indigo-400 to-violet-700",
+      accentSoft: "bg-indigo-500/12",
+      accentText: "text-indigo-600 dark:text-indigo-400"
+    },
     {
       href: "/date-room",
       title: "Ver juntos",
