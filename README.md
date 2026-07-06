@@ -129,6 +129,13 @@ Catorce mejoras para que la app "se sienta" más cerca, en cuatro niveles:
 - **Español correcto y accesibilidad**: barrido de tildes/ñ/¿¡ por toda la interfaz, respeto de `prefers-reduced-motion` (sin confeti ni latidos para quien pide menos movimiento) y textos mínimos más legibles.
 - **Adaptadores de despliegue**: almacenamiento **S3** y bus **Redis** por entorno (ver *Despliegue*), dormidos por defecto.
 
+### Iteración 7: intuitiva para cualquiera
+El norte fue que Near la entienda cualquiera (no solo un entusiasta) en 30 segundos.
+- **Navegación de 5 destinos**: *Hoy*, *Chat*, *Juntos*, *Recuerdos* y *Ajustes* (dos verbos y dos sustantivos). Antes había 6-7 pestañas más 5 rutas huérfanas escondidas en la home. *Juntos* (`/juntos`) reúne ver juntos, lienzo y jugar; *Recuerdos* (`/recuerdos`) reúne álbum, cartas, fechas, mapa y el mes, con contexto real en cada tarjeta. El resaltado va por grupos de ruta y ninguna URL se borra (los push siguen vivos).
+- **Home "Hoy" sin menú**: fuera la parrilla de accesos rápidos que duplicaba la barra; la home queda centrada en presencia + ritual del día.
+- **Confianza como mensaje**: panel "Vuestro espacio, y de nadie más" en onboarding y en `/join` (honesto: no promete E2EE, sí acceso restringido a los dos).
+- **Bug de onboarding corregido**: `/join/[code]` ahora es público en el middleware — quien recibe el enlace y aún no tiene cuenta ya no acababa en `/login`.
+
 ## Integraciones: reales vs pendientes
 
 | Integracion | Estado | Detalle |

@@ -6,7 +6,14 @@ const PUBLIC_PATHS = ["/", "/login", "/register"];
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  if (PUBLIC_PATHS.includes(pathname) || pathname.startsWith("/api")) {
+  // /join/[code] tiene que ser público: quien recibe el enlace de invitación
+  // aún no tiene cuenta (la propia página ofrece crearla). La página filtra
+  // los códigos inválidos por su cuenta.
+  const isPublic =
+    PUBLIC_PATHS.includes(pathname) ||
+    pathname.startsWith("/join/") ||
+    pathname.startsWith("/api");
+  if (isPublic) {
     return NextResponse.next();
   }
   const hasSession =
