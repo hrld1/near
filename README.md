@@ -129,6 +129,14 @@ Catorce mejoras para que la app "se sienta" más cerca, en cuatro niveles:
 - **Español correcto y accesibilidad**: barrido de tildes/ñ/¿¡ por toda la interfaz, respeto de `prefers-reduced-motion` (sin confeti ni latidos para quien pide menos movimiento) y textos mínimos más legibles.
 - **Adaptadores de despliegue**: almacenamiento **S3** y bus **Redis** por entorno (ver *Despliegue*), dormidos por defecto.
 
+### Iteración 8: "Estar juntos" — cercanía ambiental
+Convertir la cercanía de *acción* en *estado*: una pantalla que puedes dejar abierta y que respira con la vida de tu pareja, sin que tengas que hacer nada.
+- **La ventana a su mundo** (`/together`): un **cielo dinámico** a pantalla completa según la hora local de la pareja (amanece / día / atardece / noche, con sol o luna en su arco y estrellas de noche — `lib/sky.ts`, puro y testeado). Su hora grande + tu hora discreta, avatar latiendo, presencia viva (en Near / estado / ánimo del día) y su **clima** (Open-Meteo, `lib/weather.ts`). Todo en vivo.
+- **Co-presencia**: cuando los dos tenéis la ventana abierta, aparece *"está mirando el mismo cielo, ahora"* (señal efímera `together:here` por el bus SSE). Es la magia ambiental: sentir que coincidís sin decir nada.
+- **Acercarte de un toque**: Latido, Tacto y Llamar desde la propia ventana, reutilizando el nudge, el beso de pulgar y el motor de llamada global.
+- **Modo mesita**: Wake Lock para que la pantalla no se apague; respeta `prefers-reduced-motion`.
+- Entradas desde el hero de la home y el hub *Juntos* (sin añadir un 6º destino a la barra).
+
 ### Iteración 7: intuitiva para cualquiera
 El norte fue que Near la entienda cualquiera (no solo un entusiasta) en 30 segundos.
 - **Navegación de 5 destinos**: *Hoy*, *Chat*, *Juntos*, *Recuerdos* y *Ajustes* (dos verbos y dos sustantivos). Antes había 6-7 pestañas más 5 rutas huérfanas escondidas en la home. *Juntos* (`/juntos`) reúne ver juntos, lienzo y jugar; *Recuerdos* (`/recuerdos`) reúne álbum, cartas, fechas, mapa y el mes, con contexto real en cada tarjeta. El resaltado va por grupos de ruta y ninguna URL se borra (los push siguen vivos).
