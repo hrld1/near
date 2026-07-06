@@ -7,6 +7,13 @@ import { prisma } from "@/lib/db";
 import { registerSchema, loginSchema } from "@/lib/validators";
 import type { FormState } from "@/types";
 
+// Solo permitimos volver a un destino interno seguro. En la practica, el enlace
+// /join/[code]: asi tras registrarse/entrar se canjea la invitacion sin pasos.
+function safeRedirect(raw: FormDataEntryValue | null, fallback: string): string {
+  const value = typeof raw === "string" ? raw : "";
+  return /^\/join\/NEAR-[A-Z0-9]{6}$/.test(value) ? value : fallback;
+}
+
 export async function registerAction(_prev: FormState, formData: FormData): Promise<FormState> {
   const parsed = registerSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return { error: parsed.error.issues[0].message };
@@ -19,7 +26,11 @@ export async function registerAction(_prev: FormState, formData: FormData): Prom
   await prisma.user.create({ data: { name, email, passwordHash } });
 
   try {
-    await signIn("credentials", { email, password, redirectTo: "/onboarding" });
+    await signIn("credentials", {
+      email,
+      password,
+      redirectTo: safeRedirect(formData.get("redirectTo"), "/onboarding")
+    });
   } catch (error) {
     if (error instanceof AuthError) return { error: "No se pudo iniciar sesion" };
     throw error;
@@ -35,7 +46,7 @@ export async function loginAction(_prev: FormState, formData: FormData): Promise
     await signIn("credentials", {
       email: parsed.data.email,
       password: parsed.data.password,
-      redirectTo: "/home"
+      redirectTo: safeRedirect(formData.get("redirectTo"), "/home")
     });
   } catch (error) {
     if (error instanceof AuthError) return { error: "Email o contrasena incorrectos" };

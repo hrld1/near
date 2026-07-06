@@ -16,13 +16,16 @@ function SubmitButton({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function LoginForm() {
+export function LoginForm({ invite }: { invite?: string }) {
   const [state, action] = useFormState(loginAction, {});
   return (
     <Card className="p-7">
       <h1 className="font-display text-2xl text-ink">Hola otra vez</h1>
-      <p className="mt-1 text-sm text-ink-soft">Entra a vuestro espacio.</p>
+      <p className="mt-1 text-sm text-ink-soft">
+        {invite ? "Entra y os vinculamos al momento." : "Entra a vuestro espacio."}
+      </p>
       <form action={action} className="mt-6 space-y-4">
+        {invite && <input type="hidden" name="redirectTo" value={`/join/${invite}`} />}
         <div>
           <Label htmlFor="email">Email</Label>
           <Input id="email" name="email" type="email" autoComplete="email" required />
@@ -42,7 +45,10 @@ export function LoginForm() {
       </form>
       <p className="mt-5 text-center text-sm text-ink-soft">
         Primera vez aqui?{" "}
-        <Link href="/register" className="font-medium text-rose hover:underline">
+        <Link
+          href={invite ? `/register?invite=${invite}` : "/register"}
+          className="font-medium text-rose hover:underline"
+        >
           Crea tu cuenta
         </Link>
       </p>
@@ -50,15 +56,18 @@ export function LoginForm() {
   );
 }
 
-export function RegisterForm() {
+export function RegisterForm({ invite }: { invite?: string }) {
   const [state, action] = useFormState(registerAction, {});
   return (
     <Card className="p-7">
       <h1 className="font-display text-2xl text-ink">Crear cuenta</h1>
       <p className="mt-1 text-sm text-ink-soft">
-        Despues podras invitar a tu pareja con un codigo.
+        {invite
+          ? "Crea tu cuenta y entrarás directo a vuestro espacio."
+          : "Despues podras invitar a tu pareja con un codigo."}
       </p>
       <form action={action} className="mt-6 space-y-4">
+        {invite && <input type="hidden" name="redirectTo" value={`/join/${invite}`} />}
         <div>
           <Label htmlFor="name">Tu nombre</Label>
           <Input id="name" name="name" autoComplete="given-name" required />
@@ -83,7 +92,10 @@ export function RegisterForm() {
       </form>
       <p className="mt-5 text-center text-sm text-ink-soft">
         Ya tienes cuenta?{" "}
-        <Link href="/login" className="font-medium text-rose hover:underline">
+        <Link
+          href={invite ? `/login?invite=${invite}` : "/login"}
+          className="font-medium text-rose hover:underline"
+        >
           Entra
         </Link>
       </p>

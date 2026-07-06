@@ -3,8 +3,9 @@
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useFormState, useFormStatus } from "react-dom";
-import { Check, Copy, Ticket } from "lucide-react";
+import { Check, Copy, Share2, Ticket } from "lucide-react";
 import { createInviteAction, redeemInviteAction } from "@/actions/couple";
+import { InvitePrep } from "@/features/onboarding/invite-prep";
 import { Button } from "@/components/ui/button";
 import { Input, FieldError } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -22,6 +23,8 @@ export function LinkPartner() {
   const router = useRouter();
   const [code, setCode] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
+  const [link, setLink] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const [redeemState, redeem] = useFormState(redeemInviteAction, {});
@@ -29,6 +32,7 @@ export function LinkPartner() {
   // Quien invita se queda esperando: sondeamos hasta que exista la pareja.
   useEffect(() => {
     if (!code) return;
+    setLink(`${window.location.origin}/join/${code}`);
     const interval = setInterval(() => router.refresh(), 4000);
     return () => clearInterval(interval);
   }, [code, router]);
@@ -49,6 +53,25 @@ export function LinkPartner() {
     setTimeout(() => setCopied(false), 2000);
   }
 
+  async function shareLink() {
+    const url = link || `${window.location.origin}/join/${code}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Únete a mí en Near",
+          text: "Nuestro espacio para dos 💞",
+          url
+        });
+      } catch {
+        // el usuario canceló el diálogo: sin ruido
+      }
+      return;
+    }
+    await navigator.clipboard.writeText(url);
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 2000);
+  }
+
   return (
     <div className="space-y-4">
       <Card className="p-6">
@@ -66,10 +89,13 @@ export function LinkPartner() {
               {code}
               {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
             </button>
+            <Button onClick={shareLink} variant="secondary" className="mt-3 w-full">
+              {linkCopied ? <Check className="h-4 w-4" /> : <Share2 className="h-4 w-4" />}
+              {linkCopied ? "Enlace copiado" : "Compartir enlace de invitación"}
+            </Button>
             <p className="mt-3 flex items-center gap-2 text-xs text-ink-soft">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
-              Esperando a que tu pareja use el codigo... esta pagina se
-              actualizara sola.
+              Esperando a que tu pareja acepte... esta pagina se actualizara sola.
             </p>
           </div>
         ) : (
@@ -80,6 +106,8 @@ export function LinkPartner() {
         )}
         <FieldError>{error ?? undefined}</FieldError>
       </Card>
+
+      {code && <InvitePrep code={code} />}
 
       <div className="flex items-center gap-3 px-2 text-xs uppercase tracking-widest text-ink-soft">
         <span className="h-px flex-1 bg-sand-deep" /> o <span className="h-px flex-1 bg-sand-deep" />
