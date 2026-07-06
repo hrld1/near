@@ -2,19 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import {
-  ArrowRight,
-  BarChart3,
-  BookHeart,
-  CalendarHeart,
-  Heart,
-  Mail,
-  MapPin,
-  MessageCircle,
-  MonitorPlay,
-  Paintbrush,
-  StickyNote
-} from "lucide-react";
+import { ArrowRight, BookHeart, Heart, StickyNote } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { requireCouple } from "@/lib/couple";
 import { moodInfo, presenceInfo } from "@/lib/utils";
@@ -157,17 +145,6 @@ export default async function HomePage() {
   const partnerPhoto = partnerPhotoRow
     ? { imageUrl: partnerPhotoRow.imageUrl, caption: partnerPhotoRow.caption }
     : null;
-
-  const quickActions = [
-    { href: "/chat", label: "Chat", icon: MessageCircle },
-    { href: "/moments", label: "Momento", icon: BookHeart },
-    { href: "/date-room", label: "Sala", icon: MonitorPlay },
-    { href: "/canvas", label: "Lienzo", icon: Paintbrush },
-    { href: "/letters", label: "Cartas", icon: Mail },
-    { href: "/map", label: "Distancia", icon: MapPin },
-    { href: "/calendar", label: "Fechas", icon: CalendarHeart },
-    { href: "/recap", label: "Mes", icon: BarChart3 }
-  ];
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 md:px-8 md:py-8">
@@ -439,25 +416,10 @@ export default async function HomePage() {
         </Card>
 
         <Card className="md:col-span-3">
-          <div className="grid gap-5 md:grid-cols-[1fr_auto]">
-            <div>
-              <CardTitle>Tu nota para {partner?.name ?? "tu pareja"}</CardTitle>
-              <div className="mt-3">
-                <NoteForm current={myNote?.body ?? null} />
-              </div>
-            </div>
-            <div className="flex items-center gap-1 border-t border-sand pt-4 md:border-l md:border-t-0 md:pl-5 md:pt-0">
-              {quickActions.map((action) => (
-                <Link
-                  key={action.href}
-                  href={action.href}
-                  className="flex flex-col items-center gap-1.5 rounded-xl px-4 py-3 text-ink-soft transition hover:bg-rose-faint hover:text-rose-deep"
-                >
-                  <action.icon className="h-5 w-5" />
-                  <span className="text-[11px] font-medium">{action.label}</span>
-                </Link>
-              ))}
-            </div>
+          <CardTitle>Tu nota para {partner?.name ?? "tu pareja"}</CardTitle>
+          <p className="mt-0.5 text-xs text-ink-soft">Una línea suya que verá al abrir su Hoy.</p>
+          <div className="mt-3">
+            <NoteForm current={myNote?.body ?? null} />
           </div>
         </Card>
       </div>
