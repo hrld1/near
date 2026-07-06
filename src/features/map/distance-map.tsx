@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { MapPin, Plane } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { setCityAction } from "@/actions/presence";
 
 type Geo = { lat: number; lon: number; label: string };
@@ -132,7 +132,6 @@ export function DistanceMap({
             />
           ))}
           <path d="M 60 150 Q 200 40 340 150" fill="none" stroke="rgba(244,114,182,0.7)" strokeWidth="2" strokeDasharray="5 5" />
-          <Plane className="text-rose" />
           {/* punto mío */}
           <circle cx="60" cy="150" r="7" fill="#f472b6" />
           <circle cx="60" cy="150" r="13" fill="none" stroke="rgba(244,114,182,0.4)" strokeWidth="2" />
