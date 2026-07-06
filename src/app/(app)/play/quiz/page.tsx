@@ -44,7 +44,7 @@ export default async function QuizPage() {
         <ArrowLeft className="h-4 w-4" /> Arcade
       </Link>
       <header className="mb-6">
-        <h1 className="font-display text-3xl text-ink">Cuanto nos conocemos?</h1>
+        <h1 className="font-display text-3xl text-ink">¿Cuánto nos conocemos?</h1>
         <p className="mt-1 text-sm text-ink-soft">
           Cada uno responde por si misma/o y apuesta por la respuesta del otro.
         </p>

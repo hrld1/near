@@ -35,7 +35,7 @@ export const submitScoreAction = coupleAction<
     return { ok: false, error: "Puntuacion no valida" };
   }
 
-  // dia de la PAREJA: el duelo compara los scores de ambos bajo la misma clave
+  // día de la PAREJA: el duelo compara los scores de ambos bajo la misma clave
   const dateKey = dayKeyIn(couple.timezone);
   const previous = await prisma.gameScore.findMany({
     where: { userId: user.id, gameKey: def.key, dateKey }
@@ -54,7 +54,7 @@ export const submitScoreAction = coupleAction<
     }
   });
 
-  // puntos de temporada: participar (1a vez del dia en este juego) + mejorar
+  // puntos de temporada: participar (1a vez del día en este juego) + mejorar
   if (previous.length === 0) {
     await addPoints(coupleId, user.id, POINTS.gamePlayed, dayKeyIn(user.timezone));
   }
@@ -90,7 +90,7 @@ export const claimMissionBonusAction = coupleAction<[], { points: number }>(
     });
     if (bonusClaimed) return { ok: false, error: "Bonus ya reclamado hoy" };
     if (!allDone) return { ok: false, error: "Aun te quedan misiones" };
-    // el claim protege el set de misiones, que rota con el dia de la pareja
+    // el claim protege el set de misiones, que rota con el día de la pareja
     await prisma.dailyClaim.create({
       data: { coupleId, userId: user.id, dateKey: coupleDay, type: "DAILY_MISSIONS" }
     });
@@ -102,7 +102,7 @@ export const claimMissionBonusAction = coupleAction<[], { points: number }>(
   }
 );
 
-// Reclama la victoria del duelo de AYER (dia de pareja). El servidor
+// Reclama la victoria del duelo de AYER (día de pareja). El servidor
 // re-verifica el resultado; el unique de DailyClaim impide el doble cobro.
 export const claimDuelWinAction = coupleAction<[], { points: number }>(
   async ({ user, couple, coupleId }) => {
@@ -125,7 +125,7 @@ export const claimDuelWinAction = coupleAction<[], { points: number }>(
   }
 );
 
-// Reclama el bonus de la semana pasada completa (7/7 dias de pareja).
+// Reclama el bonus de la semana pasada completa (7/7 días de pareja).
 export const claimWeeklyBonusAction = coupleAction<[], { points: number }>(
   async ({ user, couple, coupleId }) => {
     const status = await getWeeklyBonusStatus(
@@ -150,7 +150,7 @@ export const claimWeeklyBonusAction = coupleAction<[], { points: number }>(
 );
 
 // Recalcula logros bajo demanda (lo dispara el cliente al entrar en /play):
-// asi el render del server component queda como lectura pura.
+// así el render del server component queda como lectura pura.
 export const syncAchievementsAction = coupleAction<[], { fresh: string[] }>(
   async ({ user, couple, coupleId }) => {
     const result = await syncAchievements(

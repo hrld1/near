@@ -15,7 +15,7 @@ function urlBase64ToUint8Array(base64: string) {
 }
 
 // Alta/baja de notificaciones push de ESTE dispositivo. El permiso se pide
-// solo al pulsar el boton (nunca al cargar).
+// solo al pulsar el botón (nunca al cargar).
 export function PushToggle() {
   const [status, setStatus] = useState<Status>("loading");
   const [busy, setBusy] = useState(false);
@@ -98,7 +98,7 @@ export function PushToggle() {
     return (
       <p className="text-sm text-ink-soft">
         Este navegador no soporta notificaciones push. En iPhone/iPad hace falta
-        iOS 16.4+ y anadir Near a la pantalla de inicio.
+        iOS 16.4+ y añadir Near a la pantalla de inicio.
       </p>
     );
   }
@@ -106,7 +106,7 @@ export function PushToggle() {
     return (
       <p className="flex items-start gap-2 text-sm text-ink-soft">
         <BellOff className="mt-0.5 h-4 w-4 shrink-0" />
-        Las notificaciones estan bloqueadas para este sitio. Permitelas en los
+        Las notificaciones están bloqueadas para este sitio. Permitelas en los
         ajustes del navegador y recarga.
       </p>
     );
@@ -128,7 +128,7 @@ export function PushToggle() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="flex items-center gap-2 text-sm text-ink-soft">
             <Bell className="h-4 w-4" />
-            Mensajes, latidos y la caja del dia, aunque no estes mirando.
+            Mensajes, latidos y la caja del día, aunque no estes mirando.
           </p>
           <Button size="sm" loading={busy} onClick={enable}>
             Activar

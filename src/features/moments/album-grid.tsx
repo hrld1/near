@@ -199,7 +199,7 @@ export function AlbumGrid({ photos, myId }: { photos: AlbumPhoto[]; myId: string
               </span>
             )}
             {(photo.favCount > 0 || photo.comments.length > 0) && (
-              <span className="absolute bottom-1.5 right-1.5 flex items-center gap-1.5 rounded-full bg-black/50 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
+              <span className="absolute bottom-1.5 right-1.5 flex items-center gap-1.5 rounded-full bg-black/50 px-2 py-0.5 text-[11px] font-medium text-white backdrop-blur-sm">
                 {photo.favCount > 0 && (
                   <span className="flex items-center gap-0.5">
                     <Heart className="h-2.5 w-2.5 fill-current" /> {photo.favCount}

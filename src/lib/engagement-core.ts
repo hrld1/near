@@ -1,7 +1,7 @@
 import { shiftDayKey, type DayKey } from "@/lib/dates";
 
 // Parte PURA del motor de engagement: sin Prisma, testeable en Vitest.
-// Las funciones async de engagement.ts consultan la BD y delegan aqui.
+// Las funciones async de engagement.ts consultan la BD y delegan aquí.
 
 export type Mission = {
   id: string;
@@ -20,9 +20,9 @@ export function hashString(input: string) {
   return Math.abs(h);
 }
 
-// Racha de pareja sobre un mapa dia -> miembros activos. El dia de hoy
+// Racha de pareja sobre un mapa día -> miembros activos. El día de hoy
 // cuenta si ambos ya entraron; si no, la racha sigue viva mientras ayer
-// fuera completo. Ventana maxima: 120 dias.
+// fuera completo. Ventana maxima: 120 días.
 export function computeStreak(
   byDay: Map<string, Set<string>>,
   memberIds: string[],
@@ -32,7 +32,7 @@ export function computeStreak(
     memberIds.length === 2 && memberIds.every((id) => byDay.get(key)?.has(id));
 
   let streak = 0;
-  let cursor = complete(today) ? 0 : 1; // si hoy aun no esta completo, empezamos en ayer
+  let cursor = complete(today) ? 0 : 1; // si hoy aún no esta completo, empezamos en ayer
   while (cursor <= 120) {
     if (complete(shiftDayKey(today, -cursor))) {
       streak++;
@@ -46,7 +46,7 @@ export function computeStreak(
 
 // 3 misiones deterministas por semilla (el reto diario siempre entra).
 // El algoritmo se conserva tal cual para no cambiar las misiones de un
-// dia ya empezado.
+// día ya empezado.
 export function pickDailyMissions(seed: number, pool: Mission[]): Mission[] {
   const rest = pool.filter((m) => m.id !== "duel");
   const picked = [pool.find((m) => m.id === "duel")!];

@@ -3,7 +3,7 @@
 import { HeartCrack } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-// Ultima red de la app: si una pagina revienta, esto evita el pantallazo
+// Última red de la app: si una página revienta, esto evita el pantallazo
 // tecnico de Next y ofrece reintentar.
 export default function RootError({
   error,
@@ -21,10 +21,10 @@ export default function RootError({
         <h1 className="mt-4 font-display text-2xl text-ink">Algo se ha torcido</h1>
         <p className="mt-2 text-sm leading-relaxed text-ink-soft">
           No eres tu, somos nosotros. Vuelve a intentarlo; si sigue pasando,
-          recarga la pagina.
+          recarga la página.
         </p>
         {error.digest && (
-          <p className="mt-2 text-[10px] uppercase tracking-wider text-ink-soft/60">
+          <p className="mt-2 text-[11px] uppercase tracking-wider text-ink-soft/60">
             ref: {error.digest}
           </p>
         )}

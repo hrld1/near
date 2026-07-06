@@ -1,7 +1,7 @@
 "use client";
 
 // Compresion real en cliente antes de subir: reescala a max 1600px y
-// re-codifica a JPEG (o mantiene el original si ya es mas pequeno).
+// re-codifica a JPEG (o mantiene el original si ya es mas pequeño).
 const MAX_DIMENSION = 1600;
 const QUALITY = 0.82;
 

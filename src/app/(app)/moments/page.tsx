@@ -109,7 +109,7 @@ export default async function MomentsPage({
           <EmptyState
             icon={Images}
             title="El album esta esperando su primera foto"
-            description="Subid varias a la vez: se comprimen automaticamente y solo las veis vosotros dos. Marcad favoritas y dejad notas en cada una."
+            description="Subid varias a la vez: se comprimen automáticamente y solo las veis vosotros dos. Marcad favoritas y dejad notas en cada una."
           />
         ) : (
           <AlbumGrid photos={photos} myId={user.id} />
@@ -117,8 +117,8 @@ export default async function MomentsPage({
       ) : groups.length === 0 ? (
         <EmptyState
           icon={BookHeart}
-          title="Todavia no hay recuerdos aqui"
-          description="La foto de hoy, una nota pequena, ese dia que no quereis olvidar."
+          title="Todavia no hay recuerdos aquí"
+          description="La foto de hoy, una nota pequeña, ese día que no quereis olvidar."
         />
       ) : (
         <div className="space-y-8">
@@ -145,7 +145,7 @@ export default async function MomentsPage({
                       <div className="flex items-start justify-between gap-2">
                         <div>
                           {moment.featured && (
-                            <span className="mb-1 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+                            <span className="mb-1 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
                               <Star className="h-2.5 w-2.5 fill-current" /> Momento especial
                             </span>
                           )}

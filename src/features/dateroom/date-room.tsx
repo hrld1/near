@@ -212,7 +212,7 @@ export function DateRoom({
               mode === "COMPANION" ? "bg-paper text-ink shadow-card" : "text-ink-soft hover:text-ink"
             )}
           >
-            <Popcorn className="h-4 w-4" /> Netflix y compania
+            <Popcorn className="h-4 w-4" /> Netflix y compañía
           </button>
         </div>
 
@@ -256,7 +256,7 @@ export function DateRoom({
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-white/70">
               <Clapperboard className="h-8 w-8" />
               <p className="max-w-xs text-center text-sm">
-                Pega un enlace de YouTube arriba. La reproduccion se sincroniza
+                Pega un enlace de YouTube arriba. La reproducción se sincroniza
                 para los dos: play, pausa y saltos.
               </p>
             </div>

@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-// Comprobacion ligera de cookie de sesion (edge-safe, sin Prisma).
-// La proteccion real la hacen los layouts/paginas de servidor via auth().
+// Comprobacion ligera de cookie de sesión (edge-safe, sin Prisma).
+// La proteccion real la hacen los layouts/páginas de servidor via auth().
 const PUBLIC_PATHS = ["/", "/login", "/register"];
 
 export function middleware(req: NextRequest) {

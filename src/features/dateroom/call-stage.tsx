@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 // Escenario de la llamada DENTRO de la sala: solo pinta imagen. El audio
 // remoto suena en el <audio> del CallProvider (global, sobrevive a navegar),
-// asi que aqui los <video> van muted para no duplicar sonido. Iniciar,
+// así que aquí los <video> van muted para no duplicar sonido. Iniciar,
 // aceptar, colgar y demas controles salen del contexto global useCall().
 export function CallStage() {
   const {

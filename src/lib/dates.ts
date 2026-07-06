@@ -1,14 +1,14 @@
-// Fechas con zona horaria real. Near maneja DOS claves de dia:
-// - Dia del USUARIO (User.timezone): todo lo personal-diario (mood, pregunta,
-//   ActivityDay, intentos de juego, claims). "Hiciste tu mood check en TU dia".
-// - Dia de la PAREJA (Couple.timezone): lo compartido-determinista (caja diaria,
-//   reto del dia, semilla de misiones, racha, temporada). Asi ambos miembros ven
+// Fechas con zona horaria real. Near maneja DOS claves de día:
+// - Día del USUARIO (User.timezone): todo lo personal-diario (mood, pregunta,
+//   ActivityDay, intentos de juego, claims). "Hiciste tu mood check en TU día".
+// - Día de la PAREJA (Couple.timezone): lo compartido-determinista (caja diaria,
+//   reto del día, semilla de misiones, racha, temporada). Así ambos miembros ven
 //   la misma caja/reto aunque vivan en husos distintos.
 // Todo son funciones puras sobre Intl (sin dependencias), testeadas en Vitest.
 
 export type DayKey = string; // "YYYY-MM-DD"
 
-// Clave de dia en una zona horaria. en-CA formatea nativamente YYYY-MM-DD.
+// Clave de día en una zona horaria. en-CA formatea nativamente YYYY-MM-DD.
 export function dayKeyIn(timeZone: string, date: Date = new Date()): DayKey {
   return new Intl.DateTimeFormat("en-CA", {
     timeZone,
@@ -23,7 +23,7 @@ export function monthKeyIn(timeZone: string, date: Date = new Date()): string {
   return dayKeyIn(timeZone, date).slice(0, 7);
 }
 
-// Aritmetica de calendario pura sobre claves (sin zona: una clave ya es un dia).
+// Aritmetica de calendario pura sobre claves (sin zona: una clave ya es un día).
 export function shiftDayKey(dateKey: DayKey, days: number): DayKey {
   const [y, m, d] = dateKey.split("-").map(Number);
   return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10);
@@ -37,7 +37,7 @@ export function mondayOfWeek(dateKey: DayKey): DayKey {
   return shiftDayKey(dateKey, -(isoDow - 1));
 }
 
-// Suma meses clampando el dia (31 de enero + 1 mes = 28/29 de febrero).
+// Suma meses clampando el día (31 de enero + 1 mes = 28/29 de febrero).
 function addMonthsClamped(date: Date, months: number): Date {
   const y = date.getFullYear();
   const m = date.getMonth() + months;
@@ -45,8 +45,8 @@ function addMonthsClamped(date: Date, months: number): Date {
   return new Date(y, m, Math.min(date.getDate(), lastDay));
 }
 
-// Proximo hito del aniversario: cada mes el "mesiversario" y, cuando toca,
-// el aniversario anual. Si hoy es el dia, hoy ES el hito (no el siguiente).
+// Próximo hito del aniversario: cada mes el "mesiversario" y, cuando toca,
+// el aniversario anual. Si hoy es el día, hoy ES el hito (no el siguiente).
 export function nextAnniversary(anniversary: Date, now: Date = new Date()) {
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   let months =
@@ -87,7 +87,7 @@ function tzOffsetMs(timeZone: string, date: Date): number {
   return wallAsUtc - date.getTime();
 }
 
-// Instante UTC en que empieza un dia local. Doble pase para acertar en DST.
+// Instante UTC en que empieza un día local. Doble pase para acertar en DST.
 function startOfDayUtc(dateKey: DayKey, timeZone: string): Date {
   const wall = new Date(`${dateKey}T00:00:00Z`).getTime();
   let ts = wall - tzOffsetMs(timeZone, new Date(wall));
@@ -95,8 +95,8 @@ function startOfDayUtc(dateKey: DayKey, timeZone: string): Date {
   return new Date(ts);
 }
 
-// Rango UTC [inicio, fin) de un dia local: para filtrar por createdAt en BD.
-// Los dias de cambio de hora duran 23h o 25h y aqui se respeta.
+// Rango UTC [inicio, fin) de un día local: para filtrar por createdAt en BD.
+// Los días de cambio de hora duran 23h o 25h y aquí se respeta.
 export function dayRangeUtc(dateKey: DayKey, timeZone: string): { start: Date; end: Date } {
   return {
     start: startOfDayUtc(dateKey, timeZone),

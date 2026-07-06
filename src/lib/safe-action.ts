@@ -1,8 +1,8 @@
 import { requireCoupleAction } from "@/lib/couple";
 import type { ActionResult, FormState } from "@/types";
 
-// Envoltorios para server actions de pareja: sesion + pareja + try/catch
-// viven aqui una sola vez en lugar de repetirse en cada action.
+// Envoltorios para server actions de pareja: sesión + pareja + try/catch
+// viven aquí una sola vez en lugar de repetirse en cada action.
 // OJO: no usar en actions que hagan redirect() (el catch se lo tragaria);
 // auth.ts y couple.ts quedan fuera a proposito.
 

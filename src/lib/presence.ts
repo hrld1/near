@@ -1,6 +1,6 @@
 // La presencia es voluntaria pero no eterna: un "Libre" de hace 8 horas ya
 // no dice nada. Caducidad EN LECTURA (sin cron): quien muestra presencia
-// pasa por aqui. presenceUpdatedAt se fija al elegir estado.
+// pasa por aquí. presenceUpdatedAt se fija al elegir estado.
 
 export const PRESENCE_TTL_HOURS: Record<string, number> = {
   FREE: 4,

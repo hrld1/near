@@ -8,7 +8,7 @@ export default function NotFound() {
         <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-faint">
           <Compass className="h-7 w-7 text-rose" />
         </span>
-        <h1 className="mt-4 font-display text-2xl text-ink">Esta pagina no existe</h1>
+        <h1 className="mt-4 font-display text-2xl text-ink">Esta página no existe</h1>
         <p className="mt-2 text-sm leading-relaxed text-ink-soft">
           Te habras perdido por el camino. Lo importante esta en casa.
         </p>

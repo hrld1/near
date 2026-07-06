@@ -44,6 +44,21 @@
   }
 }
 
+/* Accesibilidad: quien pide menos movimiento (ajuste del sistema) no ve
+   confeti, latidos, ni transiciones largas. Las animaciones saltan a su estado
+   final al instante en vez de desactivarse a medias. Los componentes que usan
+   la variante motion-safe de Tailwind ya lo respetan; esto cubre el resto. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 @layer utilities {
   .scrollbar-thin::-webkit-scrollbar {
     width: 6px;

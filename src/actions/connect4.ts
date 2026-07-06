@@ -19,7 +19,7 @@ export const c4SignalAction = coupleAction<
   [input: { kind: "invite" | "accept" | "move" | "quit"; seed?: number; col?: number }]
 >(async ({ user, coupleId }, input) => {
   const parsed = c4Schema.safeParse(input);
-  if (!parsed.success) return { ok: false, error: "Senal no valida" };
+  if (!parsed.success) return { ok: false, error: "Señal no valida" };
   publish(coupleId, {
     type: "c4:signal",
     payload: {

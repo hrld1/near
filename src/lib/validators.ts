@@ -3,12 +3,12 @@ import { z } from "zod";
 export const registerSchema = z.object({
   name: z.string().trim().min(2, "El nombre necesita al menos 2 caracteres").max(50),
   email: z.string().trim().toLowerCase().email("Email no valido"),
-  password: z.string().min(8, "La contrasena necesita al menos 8 caracteres").max(100)
+  password: z.string().min(8, "La contraseña necesita al menos 8 caracteres").max(100)
 });
 
 export const loginSchema = z.object({
   email: z.string().trim().toLowerCase().email("Email no valido"),
-  password: z.string().min(1, "Escribe tu contrasena")
+  password: z.string().min(1, "Escribe tu contraseña")
 });
 
 export const inviteCodeSchema = z.object({
@@ -16,7 +16,7 @@ export const inviteCodeSchema = z.object({
     .string()
     .trim()
     .toUpperCase()
-    .regex(/^NEAR-[A-Z0-9]{6}$/, "El codigo tiene el formato NEAR-XXXXXX")
+    .regex(/^NEAR-[A-Z0-9]{6}$/, "El código tiene el formato NEAR-XXXXXX")
 });
 
 export const messageSchema = z
@@ -55,7 +55,7 @@ export const momentSchema = z
     tags: z.array(z.string().trim().toLowerCase().min(1).max(24)).max(5).optional()
   })
   .refine((m) => (m.kind === "PHOTO" ? !!m.imageUrl : !!m.body), {
-    message: "Anade una foto o un texto"
+    message: "Añade una foto o un texto"
   });
 
 export const eventSchema = z.object({

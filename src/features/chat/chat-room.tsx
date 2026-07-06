@@ -46,7 +46,7 @@ export function ChatRoom({
     initialPartnerSeenAt
   });
 
-  // "Visto" bajo mi ultimo mensaje ya confirmado, si la pareja lo abrio despues
+  // "Visto" bajo mi último mensaje ya confirmado, si la pareja lo abrio después
   const lastOwn = [...chat.messages]
     .reverse()
     .find((m) => m.senderId === me.id && !m.id.startsWith("tmp-"));
@@ -98,8 +98,8 @@ export function ChatRoom({
               </p>
               <p className="mt-1 max-w-xs text-sm text-ink-soft">
                 {channel === "DATE_ROOM"
-                  ? "Comentad lo que estais viendo, este chat es solo de la sala."
-                  : "Todo lo que os digais aqui se queda entre vosotros dos."}
+                  ? "Comentad lo que estáis viendo, este chat es solo de la sala."
+                  : "Todo lo que os digais aquí se queda entre vosotros dos."}
               </p>
             </div>
             {channel === "MAIN" && partner && (
@@ -155,7 +155,7 @@ export function ChatRoom({
                 {!own && !compact && (
                   <span className={cn("w-7 shrink-0", !lastOfGroup && "invisible")}>
                     {partner && (
-                      <Avatar name={partner.name} tone={1} size="sm" className="h-7 w-7 text-[10px]" />
+                      <Avatar name={partner.name} tone={1} size="sm" className="h-7 w-7 text-[11px]" />
                     )}
                   </span>
                 )}
@@ -188,7 +188,7 @@ export function ChatRoom({
           <div className="mt-3.5 flex items-end gap-2">
             {!compact && (
               <span className="w-7 shrink-0">
-                <Avatar name={partner.name} tone={1} size="sm" className="h-7 w-7 text-[10px]" />
+                <Avatar name={partner.name} tone={1} size="sm" className="h-7 w-7 text-[11px]" />
               </span>
             )}
             <div className="flex items-center gap-1 rounded-2xl rounded-bl-md bg-sand px-3.5 py-3">

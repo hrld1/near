@@ -5,7 +5,7 @@ import type { StreamEvent } from "@/types";
 
 type Handler = (event: StreamEvent) => void;
 
-// UNA sola conexion SSE por pestaña, compartida por todos los que escuchan.
+// UNA sola conexión SSE por pestaña, compartida por todos los que escuchan.
 // Antes cada useCoupleStream abria su propio EventSource: con varias piezas en
 // pantalla (chat, presencia, llamada, tacto, refrescos...) se rozaba el limite
 // de ~6 conexiones por host de HTTP/1.1 y se bloqueaban peticiones. Ahora hay
@@ -45,7 +45,7 @@ export function useCoupleStream(onEvent: Handler) {
     return () => {
       listeners.delete(handler);
       // sin nadie escuchando, cerramos; el layout mantiene listeners vivos
-      // durante la navegacion, asi que esto solo ocurre al cerrar la app
+      // durante la navegacion, así que esto solo ocurre al cerrar la app
       if (listeners.size === 0 && source) {
         source.close();
         source = null;

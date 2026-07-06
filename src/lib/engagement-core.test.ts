@@ -13,7 +13,7 @@ const A = "user-a";
 const B = "user-b";
 const TODAY = "2026-07-04";
 
-// byDay a partir de "que dias completo cada uno", relativo a TODAY
+// byDay a partir de "que días completo cada uno", relativo a TODAY
 function activity(daysAgoA: number[], daysAgoB: number[]) {
   const byDay = new Map<string, Set<string>>();
   const add = (userId: string, daysAgo: number) => {
@@ -27,7 +27,7 @@ function activity(daysAgoA: number[], daysAgoB: number[]) {
 }
 
 describe("computeStreak", () => {
-  it("cuenta dias consecutivos completos incluyendo hoy", () => {
+  it("cuenta días consecutivos completos incluyendo hoy", () => {
     const result = computeStreak(activity([0, 1, 2], [0, 1, 2]), [A, B], TODAY);
     expect(result).toEqual({ streak: 3, todayComplete: true });
   });
@@ -38,7 +38,7 @@ describe("computeStreak", () => {
   });
 
   it("un hueco corta la racha", () => {
-    // completos hoy y hace 2 dias; ayer solo A
+    // completos hoy y hace 2 días; ayer solo A
     const result = computeStreak(activity([0, 1, 2], [0, 2]), [A, B], TODAY);
     expect(result).toEqual({ streak: 1, todayComplete: true });
   });
@@ -48,7 +48,7 @@ describe("computeStreak", () => {
     expect(computeStreak(activity([0], [0]), [A], TODAY).streak).toBe(0); // 1 miembro
   });
 
-  it("se detiene en la ventana de 120 dias", () => {
+  it("se detiene en la ventana de 120 días", () => {
     const days = Array.from({ length: 200 }, (_, i) => i);
     const result = computeStreak(activity(days, days), [A, B], TODAY);
     expect(result.streak).toBe(121); // hoy + 120 anteriores
@@ -102,7 +102,7 @@ describe("seasonLevel", () => {
     expect(seasonLevel(5000).name).toBe("Supernova");
   });
 
-  it("expone el siguiente nivel (o null en el ultimo)", () => {
+  it("expone el siguiente nivel (o null en el último)", () => {
     expect(seasonLevel(0).next?.name).toBe("Llama");
     expect(seasonLevel(1100).next).toBeNull();
     expect(seasonLevel(1100).index).toBe(SEASON_LEVELS.length - 1);

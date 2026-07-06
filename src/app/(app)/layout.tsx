@@ -50,7 +50,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     </div>
   );
 
-  // El motor de llamada vive por encima de las paginas: la llamada suena y
+  // El motor de llamada vive por encima de las páginas: la llamada suena y
   // sobrevive a la navegacion. Sin pareja (onboarding) no hace falta.
   if (!user.coupleId) return content;
   return (

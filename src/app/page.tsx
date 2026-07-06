@@ -15,7 +15,7 @@ export default async function LandingPage() {
         </div>
         <h1 className="font-display text-5xl tracking-tight text-ink">Near</h1>
         <p className="mx-auto mt-4 max-w-md text-lg leading-relaxed text-ink-soft">
-          Un hogar digital para dos. Hablad, guardad momentos, contad los dias
+          Un hogar digital para dos. Hablad, guardad momentos, contad los días
           y pasad tiempo juntos, aunque os separen kilometros.
         </p>
         <div className="mt-8 flex items-center justify-center gap-3">

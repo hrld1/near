@@ -54,7 +54,7 @@ export type CompanionSignalKind = "ready" | "go" | "pause" | "resume";
 
 // Todos los eventos del bus SSE como union discriminada: publish() y los
 // consumidores comparten el mismo contrato y el compilador delata payloads
-// inconsistentes. Anadir un evento = anadir un miembro aqui.
+// inconsistentes. Añadir un evento = añadir un miembro aquí.
 export type StreamEvent =
   | { type: "connected" }
   | { type: "ping" }
@@ -108,9 +108,9 @@ export type StreamEvent =
   | { type: "chat:typing"; payload: { userId: string; channel: "MAIN" | "DATE_ROOM" } }
   // el receptor abrio el chat: el emisor pinta "Visto"
   | { type: "chat:seen"; payload: { userId: string; at: string } }
-  // transicion de conexion SSE (0<->1 conexiones): punto "en Near ahora"
+  // transicion de conexión SSE (0<->1 conexiones): punto "en Near ahora"
   | { type: "online"; payload: { userId: string; online: boolean } }
-  // beso de pulgar: presencia y posicion del dedo (normalizada 0..1)
+  // beso de pulgar: presencia y posición del dedo (normalizada 0..1)
   | {
       type: "touch:signal";
       payload: {
@@ -124,11 +124,11 @@ export type StreamEvent =
     }
   // lienzo compartido: trazos y limpiado
   | { type: "canvas:op"; payload: { byId: string; op: CanvasOp } }
-  // foto del dia nueva
+  // foto del día nueva
   | { type: "photo:new"; payload: { userId: string; imageUrl: string; caption: string | null } }
   // una carta ha quedado entregada para toId
   | { type: "letter:delivered"; payload: { toId: string } }
-  // sync de musica (Spotify): estado del lider hacia el seguidor
+  // sync de música (Spotify): estado del lider hacia el seguidor
   | {
       type: "music:sync";
       payload: {

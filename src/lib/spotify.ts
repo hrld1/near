@@ -5,7 +5,7 @@ import { prisma } from "@/lib/db";
 // mantiene el modo companion honesto. Sin claves, la app funciona igual.
 //
 // Flujo: OAuth (Authorization Code) -> tokens por usuario (SpotifyAccount) ->
-// el "lider" comparte su reproduccion actual por el bus (music:sync) y el
+// el "lider" comparte su reproducción actual por el bus (music:sync) y el
 // "seguidor", si tiene su cuenta conectada y Spotify Premium con un
 // dispositivo activo, la reproduce en su lado.
 

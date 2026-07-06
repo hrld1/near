@@ -11,13 +11,13 @@ import type { MemberInfo } from "@/types";
 
 // El beso de pulgar. Ambos apoyan el dedo en la superficie; sus posiciones
 // (normalizadas 0..1) viajan por el bus SSE. Cuando los dos dedos coinciden
-// en la misma zona nace un latido: vibracion en patron de corazon, sonido
+// en la misma zona nace un latido: vibracion en patron de corazón, sonido
 // grave y un resplandor que crece mientras sigan tocandose.
 
 type Finger = { x: number; y: number; pressing: boolean };
 const NEAR = 0.14; // umbral normalizado para considerar que los dedos se tocan
 
-// La superficie es un lienzo oscuro fijo (mismo en claro y oscuro): asi los
+// La superficie es un lienzo oscuro fijo (mismo en claro y oscuro): así los
 // resplandores rosados y ambar contrastan igual en cualquier tema.
 const MINE_GLOW = "244,114,182"; // rosa
 const THEIRS_GLOW = "251,191,36"; // ambar

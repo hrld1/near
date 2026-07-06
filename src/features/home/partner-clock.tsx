@@ -23,7 +23,7 @@ export function PartnerClock({ timezone, name }: { timezone: string; name: strin
           day: "numeric"
         }).format(now);
         const myDay = new Intl.DateTimeFormat("en-CA", { day: "numeric" }).format(now);
-        setDayDiff(theirDay === myDay ? "" : " (otro dia)");
+        setDayDiff(theirDay === myDay ? "" : " (otro día)");
       } catch {
         setTime(null);
       }

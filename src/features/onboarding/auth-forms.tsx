@@ -31,7 +31,7 @@ export function LoginForm({ invite }: { invite?: string }) {
           <Input id="email" name="email" type="email" autoComplete="email" required />
         </div>
         <div>
-          <Label htmlFor="password">Contrasena</Label>
+          <Label htmlFor="password">Contraseña</Label>
           <Input
             id="password"
             name="password"
@@ -44,7 +44,7 @@ export function LoginForm({ invite }: { invite?: string }) {
         <SubmitButton>Entrar</SubmitButton>
       </form>
       <p className="mt-5 text-center text-sm text-ink-soft">
-        Primera vez aqui?{" "}
+        ¿Primera vez aquí?{" "}
         <Link
           href={invite ? `/register?invite=${invite}` : "/register"}
           className="font-medium text-rose hover:underline"
@@ -64,7 +64,7 @@ export function RegisterForm({ invite }: { invite?: string }) {
       <p className="mt-1 text-sm text-ink-soft">
         {invite
           ? "Crea tu cuenta y entrarás directo a vuestro espacio."
-          : "Despues podras invitar a tu pareja con un codigo."}
+          : "Después podrás invitar a tu pareja con un código."}
       </p>
       <form action={action} className="mt-6 space-y-4">
         {invite && <input type="hidden" name="redirectTo" value={`/join/${invite}`} />}
@@ -77,7 +77,7 @@ export function RegisterForm({ invite }: { invite?: string }) {
           <Input id="email" name="email" type="email" autoComplete="email" required />
         </div>
         <div>
-          <Label htmlFor="password">Contrasena</Label>
+          <Label htmlFor="password">Contraseña</Label>
           <Input
             id="password"
             name="password"
@@ -91,7 +91,7 @@ export function RegisterForm({ invite }: { invite?: string }) {
         <SubmitButton>Crear cuenta</SubmitButton>
       </form>
       <p className="mt-5 text-center text-sm text-ink-soft">
-        Ya tienes cuenta?{" "}
+        ¿Ya tienes cuenta?{" "}
         <Link
           href={invite ? `/login?invite=${invite}` : "/login"}
           className="font-medium text-rose hover:underline"

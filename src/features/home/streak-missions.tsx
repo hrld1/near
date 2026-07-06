@@ -70,14 +70,14 @@ export function StreakMissions({
         </span>
         <div>
           <p className="font-display text-2xl leading-none text-ink">
-            {streak} {streak === 1 ? "dia" : "dias"}
+            {streak} {streak === 1 ? "día" : "días"}
           </p>
           <p className="mt-1 text-xs text-ink-soft">
             {todayComplete
               ? "Racha asegurada hoy. Equipazo."
               : streak > 0
                 ? "Entrad ambos hoy para no perderla."
-                : "La racha empieza cuando ambos entrais el mismo dia."}
+                : "La racha empieza cuando ambos entrais el mismo día."}
           </p>
         </div>
       </div>
@@ -117,7 +117,7 @@ export function StreakMissions({
       <div className="mt-3">
         {claimed ? (
           <p className="flex items-center gap-2 rounded-xl bg-amber-50 px-3 py-2.5 text-sm font-medium text-amber-700 dark:bg-amber-900/20 dark:text-amber-400">
-            <Gift className="h-4 w-4" /> Bonus de +{bonusPoints} reclamado. Manana, mas.
+            <Gift className="h-4 w-4" /> Bonus de +{bonusPoints} reclamado. Mañana, mas.
           </p>
         ) : (
           <Button
@@ -149,7 +149,7 @@ export function StreakMissions({
           ) : (
             <p className="flex items-center gap-2 rounded-xl bg-sand px-3 py-2 text-xs text-ink-soft">
               <CalendarCheck className="h-3.5 w-3.5" />
-              Semana en curso: {weekly.thisWeekDaysComplete}/7 dias completos (7/7 = +{weekly.points})
+              Semana en curso: {weekly.thisWeekDaysComplete}/7 días completos (7/7 = +{weekly.points})
             </p>
           )}
           {weeklyError && (

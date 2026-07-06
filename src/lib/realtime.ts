@@ -16,7 +16,7 @@ const bus = (globalForBus.nearBus ??= new Map<string, Set<Listener>>());
 
 // Conexiones SSE vivas por usuario: si tiene alguna, esta "online" y no
 // hace falta push. Misma limitacion single-process que el bus (con varias
-// instancias, esto tambien iria a Redis).
+// instancias, esto también iria a Redis).
 const online = (globalForBus.nearOnline ??= new Map<string, number>());
 
 export function trackOnline(userId: string): () => void {
@@ -52,7 +52,7 @@ export function publish(coupleId: string, event: StreamEvent) {
     try {
       listener(event);
     } catch {
-      // listener roto: se limpia al cerrar la conexion
+      // listener roto: se limpia al cerrar la conexión
     }
   }
 }

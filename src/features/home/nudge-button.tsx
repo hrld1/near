@@ -11,7 +11,7 @@ export function NudgeButton({
   lastNudge
 }: {
   partnerName: string;
-  // ultimo "pensando en ti" que enviaste (para pintar el visto)
+  // último "pensando en ti" que enviaste (para pintar el visto)
   lastNudge: { id: string; seen: boolean } | null;
 }) {
   const [sent, setSent] = useState(false);

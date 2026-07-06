@@ -6,7 +6,7 @@ import { openDailyBoxAction } from "@/actions/box";
 import { cn } from "@/lib/utils";
 
 const KIND_LABEL: Record<string, string> = {
-  DARE: "Reto del dia",
+  DARE: "Reto del día",
   QUESTION: "Pregunta valiente",
   GESTURE: "Pequeno gesto",
   FLASHBACK: "Flashback"
@@ -49,7 +49,7 @@ export function DailyBox({
           )}
         />
         <p className="text-sm font-medium text-ink">Vuestra caja de hoy esta cerrada</p>
-        <p className="text-xs text-ink-soft">Abridla y os toca a los dos. Una por dia.</p>
+        <p className="text-xs text-ink-soft">Abridla y os toca a los dos. Una por día.</p>
         {error && <p className="text-xs text-red-700 dark:text-red-400">{error}</p>}
       </button>
     );

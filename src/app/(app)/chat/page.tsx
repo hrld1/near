@@ -86,7 +86,7 @@ export default async function ChatPage() {
             <div className="flex items-center gap-1.5">
               {streakInfo.streak > 0 && (
                 <span
-                  title={`Racha de ${streakInfo.streak} dias`}
+                  title={`Racha de ${streakInfo.streak} días`}
                   className="flex items-center gap-1 rounded-full bg-orange-500/10 px-2.5 py-1 text-xs font-semibold text-orange-600 dark:text-orange-400"
                 >
                   <Flame className="h-3.5 w-3.5" />

@@ -47,7 +47,7 @@ export function MoodCheck({
             )}
           >
             <span className="text-xl">{mood.emoji}</span>
-            <span className="text-[10px] font-medium text-ink-soft">{mood.label}</span>
+            <span className="text-[11px] font-medium text-ink-soft">{mood.label}</span>
           </button>
         ))}
       </div>
@@ -59,12 +59,12 @@ export function MoodCheck({
               setNote(e.target.value);
               setDirty(true);
             }}
-            placeholder="Algo que anadir? (opcional)"
+            placeholder="Algo que añadir? (opcional)"
             maxLength={200}
             className="h-9 text-xs"
           />
           <Button size="sm" onClick={save} loading={pending} disabled={!selected || !dirty}>
-            {dirty ? "Guardar" : "Al dia"}
+            {dirty ? "Guardar" : "Al día"}
           </Button>
         </div>
       )}

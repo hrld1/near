@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 
 // 4 en raya en vivo. El bus SSE serializa los movimientos: cada cliente
 // aplica los eventos en el orden en que llegan (incluido el eco de los
-// propios), asi que ambos tableros avanzan igual.
+// propios), así que ambos tableros avanzan igual.
 
 const COLS = 7;
 const ROWS = 6;
@@ -126,7 +126,7 @@ export function Connect4({ myId, partnerName }: { myId: string; partnerName: str
       }
     }
     if (kind === "invite" && mine) {
-      // eco de mi propia invitacion: quedo a la espera
+      // eco de mi propia invitación: quedo a la espera
       seedRef.current = seed ?? 0;
     }
     if (kind === "accept") {
@@ -144,7 +144,7 @@ export function Connect4({ myId, partnerName }: { myId: string; partnerName: str
     }
   });
 
-  // salir de la pagina en mitad de partida = abandonar
+  // salir de la página en mitad de partida = abandonar
   useEffect(() => {
     return () => {
       if (phaseRef.current === "playing") void c4SignalAction({ kind: "quit" });
@@ -215,7 +215,7 @@ export function Connect4({ myId, partnerName }: { myId: string; partnerName: str
                 Retar a {partnerName}
               </Button>
               <p className="max-w-xs text-xs text-ink-soft">
-                Le llegara el reto al instante si esta dentro de la app.
+                Le llegará el reto al instante si esta dentro de la app.
               </p>
             </div>
           )}

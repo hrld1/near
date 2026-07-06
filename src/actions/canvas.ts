@@ -9,7 +9,7 @@ import type { CanvasOp } from "@/types";
 // Lienzo compartido en vivo: cada trazo (o el "limpiar") viaja por el bus SSE
 // dentro de la pareja, igual que la señalizacion de llamada o el beso de pulgar.
 // Alta frecuencia mientras se dibuja: sin push, solo bus. El trazo se guarda
-// tambien en el registro en memoria (canvas-log) para quien entre tarde.
+// también en el registro en memoria (canvas-log) para quien entre tarde.
 
 const strokeSchema = z.object({
   id: z.string().min(1).max(64),

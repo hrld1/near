@@ -28,7 +28,7 @@ export function setupHiDpi(
   return ctx;
 }
 
-// Posicion del puntero en coordenadas logicas del canvas.
+// Posición del puntero en coordenadas logicas del canvas.
 export function pointerPos(
   canvas: HTMLCanvasElement,
   e: { clientX: number; clientY: number },

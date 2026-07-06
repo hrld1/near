@@ -1,8 +1,8 @@
 // Registro de minijuegos de la arcade. Cada juego es un componente cliente
-// que reporta un score numerico; aqui vive todo lo declarativo (reglas,
-// direccion del score, formato) para que anadir un juego nuevo sea trivial.
+// que reporta un score numerico; aquí vive todo lo declarativo (reglas,
+// direccion del score, formato) para que añadir un juego nuevo sea trivial.
 // El quiz "Nos conocemos?" NO esta en este registro a proposito: no tiene
-// score numerico ni intentos/dia (es cooperativo y por preguntas), y meterlo
+// score numerico ni intentos/día (es cooperativo y por preguntas), y meterlo
 // con calzador ensuciaria el contrato GameDef. Vive en /play/quiz.
 
 export type GameDef = {
@@ -25,7 +25,7 @@ export const GAMES: GameDef[] = [
     key: "reaction",
     name: "Reflejos",
     tagline: "Toca cuando se encienda. Ni antes ni tarde.",
-    rules: "5 rondas. Espera al color y toca lo mas rapido posible. Si te adelantas, ronda penalizada. Cuenta la media en milisegundos.",
+    rules: "5 rondas. Espera al color y toca lo mas rápido posible. Si te adelantas, ronda penalizada. Cuenta la media en milisegundos.",
     lowerIsBetter: true,
     unit: "ms",
     maxAttemptsPerDay: 5,
@@ -47,7 +47,7 @@ export const GAMES: GameDef[] = [
     key: "targets",
     name: "Dianas",
     tagline: "30 segundos. Todas las dianas que puedas.",
-    rules: "Aparecen dianas que encogen. Cada acierto suma 1; las dianas pequenas valen 2. Tienes 30 segundos.",
+    rules: "Aparecen dianas que encogen. Cada acierto suma 1; las dianas pequeñas valen 2. Tienes 30 segundos.",
     lowerIsBetter: false,
     unit: "pts",
     maxAttemptsPerDay: 5,
@@ -58,7 +58,7 @@ export const GAMES: GameDef[] = [
     key: "echo",
     name: "Eco",
     tagline: "Repite la secuencia. Cada ronda, un paso mas.",
-    rules: "Observa la secuencia de colores y repitela. Cada ronda anade un paso. Tu puntuacion es la ronda mas larga completada.",
+    rules: "Observa la secuencia de colores y repitela. Cada ronda añade un paso. Tu puntuacion es la ronda mas larga completada.",
     lowerIsBetter: false,
     unit: "rondas",
     maxAttemptsPerDay: 5,
@@ -91,7 +91,7 @@ export const GAMES: GameDef[] = [
   {
     key: "typing",
     name: "Teclas",
-    tagline: "Escribe mas rapido de lo que piensas.",
+    tagline: "Escribe mas rápido de lo que piensas.",
     rules: "Teclea la palabra y confirma con Enter o espacio. Cada palabra correcta suma 1. Tienes 45 segundos.",
     lowerIsBetter: false,
     unit: "palabras",
@@ -127,7 +127,7 @@ export function gameByKey(key: string) {
   return GAMES.find((g) => g.key === key) ?? null;
 }
 
-// Reto del dia: rota de forma determinista.
+// Reto del día: rota de forma determinista.
 export function gameOfDay(dateKey: string): GameDef {
   const [y, m, d] = dateKey.split("-").map(Number);
   const dayNumber = Math.floor(Date.UTC(y, m - 1, d) / 86_400_000);
@@ -148,12 +148,12 @@ export function bestOf(def: Pick<GameDef, "lowerIsBetter">, scores: number[]): n
 
 // Palabras para "Palabra oculta" (es-ES, 5-7 letras, sin tildes para simplificar input)
 export const WORDS = [
-  "abrazo", "besos", "carino", "cartas", "cielo", "citas", "corazon", "cuerpo",
+  "abrazo", "besos", "carino", "cartas", "cielo", "citas", "corazón", "cuerpo",
   "destino", "dulce", "espera", "estrella", "fuego", "futuro", "regalo", "hogar",
   "ilusion", "lejos", "luna", "maleta", "manos", "mapa", "memoria", "mimos",
   "nube", "pareja", "peli", "planes", "playa", "promesa", "puente", "risas",
-  "secreto", "sueno", "tren", "viaje", "vuelo", "juntos", "siempre", "camino",
-  "aviones", "andenes", "susurro", "acento", "guino", "fotos", "musica", "baile"
+  "secreto", "sueño", "tren", "viaje", "vuelo", "juntos", "siempre", "camino",
+  "aviones", "andenes", "susurro", "acento", "guino", "fotos", "música", "baile"
 ];
 
 export function wordsOfDay(dateKey: string, count = 3): string[] {

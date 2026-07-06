@@ -43,7 +43,7 @@ export const createMomentAction = coupleAction<
       happenedAt
     }
   });
-  // solo el primer momento del dia puntua (subir 12 fotos no da 60 puntos)
+  // solo el primer momento del día puntua (subir 12 fotos no da 60 puntos)
   await addPoints(coupleId, user.id, createdToday === 0 ? POINTS.moment : 0, dateKey);
   publish(coupleId, { type: "moment", payload: { authorId: user.id } });
   revalidatePath("/moments");

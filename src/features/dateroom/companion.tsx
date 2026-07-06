@@ -9,10 +9,10 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 // Modo companion HONESTO para Netflix / HBO / Prime / Disney+ / Spotify:
-// sus APIs no permiten controlar la reproduccion desde una web externa,
-// asi que Near no lo finge. Lo que si hace de verdad: coordinar la sesion
-// (misma peli/lista), estado de "listo", cuenta atras sincronizada para dar
-// al play a la vez y senales de pausa/reanudar en tiempo real.
+// sus APIs no permiten controlar la reproducción desde una web externa,
+// así que Near no lo finge. Lo que si hace de verdad: coordinar la sesión
+// (misma peli/lista), estado de "listo", cuenta atrás sincronizada para dar
+// al play a la vez y señales de pausa/reanudar en tiempo real.
 
 const PLATFORMS = [
   { key: "NETFLIX", label: "Netflix" },
@@ -117,11 +117,11 @@ export function CompanionRoom({
 
       <div>
         <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-ink-soft">
-          <Popcorn className="h-4 w-4" /> Sesion companion
+          <Popcorn className="h-4 w-4" /> Sesión companion
         </p>
         <p className="mt-1 text-xs leading-relaxed text-ink-soft">
-          Netflix, HBO y compania no permiten que una web externa controle su
-          reproduccion, y no vamos a fingirlo. Esto si es real: elegid que ver,
+          Netflix, HBO y compañía no permiten que una web externa controle su
+          reproducción, y no vamos a fingirlo. Esto si es real: elegid que ver,
           marcaos como listos y dad al play exactamente a la vez.
         </p>
       </div>
@@ -154,7 +154,7 @@ export function CompanionRoom({
             setSaved(false);
           }}
           maxLength={120}
-          placeholder="Que vais a ver/escuchar? (ej. 'Dark, S01E03')"
+          placeholder="¿Qué vais a ver/escuchar? (ej. 'Dark, S01E03')"
         />
         <Button onClick={saveSession} loading={pending} disabled={saved}>
           {saved ? "Guardado" : "Fijar plan"}
@@ -163,7 +163,7 @@ export function CompanionRoom({
 
       {saved && (
         <div className="rounded-xl bg-sand px-4 py-3 text-sm text-ink">
-          Plan de hoy: <b>{title || "sesion sorpresa"}</b> en <b>{platformLabel}</b>.
+          Plan de hoy: <b>{title || "sesión sorpresa"}</b> en <b>{platformLabel}</b>.
           Abridlo cada uno en su pantalla y usad los botones de abajo.
         </div>
       )}
@@ -198,7 +198,7 @@ export function CompanionRoom({
             <Play className="h-4 w-4" /> Sigo
           </Button>
           <span className="ml-auto text-xs text-ink-soft">
-            {partnerReady ? `${partnerName} esta lista/o ✓` : `${partnerName} aun no esta lista/o`}
+            {partnerReady ? `${partnerName} esta lista/o ✓` : `${partnerName} aún no esta lista/o`}
           </span>
         </div>
       </div>

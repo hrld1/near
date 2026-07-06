@@ -13,7 +13,7 @@ export function DeleteEvent({ id }: { id: string }) {
       title="Borrar"
       disabled={pending}
       onClick={() => {
-        if (!confirm("Borrar este evento?")) return;
+        if (!confirm("¿Borrar este evento?")) return;
         startTransition(async () => {
           await deleteEventAction(id);
           router.refresh();

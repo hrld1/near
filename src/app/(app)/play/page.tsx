@@ -33,12 +33,12 @@ export const dynamic = "force-dynamic";
 
 export default async function PlayPage() {
   const { user, couple, partner } = await requireCouple();
-  const dateKey = dayKeyIn(couple.timezone); // la arcade vive en el dia de la pareja
+  const dateKey = dayKeyIn(couple.timezone); // la arcade vive en el día de la pareja
   const daily = gameOfDay(dateKey);
   const weekKeys = Array.from({ length: 7 }, (_, i) => shiftDayKey(dateKey, -i)).reverse();
   const duelDay = shiftDayKey(dateKey, -1);
 
-  // Racha, logros y duelo de ayer degradan a vacio si fallan: no tumban la pagina.
+  // Racha, logros y duelo de ayer degradan a vacio si fallan: no tumban la página.
   const [todayScores, weekScores, season, streakInfo, unlockedAchievements, yesterdayDuel, duelClaim] =
     await Promise.all([
       prisma.gameScore.findMany({ where: { coupleId: couple.id, dateKey } }),
@@ -119,11 +119,11 @@ export default async function PlayPage() {
       <header className="mb-6">
         <h1 className="font-display text-3xl text-ink">Arcade</h1>
         <p className="mt-1 text-sm text-ink-soft">
-          Un reto nuevo cada dia. Los numeros deciden quien manda esta semana.
+          Un reto nuevo cada día. Los numeros deciden quien manda esta semana.
         </p>
       </header>
 
-      {/* Reto del dia: duelo VS */}
+      {/* Reto del día: duelo VS */}
       <Link href={`/play/${daily.key}`} className="group block">
         <section
           className={cn(
@@ -133,7 +133,7 @@ export default async function PlayPage() {
         >
           <DailyIcon className="absolute -right-6 -top-6 h-40 w-40 opacity-15 transition duration-500 group-hover:rotate-12 group-hover:scale-110" />
           <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-white/85">
-            <Swords className="h-4 w-4" /> Reto del dia
+            <Swords className="h-4 w-4" /> Reto del día
           </p>
           <h2 className="mt-1 font-display text-3xl">{daily.name}</h2>
           <p className="mt-0.5 max-w-sm text-sm text-white/85">{daily.tagline}</p>
@@ -204,7 +204,7 @@ export default async function PlayPage() {
               <p className="mt-1 text-xs text-ink-soft">
                 {season.total} pts de pareja
                 {season.level.next && ` · ${season.level.next.min - season.total} para ${season.level.next.name}`}
-                {" · "}quedan {season.daysLeft} dias
+                {" · "}quedan {season.daysLeft} días
               </p>
             </div>
           </div>
@@ -235,7 +235,7 @@ export default async function PlayPage() {
             </span>
             <div>
               <p className="font-display text-xl text-ink">
-                {streakInfo.streak} {streakInfo.streak === 1 ? "dia" : "dias"} de racha
+                {streakInfo.streak} {streakInfo.streak === 1 ? "día" : "días"} de racha
               </p>
               <p className="text-xs text-ink-soft">
                 {streakInfo.todayComplete
@@ -302,12 +302,12 @@ export default async function PlayPage() {
                       <Icon className="h-5 w-5" />
                     </span>
                     {def.key === daily.key ? (
-                      <span className="rounded-full bg-rose-faint px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-rose-deep">
+                      <span className="rounded-full bg-rose-faint px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-rose-deep">
                         Reto de hoy
                       </span>
                     ) : attemptsLeft === 0 ? (
-                      <span className="flex items-center gap-1 rounded-full bg-sand px-2 py-0.5 text-[10px] font-semibold text-ink-soft">
-                        <Lock className="h-2.5 w-2.5" /> manana
+                      <span className="flex items-center gap-1 rounded-full bg-sand px-2 py-0.5 text-[11px] font-semibold text-ink-soft">
+                        <Lock className="h-2.5 w-2.5" /> mañana
                       </span>
                     ) : null}
                   </div>
@@ -339,7 +339,7 @@ export default async function PlayPage() {
                 <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-500/12 text-indigo-600 dark:text-indigo-400">
                   <Swords className="h-5 w-5" />
                 </span>
-                <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
+                <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
                   En vivo
                 </span>
               </div>

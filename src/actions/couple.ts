@@ -15,12 +15,12 @@ import type { ActionResult, FormState } from "@/types";
 const INVITE_DAYS = 7;
 
 // Preparativos del hogar hechos mientras se espera a la pareja: se guardan en
-// Invite.prep y se aplican al canjear el codigo (ver performRedeem).
+// Invite.prep y se aplican al canjear el código (ver performRedeem).
 type InvitePrep = { anniversary?: string; note?: string; welcomeLetter?: string };
 
 export async function createInviteAction(): Promise<ActionResult<{ code: string }>> {
   const user = await getCurrentUser();
-  if (!user) return { ok: false, error: "No has iniciado sesion" };
+  if (!user) return { ok: false, error: "No has iniciado sesión" };
   if (user.coupleId) return { ok: false, error: "Ya tienes pareja vinculada" };
 
   const existing = await prisma.invite.findFirst({
@@ -36,20 +36,20 @@ export async function createInviteAction(): Promise<ActionResult<{ code: string 
       });
       return { ok: true, data: { code: invite.code } };
     } catch {
-      // colision de codigo: reintenta
+      // colision de código: reintenta
     }
   }
-  return { ok: false, error: "No se pudo generar el codigo, intentalo de nuevo" };
+  return { ok: false, error: "No se pudo generar el código, intentalo de nuevo" };
 }
 
-// Nucleo del canje, compartido por el formulario (pegar codigo) y el enlace
+// Nucleo del canje, compartido por el formulario (pegar código) y el enlace
 // /join/[code]. Aplica los preparativos (prep) dentro de la misma transaccion.
 async function performRedeem(userId: string, rawCode: unknown): Promise<ActionResult> {
   const parsed = inviteCodeSchema.safeParse({ code: rawCode });
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0].message };
 
   const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (!user) return { ok: false, error: "No has iniciado sesion" };
+  if (!user) return { ok: false, error: "No has iniciado sesión" };
   if (user.coupleId) return { ok: false, error: "Ya tienes pareja vinculada" };
 
   const invite = await prisma.invite.findUnique({
@@ -57,15 +57,15 @@ async function performRedeem(userId: string, rawCode: unknown): Promise<ActionRe
     include: { inviter: true }
   });
 
-  if (!invite || invite.status !== "PENDING") return { ok: false, error: "Ese codigo no existe o ya se uso" };
-  if (invite.expiresAt < new Date()) return { ok: false, error: "El codigo ha caducado, pide uno nuevo" };
-  if (invite.inviterId === user.id) return { ok: false, error: "Ese codigo es tuyo: compartelo con tu pareja" };
+  if (!invite || invite.status !== "PENDING") return { ok: false, error: "Ese código no existe o ya se uso" };
+  if (invite.expiresAt < new Date()) return { ok: false, error: "El código ha caducado, pide uno nuevo" };
+  if (invite.inviterId === user.id) return { ok: false, error: "Ese código es tuyo: compártelo con tu pareja" };
   if (invite.inviter.coupleId) return { ok: false, error: "Esa persona ya esta vinculada con alguien" };
 
   const prep = (invite.prep ?? null) as InvitePrep | null;
 
   await prisma.$transaction(async (tx) => {
-    // el dia compartido de la pareja arranca en la zona de quien invito
+    // el día compartido de la pareja arranca en la zona de quien invito
     const couple = await tx.couple.create({ data: { timezone: invite.inviter.timezone } });
     await tx.user.update({ where: { id: invite.inviterId }, data: { coupleId: couple.id } });
     await tx.user.update({ where: { id: user.id }, data: { coupleId: couple.id } });
@@ -98,11 +98,11 @@ async function performRedeem(userId: string, rawCode: unknown): Promise<ActionRe
     }
   });
 
-  // quien invito aun no tenia pareja, asi que no tiene stream SSE abierto:
+  // quien invito aún no tenia pareja, así que no tiene stream SSE abierto:
   // si no esta con la app delante, el push es la unica forma de enterarse
   if (!isUserOnline(invite.inviterId)) {
     void sendPushToUsers([invite.inviterId], {
-      title: `${user.name} ha aceptado tu invitacion 💞`,
+      title: `${user.name} ha aceptado tu invitación 💞`,
       body: "Vuestro hogar en Near ya esta listo.",
       url: "/home"
     });
@@ -113,7 +113,7 @@ async function performRedeem(userId: string, rawCode: unknown): Promise<ActionRe
 
 export async function redeemInviteAction(_prev: FormState, formData: FormData): Promise<FormState> {
   const user = await getCurrentUser();
-  if (!user) return { error: "No has iniciado sesion" };
+  if (!user) return { error: "No has iniciado sesión" };
   const result = await performRedeem(user.id, formData.get("code"));
   if (!result.ok) return { error: result.error };
   revalidatePath("/", "layout");
@@ -123,7 +123,7 @@ export async function redeemInviteAction(_prev: FormState, formData: FormData): 
 // Canje directo desde el enlace /join/[code] (sin pegar nada a mano).
 export async function redeemByCodeAction(code: string): Promise<ActionResult> {
   const user = await getCurrentUser();
-  if (!user) return { ok: false, error: "No has iniciado sesion" };
+  if (!user) return { ok: false, error: "No has iniciado sesión" };
   const result = await performRedeem(user.id, code);
   if (result.ok) revalidatePath("/", "layout");
   return result;
@@ -135,17 +135,17 @@ const prepSchema = z.object({
   welcomeLetter: z.string().trim().max(4000).optional()
 });
 
-// Guarda los preparativos del hogar en la invitacion mientras se espera.
+// Guarda los preparativos del hogar en la invitación mientras se espera.
 export async function savePrepAction(code: string, prep: InvitePrep): Promise<ActionResult> {
   const user = await getCurrentUser();
-  if (!user) return { ok: false, error: "No has iniciado sesion" };
+  if (!user) return { ok: false, error: "No has iniciado sesión" };
   const parsed = prepSchema.safeParse(prep);
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0].message };
 
   const invite = await prisma.invite.findFirst({
     where: { code: code.trim().toUpperCase(), inviterId: user.id, status: "PENDING" }
   });
-  if (!invite) return { ok: false, error: "Invitacion no encontrada" };
+  if (!invite) return { ok: false, error: "Invitación no encontrada" };
 
   const clean: Record<string, string> = {};
   if (parsed.data.anniversary) clean.anniversary = parsed.data.anniversary;

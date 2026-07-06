@@ -45,8 +45,8 @@ export const dynamic = "force-dynamic";
 
 function greeting() {
   const hour = new Date().getHours();
-  if (hour < 7) return "Sigues despierta/o?";
-  if (hour < 13) return "Buenos dias";
+  if (hour < 7) return "¿Sigues despierta/o?";
+  if (hour < 13) return "Buenos días";
   if (hour < 21) return "Buenas tardes";
   return "Buenas noches";
 }
@@ -59,7 +59,7 @@ export default async function HomePage() {
 
   const [myMood, partnerMood, nextEvents, latestMoment, notes, lastNudge, myLastNudge, promptCount, promptAnswers, streakInfo, missionInfo, weeklyBonus, dailyBox, myPhotoRow, partnerPhotoRow] =
     await Promise.all([
-      // cada mood vive en el dia local de su autor
+      // cada mood vive en el día local de su autor
       prisma.moodEntry.findUnique({
         where: { userId_dateKey: { userId: user.id, dateKey: userDay } }
       }),
@@ -89,7 +89,7 @@ export default async function HomePage() {
             orderBy: { createdAt: "desc" }
           })
         : null,
-      // mi ultimo nudge (para el "visto")
+      // mi último nudge (para el "visto")
       prisma.nudge.findFirst({
         where: { coupleId: couple.id, fromId: user.id },
         orderBy: { createdAt: "desc" }
@@ -112,7 +112,7 @@ export default async function HomePage() {
       prisma.dailyBox.findUnique({
         where: { coupleId_dateKey: { coupleId: couple.id, dateKey: coupleDay } }
       }),
-      // foto del dia: la mia (mi dia local) y la de mi pareja (su dia local)
+      // foto del día: la mía (mi día local) y la de mi pareja (su día local)
       prisma.dailyPhoto.findUnique({
         where: { userId_dateKey: { userId: user.id, dateKey: userDay } }
       }),
@@ -125,7 +125,7 @@ export default async function HomePage() {
         : null
     ]);
 
-  // la pregunta rota con el dia de la pareja: ambos ven la misma
+  // la pregunta rota con el día de la pareja: ambos ven la misma
   const [cy, cm, cd] = coupleDay.split("-").map(Number);
   const dayOfYear = Math.floor((Date.UTC(cy, cm - 1, cd) - Date.UTC(cy, 0, 0)) / 86_400_000);
   const prompt =
@@ -185,7 +185,7 @@ export default async function HomePage() {
         <PresencePicker current={effectivePresence(user.presence, user.presenceUpdatedAt)} />
       </header>
 
-      {/* HERO: la otra persona + la proxima fecha */}
+      {/* HERO: la otra persona + la próxima fecha */}
       <section className="mb-4 overflow-hidden rounded-3xl border border-rose/15 bg-gradient-to-br from-rose-faint via-paper to-paper shadow-card">
         <div className="grid md:grid-cols-[1.15fr_1fr]">
           <div className="p-6 md:p-7">
@@ -230,7 +230,7 @@ export default async function HomePage() {
                   <div className="mt-4 flex items-start gap-2.5 rounded-2xl bg-paper/80 px-4 py-3 shadow-card">
                     <StickyNote className="mt-0.5 h-4 w-4 shrink-0 text-rose" />
                     <div>
-                      <p className="text-[10px] font-semibold uppercase tracking-wider text-rose-deep">
+                      <p className="text-[11px] font-semibold uppercase tracking-wider text-rose-deep">
                         Nota de {partner.name}
                       </p>
                       <p className="mt-0.5 text-sm leading-relaxed text-ink">{partnerNote.body}</p>
@@ -250,7 +250,7 @@ export default async function HomePage() {
                 </div>
               </>
             ) : (
-              <p className="text-sm text-ink-soft">Aun no hay nadie vinculado.</p>
+              <p className="text-sm text-ink-soft">Aún no hay nadie vinculado.</p>
             )}
           </div>
 
@@ -277,7 +277,7 @@ export default async function HomePage() {
             ) : (
               <div className="flex h-full flex-col justify-center">
                 <p className="text-[11px] font-bold uppercase tracking-widest text-ink-soft">
-                  Proxima fecha
+                  Próxima fecha
                 </p>
                 <p className="mt-2 font-display text-xl text-ink">Nada en el horizonte</p>
                 <p className="mt-1 text-sm text-ink-soft">
@@ -321,7 +321,7 @@ export default async function HomePage() {
         </Card>
 
         <Card>
-          <CardTitle>La caja del dia</CardTitle>
+          <CardTitle>La caja del día</CardTitle>
           <div className="mt-3">
             <DailyBox
               initial={
@@ -334,7 +334,7 @@ export default async function HomePage() {
         </Card>
 
         <Card>
-          <CardTitle>Como estas hoy?</CardTitle>
+          <CardTitle>¿Cómo estás hoy?</CardTitle>
           <div className="mt-3">
             <MoodCheck currentMood={myMood?.mood ?? null} currentNote={myMood?.note ?? null} />
           </div>
@@ -364,11 +364,11 @@ export default async function HomePage() {
                 <p className="font-display text-xl leading-tight text-ink">
                   {milestone.daysLeft === 0
                     ? milestone.isAnnual
-                      ? `Hoy cumplis ${milestone.years} ${milestone.years === 1 ? "ano" : "anos"} 🎉`
+                      ? `Hoy cumplis ${milestone.years} ${milestone.years === 1 ? "año" : "años"} 🎉`
                       : `Hoy cumplis ${milestone.months} meses 🎉`
                     : milestone.isAnnual
-                      ? `${milestone.years} ${milestone.years === 1 ? "ano" : "anos"} en ${milestone.daysLeft} ${milestone.daysLeft === 1 ? "dia" : "dias"}`
-                      : `${milestone.months} meses en ${milestone.daysLeft} ${milestone.daysLeft === 1 ? "dia" : "dias"}`}
+                      ? `${milestone.years} ${milestone.years === 1 ? "año" : "años"} en ${milestone.daysLeft} ${milestone.daysLeft === 1 ? "día" : "días"}`
+                      : `${milestone.months} meses en ${milestone.daysLeft} ${milestone.daysLeft === 1 ? "día" : "días"}`}
                 </p>
                 <p className="mt-0.5 text-xs capitalize text-ink-soft">
                   {dateLong(milestone.date)}
@@ -379,7 +379,7 @@ export default async function HomePage() {
         )}
 
         <Card className="md:col-span-2">
-          <CardTitle>Pregunta del dia</CardTitle>
+          <CardTitle>Pregunta del día</CardTitle>
           <div className="mt-3">
             {prompt ? (
               <PromptCard
@@ -413,8 +413,8 @@ export default async function HomePage() {
                 </div>
               )}
               <div className="p-4">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-soft">
-                  Ultimo momento
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-soft">
+                  Último momento
                 </p>
                 {latestMoment.title && (
                   <p className="mt-0.5 truncate font-display text-base text-ink group-hover:text-rose-deep">
@@ -454,7 +454,7 @@ export default async function HomePage() {
                   className="flex flex-col items-center gap-1.5 rounded-xl px-4 py-3 text-ink-soft transition hover:bg-rose-faint hover:text-rose-deep"
                 >
                   <action.icon className="h-5 w-5" />
-                  <span className="text-[10px] font-medium">{action.label}</span>
+                  <span className="text-[11px] font-medium">{action.label}</span>
                 </Link>
               ))}
             </div>

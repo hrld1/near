@@ -163,7 +163,7 @@ export function GolfGame({ onFinish }: { onFinish: (score: number) => void }) {
       s.ball.vx *= 0.984;
       s.ball.vy *= 0.984;
 
-      // captura del hoyo (cerca y sin ir demasiado rapido)
+      // captura del hoyo (cerca y sin ir demasiado rápido)
       const h = currentHole().hole;
       const d = Math.hypot(s.ball.x - h.x, s.ball.y - h.y);
       const speed = Math.hypot(s.ball.vx, s.ball.vy);

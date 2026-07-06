@@ -4,51 +4,51 @@ import { dayKeyIn, shiftDayKey } from "../src/lib/dates";
 
 const prisma = new PrismaClient();
 
-// La pareja demo vive en Europe/Madrid: sus claves de dia se generan ahi.
+// La pareja demo vive en Europe/Madrid: sus claves de día se generan ahi.
 const DEMO_TZ = "Europe/Madrid";
 
 const PROMPTS = [
-  "Que es lo primero que haremos la proxima vez que nos veamos?",
-  "Que cancion te recuerda a nosotros ultimamente?",
-  "Que pequena cosa hizo tu dia mejor hoy?",
+  "¿Qué es lo primero que haremos la próxima vez que nos veamos?",
+  "¿Qué canción te recuerda a nosotros últimamente?",
+  "¿Qué pequeña cosa hizo tu día mejor hoy?",
   "Si pudieramos teletransportarnos ahora mismo, a donde iriamos?",
-  "Que plato quieres que cocinemos juntos algun dia?",
-  "Cual es tu recuerdo favorito de nosotros este ano?",
-  "Que te gustaria que hicieramos en nuestra proxima videollamada?",
-  "Que aprendiste hoy que quieras contarme?",
+  "¿Qué plato quieres que cocinemos juntos algún día?",
+  "¿Cuál es tu recuerdo favorito de nosotros este año?",
+  "¿Qué te gustaría que hiciéramos en nuestra próxima videollamada?",
+  "¿Qué aprendiste hoy que quieras contarme?",
   "Si nuestra relacion fuera una pelicula, cual seria?",
-  "Que es algo que admiras de mi y nunca me has dicho?",
-  "Cual seria tu domingo perfecto conmigo?",
-  "Que lugar del mundo quieres que visitemos juntos?",
-  "Que te hizo reir hoy?",
-  "Que costumbre mia echas mas de menos?",
-  "Si pudieras mandarme un objeto ahora mismo, cual seria?",
-  "Que serie deberiamos empezar a ver juntos?",
-  "Cual fue el momento exacto en que supiste que esto iba en serio?",
-  "Que te gustaria aprender a hacer conmigo?",
-  "Que detalle pequeno te enamora de nuestros dias normales?",
-  "Como imaginas un martes cualquiera cuando vivamos juntos?",
-  "Que cancion pondrias ahora mismo si estuvieramos abrazados?",
-  "Que es lo mas raro que has hecho esta semana?",
-  "Que sueno tuviste hace poco que quieras contarme?",
-  "Si hoy fuera nuestro aniversario, como lo celebrariamos a distancia?",
-  "Que foto tuya de esta semana quiero ver?",
-  "Que parte de tu rutina te gustaria compartir mas conmigo?",
-  "Cual es tu 'te quiero' favorito de los que nos hemos dicho?",
-  "Que haras manana que quieras que te pregunte despues?"
+  "¿Qué es algo que admiras de mí y nunca me has dicho?",
+  "¿Cuál sería tu domingo perfecto conmigo?",
+  "¿Qué lugar del mundo quieres que visitemos juntos?",
+  "¿Qué te hizo reír hoy?",
+  "¿Qué costumbre mía echas más de menos?",
+  "¿Si pudieras mandarme un objeto ahora mismo, cuál sería?",
+  "¿Qué serie deberíamos empezar a ver juntos?",
+  "¿Cuál fue el momento exacto en que supiste que esto iba en serio?",
+  "¿Qué te gustaría aprender a hacer conmigo?",
+  "¿Qué detalle pequeño te enamora de nuestros días normales?",
+  "¿Cómo imaginas un martes cualquiera cuando vivamos juntos?",
+  "¿Qué canción pondrías ahora mismo si estuviéramos abrazados?",
+  "¿Qué es lo más raro que has hecho esta semana?",
+  "¿Qué sueño tuviste hace poco que quieras contarme?",
+  "¿Si hoy fuera nuestro aniversario, cómo lo celebraríamos a distancia?",
+  "¿Qué foto tuya de esta semana quiero ver?",
+  "¿Qué parte de tu rutina te gustaría compartir más conmigo?",
+  "¿Cuál es tu 'te quiero' favorito de los que nos hemos dicho?",
+  "¿Qué harás mañana que quieras que te pregunte después?"
 ];
 
 const QUIZ: { text: string; options: string[] }[] = [
   { text: "Plan ideal de viernes por la noche", options: ["Peli y manta", "Salir a cenar", "Videojuegos juntos", "Dormir temprano"] },
-  { text: "Comida que podria comer toda la vida", options: ["Pizza", "Sushi", "Pasta", "Tacos"] },
-  { text: "Como gestiona un dia malo", options: ["Hablarlo todo", "Silencio y espacio", "Distraerse con algo", "Dormir y manana sera otro dia"] },
-  { text: "Superpoder que elegiria", options: ["Teletransporte", "Leer mentes", "Parar el tiempo", "Volar"] },
+  { text: "Comida que podría comer toda la vida", options: ["Pizza", "Sushi", "Pasta", "Tacos"] },
+  { text: "Cómo gestiona un día malo", options: ["Hablarlo todo", "Silencio y espacio", "Distraerse con algo", "Dormir y mañana será otro día"] },
+  { text: "Superpoder que elegiría", options: ["Teletransporte", "Leer mentes", "Parar el tiempo", "Volar"] },
   { text: "En una fiesta es...", options: ["El alma de la fiesta", "El de las conversaciones profundas", "El que baila sin parar", "El que se va pronto"] },
   { text: "Destino de escapada sonada", options: ["Playa remota", "Ciudad europea", "Montana y cabana", "Japon"] },
   { text: "Lo primero que hace al despertar", options: ["Mirar el movil", "Remolonear 20 minutos", "Levantarse de golpe", "Pensar en desayunar"] },
   { text: "Pelicula para ver en bucle", options: ["Una comedia romantica", "Algo de accion", "Animacion", "Un clasico de siempre"] },
   { text: "Su forma favorita de recibir carino", options: ["Palabras bonitas", "Tiempo juntos", "Detalles y regalos", "Contacto fisico"] },
-  { text: "Si le tocara la loteria manana...", options: ["Viajar un ano entero", "Comprar casa ya", "Invertirlo casi todo", "Dejar de trabajar"] },
+  { text: "Si le tocara la lotería mañana...", options: ["Viajar un año entero", "Comprar casa ya", "Invertirlo casi todo", "Dejar de trabajar"] },
   { text: "Su bebida de siempre", options: ["Cafe", "Te", "Cola / refresco", "Agua y ya"] },
   { text: "Miedo confesable", options: ["Aranas / bichos", "Alturas", "Hablar en publico", "Peliculas de terror"] }
 ];
@@ -87,9 +87,9 @@ async function main() {
   const min = 60 * 1000;
   await prisma.message.createMany({
     data: [
-      { coupleId: couple.id, senderId: ana.id, body: "Buenos dias ☀️ hoy me he despertado pensando en ti", createdAt: new Date(now - 180 * min) },
+      { coupleId: couple.id, senderId: ana.id, body: "Buenos días ☀️ hoy me he despertado pensando en ti", createdAt: new Date(now - 180 * min) },
       { coupleId: couple.id, senderId: leo.id, body: "Y yo con tu audio de anoche en bucle 🥹", createdAt: new Date(now - 175 * min) },
-      { coupleId: couple.id, senderId: ana.id, body: "27 dias para verte. Se me hace eterno y cortisimo a la vez", createdAt: new Date(now - 60 * min) },
+      { coupleId: couple.id, senderId: ana.id, body: "27 días para verte. Se me hace eterno y cortísimo a la vez", createdAt: new Date(now - 60 * min) },
       { coupleId: couple.id, senderId: leo.id, body: "Ya tengo lista de sitios a los que llevarte 🗺️", createdAt: new Date(now - 55 * min) }
     ]
   });
@@ -97,14 +97,14 @@ async function main() {
   const dateKey = dayKeyIn(DEMO_TZ);
   await prisma.moodEntry.createMany({
     data: [
-      { coupleId: couple.id, userId: ana.id, mood: "enamorada", note: "Dia largo pero contenta", dateKey },
+      { coupleId: couple.id, userId: ana.id, mood: "enamorada", note: "Día largo pero contenta", dateKey },
       { coupleId: couple.id, userId: leo.id, mood: "cansado", note: "Semana de examenes...", dateKey }
     ]
   });
 
   await prisma.note.createMany({
     data: [
-      { coupleId: couple.id, authorId: ana.id, body: "No olvides que estoy orgullosa de ti. Suerte manana 💛" },
+      { coupleId: couple.id, authorId: ana.id, body: "No olvides que estoy orgullosa de ti. Suerte mañana 💛" },
       { coupleId: couple.id, authorId: leo.id, body: "Reserva el 14: sorpresa preparada." }
     ]
   });
@@ -121,7 +121,7 @@ async function main() {
   await prisma.moment.createMany({
     data: [
       { coupleId: couple.id, authorId: leo.id, kind: "NOTE", title: "La videollamada de 4 horas", body: "Se suponia que ibamos a estudiar. Nos dieron las 2am hablando de nombres de perro.", happenedAt: new Date(now - 3 * day) },
-      { coupleId: couple.id, authorId: ana.id, kind: "MEMORY", title: "El dia del aeropuerto", body: "Todavia recuerdo la cara que pusiste cuando saliste por la puerta y me viste con el cartel ridiculo.", happenedAt: new Date(now - 40 * day) }
+      { coupleId: couple.id, authorId: ana.id, kind: "MEMORY", title: "El día del aeropuerto", body: "Todavía recuerdo la cara que pusiste cuando saliste por la puerta y me viste con el cartel ridículo.", happenedAt: new Date(now - 40 * day) }
     ]
   });
 

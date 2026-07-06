@@ -10,8 +10,8 @@ import type { CallSignalKind } from "@/types";
 // al otro miembro de la pareja. No se persisten.
 //
 // El primer "ring" viaja con initial=true: si la pareja tiene la app cerrada
-// (sin conexion SSE abierta) le llega un push "te esta llamando". Los re-rings
-// posteriores no lo llevan, asi que solo hay una notificacion por llamada.
+// (sin conexión SSE abierta) le llega un push "te esta llamando". Los re-rings
+// posteriores no lo llevan, así que solo hay una notificación por llamada.
 
 const signalSchema = z.object({
   // sleep/wake/goodnight: modo "dormir juntos" sobre una llamada activa
@@ -35,7 +35,7 @@ export const callSignalAction = coupleAction<
   [input: { kind: CallSignalKind; data?: string; initial?: boolean }]
 >(async ({ user, coupleId, partnerId }, input) => {
   const parsed = signalSchema.safeParse(input);
-  if (!parsed.success) return { ok: false, error: "Senal no valida" };
+  if (!parsed.success) return { ok: false, error: "Señal no valida" };
   const isInitialRing = parsed.data.kind === "ring" && parsed.data.initial === true;
   notifyPartner(
     coupleId,

@@ -306,7 +306,7 @@ export function CapsGame({ onFinish }: { onFinish: (score: number) => void }) {
         />
       </div>
       <p className="mt-2 text-center text-xs text-ink-soft">
-        Arrastra y suelta para deslizar la chapa. Puedes empujar las que ya estan en la diana.
+        Arrastra y suelta para deslizar la chapa. Puedes empujar las que ya están en la diana.
       </p>
     </div>
   );

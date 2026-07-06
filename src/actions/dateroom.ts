@@ -103,12 +103,12 @@ export const setRoomModeAction = coupleAction<
 });
 
 // Senales del modo companion (Netflix/HBO/Prime/Spotify): Near NO controla la
-// reproduccion externa (sus APIs no lo permiten sin acuerdos/SDKs); esto
-// coordina a las dos personas con honestidad: listo / cuenta atras / pausa.
+// reproducción externa (sus APIs no lo permiten sin acuerdos/SDKs); esto
+// coordina a las dos personas con honestidad: listo / cuenta atrás / pausa.
 export const companionSignalAction = coupleAction<[kind: CompanionSignalKind]>(
   async ({ user, coupleId }, kind) => {
     if (!["ready", "go", "pause", "resume"].includes(kind)) {
-      return { ok: false, error: "Senal no valida" };
+      return { ok: false, error: "Señal no valida" };
     }
     publish(coupleId, {
       type: "companion:signal",

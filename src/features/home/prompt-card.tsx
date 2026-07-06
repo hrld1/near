@@ -40,19 +40,19 @@ export function PromptCard({
       {myAnswer ? (
         <div className="mt-4 space-y-3">
           <div className="rounded-xl bg-sand px-4 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-soft">Tu</p>
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-soft">Tu</p>
             <p className="mt-0.5 text-sm text-ink">{myAnswer}</p>
           </div>
           {partnerAnswer ? (
             <div className="rounded-xl bg-rose-faint px-4 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-rose-deep">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-rose-deep">
                 {partnerName}
               </p>
               <p className="mt-0.5 text-sm text-ink">{partnerAnswer}</p>
             </div>
           ) : (
             <p className="text-xs text-ink-soft">
-              {partnerName} aun no ha respondido. Su respuesta aparecera aqui.
+              {partnerName} aún no ha respondido. Su respuesta aparecerá aquí.
             </p>
           )}
         </div>

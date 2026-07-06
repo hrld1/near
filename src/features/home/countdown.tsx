@@ -21,7 +21,7 @@ export function Countdown({ target }: { target: string }) {
 
   const diff = new Date(target).getTime() - now;
   if (diff <= 0) {
-    return <p className="font-display text-3xl text-rose-deep">Ya esta aqui</p>;
+    return <p className="font-display text-3xl text-rose-deep">Ya esta aquí</p>;
   }
 
   const days = Math.floor(diff / 86_400_000);
@@ -30,7 +30,7 @@ export function Countdown({ target }: { target: string }) {
   const seconds = Math.floor((diff % 60_000) / 1000);
 
   const cells = [
-    { value: String(days), label: days === 1 ? "dia" : "dias" },
+    { value: String(days), label: days === 1 ? "día" : "días" },
     { value: pad(hours), label: "horas" },
     { value: pad(minutes), label: "min" },
     { value: pad(seconds), label: "seg" }
@@ -43,7 +43,7 @@ export function Countdown({ target }: { target: string }) {
           <div className="min-w-[3.25rem] rounded-xl bg-rose-faint px-2 py-2 font-display text-3xl tabular-nums text-rose-deep">
             {cell.value}
           </div>
-          <div className="mt-1 text-[10px] uppercase tracking-wider text-ink-soft">
+          <div className="mt-1 text-[11px] uppercase tracking-wider text-ink-soft">
             {cell.label}
           </div>
         </div>

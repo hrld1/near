@@ -52,9 +52,9 @@ export default async function CalendarPage() {
               💗{" "}
               {milestone.daysLeft === 0
                 ? milestone.isAnnual
-                  ? `Hoy cumplis ${milestone.years} ${milestone.years === 1 ? "ano" : "anos"}`
+                  ? `Hoy cumplis ${milestone.years} ${milestone.years === 1 ? "año" : "años"}`
                   : `Hoy cumplis ${milestone.months} meses`
-                : `${milestone.isAnnual ? `${milestone.years} ${milestone.years === 1 ? "ano" : "anos"}` : `${milestone.months} meses`} el ${format(milestone.date, "d 'de' MMMM", { locale: es })}`}
+                : `${milestone.isAnnual ? `${milestone.years} ${milestone.years === 1 ? "año" : "años"}` : `${milestone.months} meses`} el ${format(milestone.date, "d 'de' MMMM", { locale: es })}`}
             </p>
           )}
         </div>
@@ -65,7 +65,7 @@ export default async function CalendarPage() {
         <EmptyState
           icon={CalendarHeart}
           title="Sin fechas a la vista"
-          description="La distancia pesa menos cuando hay una fecha marcada. Cread vuestro proximo reencuentro, una cita virtual o un aniversario."
+          description="La distancia pesa menos cuando hay una fecha marcada. Cread vuestro próximo reencuentro, una cita virtual o un aniversario."
         />
       ) : (
         <div className="space-y-7">
@@ -103,7 +103,7 @@ export default async function CalendarPage() {
           {rest.length > 0 && (
             <section>
               <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-ink-soft">
-                Despues de eso
+                Después de eso
               </h2>
               <div className="space-y-2.5">
                 {rest.map((event) => {

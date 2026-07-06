@@ -32,7 +32,7 @@ export const setMoodAction = coupleAction<[input: { mood: string; note?: string 
   async ({ user, coupleId }, input) => {
     const parsed = moodSchema.safeParse(input);
     if (!parsed.success) return { ok: false, error: parsed.error.issues[0].message };
-    const dateKey = dayKeyIn(user.timezone); // el mood es personal: tu dia
+    const dateKey = dayKeyIn(user.timezone); // el mood es personal: tu día
     const existing = await prisma.moodEntry.findUnique({
       where: { userId_dateKey: { userId: user.id, dateKey } }
     });
@@ -67,7 +67,7 @@ export const sendNudgeAction = coupleAction<[], { id: string }>(
       where: { fromId: user.id, createdAt: { gte: start } }
     });
     const nudge = await prisma.nudge.create({ data: { coupleId, fromId: user.id } });
-    // solo el primer nudge del dia puntua (el cooldown limita el ritmo, no el total)
+    // solo el primer nudge del día puntua (el cooldown limita el ritmo, no el total)
     await addPoints(coupleId, user.id, sentToday === 0 ? POINTS.nudge : 0, dateKey);
     notifyPartner(
       coupleId,
@@ -112,8 +112,8 @@ export const answerPromptAction = coupleFormAction(async ({ user, couple, couple
     answer: formData.get("answer")
   });
   if (!parsed.success) return { error: parsed.error.issues[0].message };
-  // la pregunta del dia es un ritual compartido: ambas respuestas se
-  // emparejan bajo el dia de la PAREJA (si no, la revelacion se descuadra)
+  // la pregunta del día es un ritual compartido: ambas respuestas se
+  // emparejan bajo el día de la PAREJA (si no, la revelacion se descuadra)
   const dateKey = dayKeyIn(couple.timezone);
   const existing = await prisma.promptAnswer.findUnique({
     where: { userId_dateKey: { userId: user.id, dateKey } }

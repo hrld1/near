@@ -8,7 +8,7 @@ import { registerSchema, loginSchema } from "@/lib/validators";
 import type { FormState } from "@/types";
 
 // Solo permitimos volver a un destino interno seguro. En la practica, el enlace
-// /join/[code]: asi tras registrarse/entrar se canjea la invitacion sin pasos.
+// /join/[code]: así tras registrarse/entrar se canjea la invitación sin pasos.
 function safeRedirect(raw: FormDataEntryValue | null, fallback: string): string {
   const value = typeof raw === "string" ? raw : "";
   return /^\/join\/NEAR-[A-Z0-9]{6}$/.test(value) ? value : fallback;
@@ -32,7 +32,7 @@ export async function registerAction(_prev: FormState, formData: FormData): Prom
       redirectTo: safeRedirect(formData.get("redirectTo"), "/onboarding")
     });
   } catch (error) {
-    if (error instanceof AuthError) return { error: "No se pudo iniciar sesion" };
+    if (error instanceof AuthError) return { error: "No se pudo iniciar sesión" };
     throw error;
   }
   return {};
@@ -49,7 +49,7 @@ export async function loginAction(_prev: FormState, formData: FormData): Promise
       redirectTo: safeRedirect(formData.get("redirectTo"), "/home")
     });
   } catch (error) {
-    if (error instanceof AuthError) return { error: "Email o contrasena incorrectos" };
+    if (error instanceof AuthError) return { error: "Email o contraseña incorrectos" };
     throw error;
   }
   return {};

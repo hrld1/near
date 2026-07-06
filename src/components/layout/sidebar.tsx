@@ -86,7 +86,7 @@ export function Sidebar({ userName, unreadChat = 0 }: { userName: string; unread
           <form action={logoutAction}>
             <button
               type="submit"
-              title="Cerrar sesion"
+              title="Cerrar sesión"
               className="rounded-lg p-2 text-ink-soft transition hover:bg-sand hover:text-ink"
             >
               <LogOut className="h-4 w-4" />
@@ -104,7 +104,7 @@ export function Sidebar({ userName, unreadChat = 0 }: { userName: string; unread
               key={item.href}
               href={item.href}
               className={cn(
-                "flex flex-1 flex-col items-center gap-1 py-2.5 text-[10px] font-medium transition",
+                "flex flex-1 flex-col items-center gap-1 py-2.5 text-[11px] font-medium transition",
                 active ? "text-rose-deep" : "text-ink-soft"
               )}
             >

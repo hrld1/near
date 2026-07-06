@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 // "En Near ahora": punto verde vivo mientras la pareja tiene la app abierta.
 // El estado inicial llega del servidor (isUserOnline) y las transiciones de
-// conexion (evento "online") lo mantienen al dia sin recargar. Nada cuando
+// conexión (evento "online") lo mantienen al día sin recargar. Nada cuando
 // está desconectada: entonces manda la presencia manual (Libre/Ocupado…).
 export function PartnerOnline({
   partnerId,

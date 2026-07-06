@@ -155,7 +155,7 @@ export function MomentForm() {
             value={title}
             maxLength={100}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder={kind === "MEMORY" ? "El dia del aeropuerto" : "Un titulo corto"}
+            placeholder={kind === "MEMORY" ? "El día del aeropuerto" : "Un titulo corto"}
           />
         </div>
         <div>
@@ -181,7 +181,7 @@ export function MomentForm() {
           />
         </div>
         <div>
-          <Label htmlFor="m-date">Cuando paso? (opcional)</Label>
+          <Label htmlFor="m-date">¿Cuándo pasó? (opcional)</Label>
           <Input
             id="m-date"
             type="date"

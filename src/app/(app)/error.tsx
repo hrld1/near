@@ -5,7 +5,7 @@ import { HeartCrack } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 // Boundary de la zona autenticada: el resto de la app (sidebar, otras rutas)
-// sigue navegable aunque una pagina falle.
+// sigue navegable aunque una página falle.
 export default function AppError({
   error,
   reset
@@ -20,10 +20,10 @@ export default function AppError({
       </span>
       <h1 className="mt-4 font-display text-2xl text-ink">No hemos podido cargar esto</h1>
       <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-        Ha fallado algo al preparar la pagina. Puedes reintentarlo o volver al inicio.
+        Ha fallado algo al preparar la página. Puedes reintentarlo o volver al inicio.
       </p>
       {error.digest && (
-        <p className="mt-2 text-[10px] uppercase tracking-wider text-ink-soft/60">
+        <p className="mt-2 text-[11px] uppercase tracking-wider text-ink-soft/60">
           ref: {error.digest}
         </p>
       )}

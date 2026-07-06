@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 
 // Registra el service worker (push + notificationclick). Como el SW no
-// cachea fetch, registrarlo tambien en dev no ensucia nada y permite
+// cachea fetch, registrarlo también en dev no ensucia nada y permite
 // probar las notificaciones en local.
 export function PwaRegister() {
   useEffect(() => {

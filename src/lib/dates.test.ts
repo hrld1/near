@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { dayKeyIn, dayRangeUtc, mondayOfWeek, monthKeyIn, nextAnniversary, shiftDayKey } from "./dates";
 
 describe("dayKeyIn", () => {
-  it("da dias distintos a la vez en zonas extremas", () => {
-    // 2026-07-04T23:30Z: en Kiritimati (+14) ya es dia 5; en Niue (-11) aun es dia 4
+  it("da días distintos a la vez en zonas extremas", () => {
+    // 2026-07-04T23:30Z: en Kiritimati (+14) ya es día 5; en Niue (-11) aun es día 4
     const instant = new Date("2026-07-04T23:30:00Z");
     expect(dayKeyIn("UTC", instant)).toBe("2026-07-04");
     expect(dayKeyIn("Pacific/Kiritimati", instant)).toBe("2026-07-05");
@@ -30,7 +30,7 @@ describe("monthKeyIn", () => {
 });
 
 describe("shiftDayKey", () => {
-  it("suma y resta dias", () => {
+  it("suma y resta días", () => {
     expect(shiftDayKey("2026-07-04", 1)).toBe("2026-07-05");
     expect(shiftDayKey("2026-07-04", -4)).toBe("2026-06-30");
   });
@@ -58,7 +58,7 @@ describe("mondayOfWeek", () => {
 describe("nextAnniversary", () => {
   const ann = new Date(2024, 1, 14); // 14 feb 2024
 
-  it("el proximo mesiversario cae el mismo dia del mes siguiente", () => {
+  it("el próximo mesiversario cae el mismo día del mes siguiente", () => {
     const r = nextAnniversary(ann, new Date(2026, 6, 4)); // 4 jul 2026
     expect(r.date.getMonth()).toBe(6); // julio
     expect(r.date.getDate()).toBe(14);
@@ -67,7 +67,7 @@ describe("nextAnniversary", () => {
     expect(r.daysLeft).toBe(10);
   });
 
-  it("si hoy es el dia, hoy es el hito (daysLeft 0)", () => {
+  it("si hoy es el día, hoy es el hito (daysLeft 0)", () => {
     const r = nextAnniversary(ann, new Date(2026, 6, 14));
     expect(r.daysLeft).toBe(0);
     expect(r.months).toBe(29);
@@ -81,7 +81,7 @@ describe("nextAnniversary", () => {
     expect(r.years).toBe(3);
   });
 
-  it("clampa el dia en meses cortos (31 -> fin de mes)", () => {
+  it("clampa el día en meses cortos (31 -> fin de mes)", () => {
     const a31 = new Date(2026, 0, 31); // 31 enero
     const r = nextAnniversary(a31, new Date(2026, 1, 10)); // 10 feb
     expect(r.date.getMonth()).toBe(1);
@@ -102,19 +102,19 @@ describe("dayRangeUtc", () => {
     expect(end.toISOString()).toBe("2026-07-04T22:00:00.000Z");
   });
 
-  it("el dia del cambio a horario de verano dura 23 horas", () => {
+  it("el día del cambio a horario de verano dura 23 horas", () => {
     // En Madrid, el 2026-03-29 salta de 02:00 a 03:00
     const { start, end } = dayRangeUtc("2026-03-29", "Europe/Madrid");
     expect((end.getTime() - start.getTime()) / 3_600_000).toBe(23);
   });
 
-  it("el dia de la vuelta al horario de invierno dura 25 horas", () => {
+  it("el día de la vuelta al horario de invierno dura 25 horas", () => {
     // En Madrid, el 2026-10-25 repite la hora de 02:00 a 03:00
     const { start, end } = dayRangeUtc("2026-10-25", "Europe/Madrid");
     expect((end.getTime() - start.getTime()) / 3_600_000).toBe(25);
   });
 
-  it("un instante dentro del dia local cae dentro del rango", () => {
+  it("un instante dentro del día local cae dentro del rango", () => {
     const tz = "America/Mexico_City";
     const instant = new Date("2026-07-05T04:30:00Z"); // 22:30 del 4 de julio en CDMX
     const key = dayKeyIn(tz, instant);

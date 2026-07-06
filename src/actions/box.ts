@@ -13,7 +13,7 @@ export const openDailyBoxAction = coupleAction<
   [],
   { kind: string; content: string; openedByMe: boolean }
 >(async ({ user, couple, coupleId, partnerId }) => {
-  const dateKey = dayKeyIn(couple.timezone); // la caja es de la pareja: su dia
+  const dateKey = dayKeyIn(couple.timezone); // la caja es de la pareja: su día
 
   const existing = await prisma.dailyBox.findUnique({
     where: { coupleId_dateKey: { coupleId, dateKey } }
@@ -59,7 +59,7 @@ export const openDailyBoxAction = coupleAction<
     coupleId,
     partnerId,
     { type: "box:opened", payload: { by: user.name, kind: box.kind, content: box.content } },
-    { title: `${user.name} ha abierto la caja del dia 🎁`, url: "/home", tag: "box" }
+    { title: `${user.name} ha abierto la caja del día 🎁`, url: "/home", tag: "box" }
   );
   revalidatePath("/home");
   return { ok: true, data: { kind: box.kind, content: box.content, openedByMe: true } };

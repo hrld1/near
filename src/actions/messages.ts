@@ -38,7 +38,7 @@ export const sendMessageAction = coupleAction<
     include: { reactions: true }
   });
 
-  // primer mensaje del dia (local del usuario): cuenta para racha y suma puntos
+  // primer mensaje del día (local del usuario): cuenta para racha y suma puntos
   const dateKey = dayKeyIn(user.timezone);
   const { start } = dayRangeUtc(dateKey, user.timezone);
   const todayCount = await prisma.message.count({
@@ -57,7 +57,7 @@ export const sendMessageAction = coupleAction<
       title: user.name,
       body: preview.slice(0, 90),
       url: dto.channel === "DATE_ROOM" ? "/date-room" : "/chat",
-      tag: "chat" // una rafaga de mensajes colapsa en una sola notificacion
+      tag: "chat" // una rafaga de mensajes colapsa en una sola notificación
     }
   );
   return { ok: true, data: { message: dto } };
@@ -122,7 +122,7 @@ export const markChatSeenAction = coupleAction(async ({ user, coupleId }) => {
     where: { id: user.id },
     data: { lastChatSeenAt: at }
   });
-  // el emisor pinta "Visto" en vivo bajo su ultimo mensaje
+  // el emisor pinta "Visto" en vivo bajo su último mensaje
   publish(coupleId, { type: "chat:seen", payload: { userId: user.id, at: at.toISOString() } });
   return { ok: true };
 });

@@ -21,12 +21,12 @@ describe("gameOfDay", () => {
     expect(gameOfDay("2026-07-04").key).toBe(gameOfDay("2026-07-04").key);
   });
 
-  it("rota de un dia al siguiente cubriendo todos los juegos", () => {
+  it("rota de un día al siguiente cubriendo todos los juegos", () => {
     const days = Array.from({ length: GAMES.length }, (_, i) =>
       shiftDayKey("2026-07-01", i)
     );
     const games = new Set(days.map((k) => gameOfDay(k).key));
-    expect(games.size).toBe(GAMES.length); // N dias consecutivos cubren los N juegos
+    expect(games.size).toBe(GAMES.length); // N días consecutivos cubren los N juegos
   });
 });
 
@@ -47,7 +47,7 @@ describe("compareScores", () => {
 });
 
 describe("wordsOfDay / scrambleWord", () => {
-  it("las palabras del dia son deterministas y sin repetir", () => {
+  it("las palabras del día son deterministas y sin repetir", () => {
     const a = wordsOfDay("2026-07-04");
     const b = wordsOfDay("2026-07-04");
     expect(a).toEqual(b);

@@ -101,7 +101,7 @@ export function GameHost(props: GameHostProps) {
             {props.name}
             {props.isDaily && (
               <span className="rounded-full bg-white/20 px-2.5 py-0.5 text-[11px] font-sans font-semibold uppercase tracking-wide backdrop-blur-sm">
-                Reto del dia
+                Reto del día
               </span>
             )}
           </h1>
@@ -136,7 +136,7 @@ export function GameHost(props: GameHostProps) {
                 </Button>
               ) : (
                 <p className="text-sm text-ink-soft">
-                  Sin intentos por hoy. Manana hay reto nuevo.
+                  Sin intentos por hoy. Mañana hay reto nuevo.
                 </p>
               )}
             </div>
@@ -178,7 +178,7 @@ export function GameHost(props: GameHostProps) {
               )}
               {beatPartner === null && (
                 <p className="text-sm text-ink-soft">
-                  {props.partnerName} aun no ha jugado hoy. Presume de marca en el chat.
+                  {props.partnerName} aún no ha jugado hoy. Presume de marca en el chat.
                 </p>
               )}
               {error && <p className="text-sm text-red-700 dark:text-red-400">{error}</p>}

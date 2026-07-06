@@ -70,7 +70,7 @@ export function Quiz({
           <p className="mt-3 rounded-xl bg-sand px-4 py-2.5 text-sm text-ink">
             {step === "self"
               ? `Primero tu, ${myName}: cual va contigo?`
-              : `Y ahora... que crees que respondera ${partnerName} sobre si misma/o?`}
+              : `Y ahora... que crees que responderá ${partnerName} sobre si misma/o?`}
           </p>
           <div className="mt-4 grid gap-2">
             {current.options.map((option, index) => {
@@ -97,7 +97,7 @@ export function Quiz({
           <div className="mt-5 flex justify-end gap-2">
             {step === "guess" && (
               <Button variant="ghost" onClick={() => setStep("self")}>
-                Atras
+                Atrás
               </Button>
             )}
             {step === "self" ? (
@@ -117,8 +117,8 @@ export function Quiz({
           <h2 className="mt-3 font-display text-2xl text-ink">Has respondido todo</h2>
           <p className="mt-1 text-sm text-ink-soft">
             {results.length < items.length
-              ? `Cuando ${partnerName} termine, vereis los resultados completos aqui.`
-              : "Aqui teneis vuestros resultados."}
+              ? `Cuando ${partnerName} termine, vereis los resultados completos aquí.`
+              : "Aquí teneis vuestros resultados."}
           </p>
         </Card>
       )}

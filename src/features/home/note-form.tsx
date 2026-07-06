@@ -23,7 +23,7 @@ export function NoteForm({ current }: { current: string | null }) {
         rows={2}
         maxLength={280}
         defaultValue={current ?? ""}
-        placeholder="Deja una nota que tu pareja vera en su inicio..."
+        placeholder="Deja una nota que tu pareja verá en su inicio..."
         required
       />
       <div className="flex items-center justify-between">

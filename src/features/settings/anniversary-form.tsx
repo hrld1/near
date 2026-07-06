@@ -27,7 +27,7 @@ export function AnniversaryForm({ current }: { current: string | null }) {
     <div>
       <p className="flex items-start gap-2 text-sm text-ink-soft">
         <HeartHandshake className="mt-0.5 h-4 w-4 shrink-0" />
-        El dia en que empezasteis. Activa el contador de mesiversarios y
+        El día en que empezasteis. Activa el contador de mesiversarios y
         aniversarios en el inicio.
       </p>
       <div className="mt-3 flex flex-wrap items-end gap-2">

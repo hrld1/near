@@ -88,7 +88,7 @@ export function TypingGame({ onFinish }: { onFinish: (score: number) => void }) 
           ref={inputRef}
           value={value}
           onChange={(e) => {
-            // espacio tambien confirma (fluye mejor al teclear rapido)
+            // espacio también confirma (fluye mejor al teclear rápido)
             if (e.target.value.endsWith(" ")) {
               submitWord(e.target.value.trim());
               return;
@@ -102,7 +102,7 @@ export function TypingGame({ onFinish }: { onFinish: (score: number) => void }) 
           autoCorrect="off"
           autoComplete="off"
           spellCheck={false}
-          placeholder="Teclea aqui..."
+          placeholder="Teclea aquí..."
           className="w-full max-w-xs rounded-2xl border border-sand-deep bg-paper px-4 py-3 text-center font-display text-2xl text-ink shadow-card focus:border-cyan-400 focus:outline-none"
         />
       </div>

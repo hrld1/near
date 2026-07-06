@@ -19,16 +19,16 @@ import { cn } from "@/lib/utils";
 import type { CallSignalKind, MemberInfo } from "@/types";
 
 // Motor de llamada GLOBAL de Near. Vive en el layout de (app), por encima de
-// las paginas: la llamada suena y sigue viva en cualquier pantalla, y navegar
+// las páginas: la llamada suena y sigue viva en cualquier pantalla, y navegar
 // no la corta. El audio remoto se reproduce SIEMPRE en un <audio> oculto de
 // este provider; los <video> de la sala solo pintan imagen (van muted) para
 // no duplicar el sonido.
 //
 // Robustez heredada del panel original: degradacion de medios (video+audio ->
 // audio -> espectador con transceivers recvonly), guardas de negociacion,
-// cola de ICE y 7s de gracia ante cortes transitorios. Nuevo aqui:
+// cola de ICE y 7s de gracia ante cortes transitorios. Nuevo aquí:
 // - re-ring cada 4s mientras llamas (si el otro abre la app a mitad, le suena)
-// - watchdog del entrante (si dejan de llegar rings, la invitacion se apaga)
+// - watchdog del entrante (si dejan de llegar rings, la invitación se apaga)
 // - tono + vibracion de llamada entrante, timeout de "no contesta" a los 45s
 
 type CallState = "idle" | "outgoing" | "incoming" | "connecting" | "active";
@@ -144,7 +144,7 @@ export function CallProvider({
     };
   }, [state]);
 
-  // audio remoto: suena aqui, en cualquier pagina
+  // audio remoto: suena aquí, en cualquier página
   useEffect(() => {
     if (remoteAudioRef.current) remoteAudioRef.current.srcObject = remoteStream;
   }, [remoteStream]);
@@ -264,7 +264,7 @@ export function CallProvider({
           if (stateRef.current === "idle") {
             setCallState("incoming");
             // si el que llama desaparece (cierra la pestaña, pierde red),
-            // sus re-rings dejan de llegar y la invitacion se apaga sola
+            // sus re-rings dejan de llegar y la invitación se apaga sola
             watchdogRef.current = setInterval(() => {
               if (stateRef.current === "incoming" && Date.now() - lastRingAtRef.current > 12000) {
                 cleanup(false, "Llamada perdida");
@@ -340,7 +340,7 @@ export function CallProvider({
           break;
       }
     } catch (err) {
-      // una senal rota no debe tirar una llamada ya activa
+      // una señal rota no debe tirar una llamada ya activa
       if (stateRef.current !== "active") {
         cleanup(false, mediaErrorMessage(err));
       }
@@ -502,7 +502,7 @@ export function CallProvider({
   return (
     <CallContext.Provider value={value}>
       {children}
-      {/* el audio de la llamada vive aqui: navegar no lo corta */}
+      {/* el audio de la llamada vive aquí: navegar no lo corta */}
       <audio ref={remoteAudioRef} autoPlay className="hidden" />
       <IncomingCallOverlay
         visible={state === "incoming"}
@@ -617,7 +617,7 @@ function SleepOverlay({
   );
 }
 
-// Overlay global de llamada entrante: aparece en cualquier pagina.
+// Overlay global de llamada entrante: aparece en cualquier página.
 function IncomingCallOverlay({
   visible,
   partnerName,

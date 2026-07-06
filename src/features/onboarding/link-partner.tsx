@@ -77,8 +77,8 @@ export function LinkPartner() {
       <Card className="p-6">
         <h2 className="font-display text-xl text-ink">Invita a tu pareja</h2>
         <p className="mt-1 text-sm leading-relaxed text-ink-soft">
-          Genera un codigo y compartelo. Cuando lo use, vuestro espacio se
-          creara automaticamente.
+          Genera un código y compártelo. Cuando lo use, vuestro espacio se
+          creará automáticamente.
         </p>
         {code ? (
           <div className="mt-4">
@@ -95,13 +95,13 @@ export function LinkPartner() {
             </Button>
             <p className="mt-3 flex items-center gap-2 text-xs text-ink-soft">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
-              Esperando a que tu pareja acepte... esta pagina se actualizara sola.
+              Esperando a que tu pareja acepte... esta página se actualizará sola.
             </p>
           </div>
         ) : (
           <Button onClick={generate} loading={pending} className="mt-4">
             <Ticket className="h-4 w-4" />
-            Generar codigo
+            Generar código
           </Button>
         )}
         <FieldError>{error ?? undefined}</FieldError>
@@ -114,9 +114,9 @@ export function LinkPartner() {
       </div>
 
       <Card className="p-6">
-        <h2 className="font-display text-xl text-ink">Tengo un codigo</h2>
+        <h2 className="font-display text-xl text-ink">Tengo un código</h2>
         <p className="mt-1 text-sm text-ink-soft">
-          Tu pareja ya creo uno? Pegalo aqui.
+          ¿Tu pareja ya creó uno? Pégalo aquí.
         </p>
         <form action={redeem} className="mt-4 space-y-3">
           <Input
