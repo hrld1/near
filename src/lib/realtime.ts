@@ -1,9 +1,12 @@
 import type { StreamEvent } from "@/types";
+import { createBusBridge } from "@/lib/bus-redis";
 
-// Bus de eventos en memoria para SSE.
-// Valido para un solo proceso (dev / single node). Para produccion
-// multi-instancia, sustituir por Redis pub/sub o un servicio tipo Pusher:
-// la interfaz publish/subscribe se mantiene igual.
+// Bus de eventos para SSE. Por defecto vive en memoria (un solo proceso: dev o
+// single-node). En multi-nodo, el puente Redis (lib/bus-redis, activo solo con
+// REDIS_URL) reparte los eventos entre instancias; la interfaz publish/
+// subscribe no cambia. El seguimiento de "online" es local (best-effort): con
+// varias instancias, un push de más a alguien conectado en otro nodo es
+// inofensivo.
 
 type Listener = (event: StreamEvent) => void;
 
@@ -13,6 +16,10 @@ const globalForBus = globalThis as unknown as {
 };
 
 const bus = (globalForBus.nearBus ??= new Map<string, Set<Listener>>());
+
+// Puente a otras instancias: al recibir un evento de otro nodo, se entrega solo
+// a los oyentes locales (sin reenviarlo, para no crear bucles).
+const bridge = createBusBridge((coupleId, event) => deliverLocal(coupleId, event));
 
 // Conexiones SSE vivas por usuario: si tiene alguna, esta "online" y no
 // hace falta push. Misma limitacion single-process que el bus (con varias
@@ -45,7 +52,9 @@ export function subscribe(coupleId: string, listener: Listener): () => void {
   };
 }
 
-export function publish(coupleId: string, event: StreamEvent) {
+// Entrega a los oyentes de ESTA instancia. Lo usa publish() y el puente Redis
+// cuando llega un evento de otro nodo.
+function deliverLocal(coupleId: string, event: StreamEvent) {
   const set = bus.get(coupleId);
   if (!set) return;
   for (const listener of set) {
@@ -55,4 +64,10 @@ export function publish(coupleId: string, event: StreamEvent) {
       // listener roto: se limpia al cerrar la conexión
     }
   }
+}
+
+export function publish(coupleId: string, event: StreamEvent) {
+  deliverLocal(coupleId, event);
+  // reenvía a otras instancias (no-op sin REDIS_URL)
+  bridge.publish(coupleId, event);
 }
