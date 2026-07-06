@@ -3,29 +3,51 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  CalendarHeart,
-  Gamepad2,
+  BookHeart,
   Heart,
   Home,
   LogOut,
   MessageCircle,
-  MonitorPlay,
-  BookHeart,
-  Settings
+  Settings,
+  Users
 } from "lucide-react";
 import { logoutAction } from "@/actions/auth";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Avatar } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
-const NAV = [
-  { href: "/home", label: "Inicio", icon: Home },
-  { href: "/chat", label: "Chat", icon: MessageCircle },
-  { href: "/moments", label: "Momentos", icon: BookHeart },
-  { href: "/calendar", label: "Fechas", icon: CalendarHeart },
-  { href: "/date-room", label: "Cita", icon: MonitorPlay },
-  { href: "/play", label: "Arcade", icon: Gamepad2 }
+// 5 destinos, dos verbos y dos sustantivos: Hoy (estar), Chat (hablar),
+// Juntos (hacer a la vez), Recuerdos (recordar) y Ajustes. Cada destino
+// "posee" varias rutas: por eso el resaltado va por prefijos (match).
+type NavItem = {
+  href: string;
+  label: string;
+  icon: typeof Home;
+  match: string[];
+};
+
+const PRIMARY: NavItem[] = [
+  { href: "/home", label: "Hoy", icon: Home, match: ["/home"] },
+  { href: "/chat", label: "Chat", icon: MessageCircle, match: ["/chat"] },
+  {
+    href: "/juntos",
+    label: "Juntos",
+    icon: Users,
+    match: ["/juntos", "/date-room", "/canvas", "/play"]
+  },
+  {
+    href: "/recuerdos",
+    label: "Recuerdos",
+    icon: BookHeart,
+    match: ["/recuerdos", "/moments", "/letters", "/calendar", "/map", "/recap"]
+  }
 ];
+
+const SETTINGS: NavItem = { href: "/settings", label: "Ajustes", icon: Settings, match: ["/settings"] };
+
+function isActive(item: NavItem, pathname: string) {
+  return item.match.some((prefix) => pathname === prefix || pathname.startsWith(prefix + "/"));
+}
 
 export function Sidebar({ userName, unreadChat = 0 }: { userName: string; unreadChat?: number }) {
   const pathname = usePathname();
@@ -41,8 +63,8 @@ export function Sidebar({ userName, unreadChat = 0 }: { userName: string; unread
           <span className="font-display text-xl text-ink">Near</span>
         </Link>
         <nav className="flex flex-1 flex-col gap-1">
-          {NAV.map((item) => {
-            const active = pathname.startsWith(item.href);
+          {PRIMARY.map((item) => {
+            const active = isActive(item, pathname);
             return (
               <Link
                 key={item.href}
@@ -77,7 +99,7 @@ export function Sidebar({ userName, unreadChat = 0 }: { userName: string; unread
             title="Ajustes"
             className={cn(
               "rounded-lg p-2 transition hover:bg-sand hover:text-ink",
-              pathname.startsWith("/settings") ? "text-rose-deep" : "text-ink-soft"
+              isActive(SETTINGS, pathname) ? "text-rose-deep" : "text-ink-soft"
             )}
           >
             <Settings className="h-4 w-4" />
@@ -95,10 +117,10 @@ export function Sidebar({ userName, unreadChat = 0 }: { userName: string; unread
         </div>
       </aside>
 
-      {/* Mobile bottom nav */}
+      {/* Mobile bottom nav: los 5 destinos */}
       <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t border-sand bg-paper/90 backdrop-blur md:hidden">
-        {[...NAV, { href: "/settings", label: "Ajustes", icon: Settings }].map((item) => {
-          const active = pathname.startsWith(item.href);
+        {[...PRIMARY, SETTINGS].map((item) => {
+          const active = isActive(item, pathname);
           return (
             <Link
               key={item.href}
