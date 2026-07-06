@@ -1,11 +1,18 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { MapPin } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Fingerprint, Heart, MapPin, Phone, Sparkles, Sun, SunMoon } from "lucide-react";
 import { skyForHour } from "@/lib/sky";
 import { currentWeather, geocode, weatherText, type Wx } from "@/lib/weather";
 import { effectivePresence } from "@/lib/presence";
 import { presenceInfo, moodInfo } from "@/lib/utils";
+import { heartbeat, sfx } from "@/lib/sound";
+import { sendNudgeAction } from "@/actions/presence";
+import { touchSignalAction } from "@/actions/touch";
+import { togetherHereAction } from "@/actions/together";
+import { useCoupleStream } from "@/hooks/use-stream";
+import { useCall } from "@/features/call/call-context";
 import { PartnerOnline } from "@/features/presence/partner-online";
 import { Avatar } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -52,6 +59,7 @@ const STARS = Array.from({ length: 42 }, (_, i) => ({
 }));
 
 export function TogetherWindow({
+  myId,
   partner,
   myTimezone,
   partnerTimezone,
@@ -64,6 +72,7 @@ export function TogetherWindow({
   partnerMoodNote,
   initialOnline
 }: {
+  myId: string;
   partner: MemberInfo | null;
   myTimezone: string;
   partnerTimezone: string;
@@ -76,15 +85,93 @@ export function TogetherWindow({
   partnerMoodNote: string | null;
   initialOnline: boolean;
 }) {
+  const router = useRouter();
+  const call = useCall();
   const [now, setNow] = useState(() => new Date());
   const [wx, setWx] = useState<Wx | null>(null);
+  const [partnerHere, setPartnerHere] = useState(false);
+  const [nudged, setNudged] = useState(false);
+  const [awake, setAwake] = useState(false);
   const wxDone = useRef(false);
+  const partnerHereRef = useRef(false);
+  const wakeRef = useRef<WakeLockSentinel | null>(null);
 
   // el cielo se recalcula solo con el tiempo: tic cada 30s
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 30_000);
     return () => clearInterval(id);
   }, []);
+
+  // co-presencia: aviso de que estoy mirando; al salir, de que me voy. Si me
+  // entero de que la pareja está, respondo una vez (el ref corta el ping-pong)
+  // para que quien llega tarde también se entere.
+  useEffect(() => {
+    if (!partner) return;
+    void togetherHereAction(true);
+    const onHide = () => void togetherHereAction(false);
+    window.addEventListener("pagehide", onHide);
+    return () => {
+      window.removeEventListener("pagehide", onHide);
+      void togetherHereAction(false);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useCoupleStream((event) => {
+    if (event.type !== "together:here") return;
+    if (event.payload.userId === myId) return;
+    if (event.payload.here) {
+      if (!partnerHereRef.current) {
+        partnerHereRef.current = true;
+        setPartnerHere(true);
+        void togetherHereAction(true);
+      }
+    } else {
+      partnerHereRef.current = false;
+      setPartnerHere(false);
+    }
+  });
+
+  // Wake Lock: modo "mesita de noche" — la pantalla no se apaga. Se re-pide al
+  // volver la pestaña (el navegador lo suelta al ocultarse). Silencioso si no
+  // está soportado.
+  async function requestWake() {
+    try {
+      if (!("wakeLock" in navigator)) return;
+      wakeRef.current = await navigator.wakeLock.request("screen");
+      setAwake(true);
+      wakeRef.current.addEventListener?.("release", () => setAwake(false));
+    } catch {
+      setAwake(false);
+    }
+  }
+  function releaseWake() {
+    void wakeRef.current?.release().catch(() => undefined);
+    wakeRef.current = null;
+    setAwake(false);
+  }
+  useEffect(() => {
+    const onVis = () => {
+      if (document.visibilityState === "visible" && awake && !wakeRef.current) void requestWake();
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      document.removeEventListener("visibilitychange", onVis);
+      void wakeRef.current?.release().catch(() => undefined);
+    };
+  }, [awake]);
+
+  function latido() {
+    heartbeat();
+    sfx.pulse();
+    setNudged(true);
+    setTimeout(() => setNudged(false), 2600);
+    void sendNudgeAction();
+  }
+  function tacto() {
+    void touchSignalAction({ kind: "invite" });
+    router.push("/touch");
+  }
 
   // clima de su ciudad, una vez
   useEffect(() => {
@@ -195,22 +282,69 @@ export function TogetherWindow({
               </p>
             )}
 
+            {/* la magia ambiental: estáis mirando el mismo cielo a la vez */}
+            {partnerHere && (
+              <p className="mt-5 inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm font-medium text-white shadow-lift motion-safe:animate-fade-up">
+                <Sparkles className="h-4 w-4 text-amber-200" />
+                {partnerName} está mirando el mismo cielo, ahora
+              </p>
+            )}
+
             {!partnerCity && (
               <p className="mt-5 flex items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-1.5 text-xs text-white/70">
                 <MapPin className="h-3.5 w-3.5" />
                 Pídele que añada su ciudad para ver su cielo real
               </p>
             )}
+
+            {/* acercarte: un toque desde aquí mismo */}
+            <div className="mt-8 flex items-center gap-3">
+              <button
+                onClick={latido}
+                className={cn(
+                  "flex flex-col items-center gap-1.5 rounded-2xl px-5 py-3 text-xs font-medium backdrop-blur transition",
+                  nudged ? "bg-rose/40 text-white" : "bg-white/10 text-white/85 hover:bg-white/20"
+                )}
+              >
+                <Heart className={cn("h-5 w-5", nudged && "fill-current")} />
+                {nudged ? "Enviado" : "Latido"}
+              </button>
+              <button
+                onClick={tacto}
+                className="flex flex-col items-center gap-1.5 rounded-2xl bg-white/10 px-5 py-3 text-xs font-medium text-white/85 backdrop-blur transition hover:bg-white/20"
+              >
+                <Fingerprint className="h-5 w-5" />
+                Tacto
+              </button>
+              <button
+                onClick={() => void call.startCall()}
+                className="flex flex-col items-center gap-1.5 rounded-2xl bg-white/10 px-5 py-3 text-xs font-medium text-white/85 backdrop-blur transition hover:bg-white/20"
+              >
+                <Phone className="h-5 w-5" />
+                Llamar
+              </button>
+            </div>
           </>
         ) : (
           <p className="text-white/70">Aún no hay nadie vinculado.</p>
         )}
       </div>
 
-      {/* tu hora, discreta abajo */}
-      <p className="absolute bottom-6 z-10 text-xs text-white/45">
-        Aquí son las {myTime}
-      </p>
+      {/* tu hora + mantener encendida, discretos abajo */}
+      <div className="absolute inset-x-0 bottom-6 z-10 flex flex-col items-center gap-2">
+        <button
+          onClick={() => (awake ? releaseWake() : requestWake())}
+          className={cn(
+            "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs backdrop-blur transition",
+            awake ? "bg-white/20 text-white" : "bg-white/5 text-white/55 hover:bg-white/10"
+          )}
+          title="Evita que la pantalla se apague (modo mesita)"
+        >
+          {awake ? <Sun className="h-3.5 w-3.5" /> : <SunMoon className="h-3.5 w-3.5" />}
+          {awake ? "Pantalla encendida" : "Mantener encendida"}
+        </button>
+        <p className="text-xs text-white/45">Aquí son las {myTime}</p>
+      </div>
     </div>
   );
 }

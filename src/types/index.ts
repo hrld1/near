@@ -141,7 +141,10 @@ export type StreamEvent =
         playing: boolean;
         at: number;
       };
-    };
+    }
+  // --- iteracion 8 ---
+  // co-presencia en la ventana "Estar juntos" (mirando el mismo cielo)
+  | { type: "together:here"; payload: { userId: string; here: boolean } };
 
 export type StreamEventType = StreamEvent["type"];
 

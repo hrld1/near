@@ -25,6 +25,7 @@ export default async function TogetherPage() {
       {/* el ánimo/estado de la pareja se refresca solo cuando cambian */}
       <LiveRefresh types={["mood", "presence", "note"]} />
       <TogetherWindow
+        myId={user.id}
         partner={partner ? { id: partner.id, name: partner.name, image: partner.image } : null}
         myTimezone={user.timezone}
         partnerTimezone={partner?.timezone ?? user.timezone}
