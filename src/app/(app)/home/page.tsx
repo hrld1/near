@@ -12,6 +12,7 @@ import {
   MapPin,
   MessageCircle,
   MonitorPlay,
+  Paintbrush,
   StickyNote
 } from "lucide-react";
 import { prisma } from "@/lib/db";
@@ -161,6 +162,7 @@ export default async function HomePage() {
     { href: "/chat", label: "Chat", icon: MessageCircle },
     { href: "/moments", label: "Momento", icon: BookHeart },
     { href: "/date-room", label: "Sala", icon: MonitorPlay },
+    { href: "/canvas", label: "Lienzo", icon: Paintbrush },
     { href: "/letters", label: "Cartas", icon: Mail },
     { href: "/map", label: "Distancia", icon: MapPin },
     { href: "/calendar", label: "Fechas", icon: CalendarHeart },
