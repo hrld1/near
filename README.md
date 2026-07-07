@@ -129,6 +129,13 @@ Catorce mejoras para que la app "se sienta" más cerca, en cuatro niveles:
 - **Español correcto y accesibilidad**: barrido de tildes/ñ/¿¡ por toda la interfaz, respeto de `prefers-reduced-motion` (sin confeti ni latidos para quien pide menos movimiento) y textos mínimos más legibles.
 - **Adaptadores de despliegue**: almacenamiento **S3** y bus **Redis** por entorno (ver *Despliegue*), dormidos por defecto.
 
+### Iteración 9: "El momento de hoy" — el ritual diario recíproco
+Darle a Near una espina: un único gesto diario, recíproco, que hace que abrir la app cada día sea inevitable.
+- **El momento de hoy** (corazón de *Hoy*): cada día un **tema compartido** (`lib/moment-of-day.ts`, determinista por día de pareja, testeado) al que **los dos** respondéis con una foto y unas palabras.
+- **Revelación recíproca**: ves el momento de tu pareja **solo después de compartir el tuyo**. Si va por delante, te lo dice ("ya ha compartido el suyo") sin enseñarlo — esa reciprocidad es el gancho.
+- **Racha** de días seguidos en que los dos lo hacéis (reutiliza `computeStreak`), y **aviso** cuando tu pareja completa el suyo (push existente de la foto del día).
+- Reutiliza el modelo/acción/push de la foto del día — **sin cambios de esquema**. Sustituye la vieja tarjeta "La foto de hoy" y la eleva a hero.
+
 ### Iteración 8: "Estar juntos" — cercanía ambiental
 Convertir la cercanía de *acción* en *estado*: una pantalla que puedes dejar abierta y que respira con la vida de tu pareja, sin que tengas que hacer nada.
 - **La ventana a su mundo** (`/together`): un **cielo dinámico** a pantalla completa según la hora local de la pareja (amanece / día / atardece / noche, con sol o luna en su arco y estrellas de noche — `lib/sky.ts`, puro y testeado). Su hora grande + tu hora discreta, avatar latiendo, presencia viva (en Near / estado / ánimo del día) y su **clima** (Open-Meteo, `lib/weather.ts`). Todo en vivo.
