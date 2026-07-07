@@ -6,11 +6,13 @@ import { ArrowRight, BookHeart, Heart, Moon, StickyNote } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { requireCouple } from "@/lib/couple";
 import { moodInfo, presenceInfo } from "@/lib/utils";
-import { dayKeyIn, nextAnniversary } from "@/lib/dates";
+import { dayKeyIn, nextAnniversary, shiftDayKey } from "@/lib/dates";
 import { effectivePresence } from "@/lib/presence";
 import { isUserOnline } from "@/lib/realtime";
 import { agoLabel, dateLong } from "@/lib/format";
 import { getCoupleStreak, getDailyMissions, getWeeklyBonusStatus, POINTS } from "@/lib/engagement";
+import { computeStreak } from "@/lib/engagement-core";
+import { momentThemeOfDay } from "@/lib/moment-of-day";
 import { eventIcon } from "@/components/product-icons";
 import { Card, CardTitle } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
@@ -25,7 +27,7 @@ import { PromptCard } from "@/features/home/prompt-card";
 import { NoteForm } from "@/features/home/note-form";
 import { StreakMissions } from "@/features/home/streak-missions";
 import { DailyBox } from "@/features/home/daily-box";
-import { DailyPhoto } from "@/features/home/daily-photo";
+import { MomentOfDay } from "@/features/home/moment-of-day";
 import { PartnerClock } from "@/features/home/partner-clock";
 
 export const metadata: Metadata = { title: "Inicio" };
@@ -145,6 +147,25 @@ export default async function HomePage() {
   const partnerPhoto = partnerPhotoRow
     ? { imageUrl: partnerPhotoRow.imageUrl, caption: partnerPhotoRow.caption }
     : null;
+
+  // El momento de hoy: tema compartido + revelación recíproca + racha de días
+  // seguidos en que LOS DOS lo hicieron (misma lógica que la racha de pareja).
+  const momentTheme = momentThemeOfDay(coupleDay);
+  const iRevealed = !!myPhotoRow; // he compartido → puedo ver el suyo
+  const recentPhotos = partner
+    ? await prisma.dailyPhoto.findMany({
+        where: { coupleId: couple.id, dateKey: { gte: shiftDayKey(coupleDay, -40) } },
+        select: { userId: true, dateKey: true }
+      })
+    : [];
+  const photoByDay = new Map<string, Set<string>>();
+  for (const row of recentPhotos) {
+    if (!photoByDay.has(row.dateKey)) photoByDay.set(row.dateKey, new Set());
+    photoByDay.get(row.dateKey)!.add(row.userId);
+  }
+  const momentStreak = partner
+    ? computeStreak(photoByDay, couple.members.map((m) => m.id), coupleDay).streak
+    : 0;
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 md:px-8 md:py-8">
@@ -282,6 +303,20 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* EL RITUAL DEL DÍA: el corazón de Hoy, antes que nada más */}
+      {partner && (
+        <div className="mb-4">
+          <MomentOfDay
+            theme={momentTheme}
+            partnerName={partner.name}
+            streak={momentStreak}
+            initialMyPhoto={myPhoto}
+            initialPartnerPhoto={iRevealed ? partnerPhoto : null}
+            partnerPostedInitial={!!partnerPhotoRow}
+          />
+        </div>
+      )}
+
       <div className="grid gap-4 md:grid-cols-3">
         <Card className="md:row-span-2">
           <CardTitle>Racha y misiones</CardTitle>
@@ -326,19 +361,6 @@ export default async function HomePage() {
             <MoodCheck currentMood={myMood?.mood ?? null} currentNote={myMood?.note ?? null} />
           </div>
         </Card>
-
-        {partner && (
-          <Card className="md:row-span-2">
-            <CardTitle>La foto de hoy</CardTitle>
-            <div className="mt-3">
-              <DailyPhoto
-                partnerName={partner.name}
-                initialPartnerPhoto={partnerPhoto}
-                initialMyPhoto={myPhoto}
-              />
-            </div>
-          </Card>
-        )}
 
         {milestone && (
           <Card>
