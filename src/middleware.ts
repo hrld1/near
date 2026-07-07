@@ -12,6 +12,7 @@ export function middleware(req: NextRequest) {
   const isPublic =
     PUBLIC_PATHS.includes(pathname) ||
     pathname.startsWith("/join/") ||
+    pathname.startsWith("/recover") ||
     pathname.startsWith("/api");
   if (isPublic) {
     return NextResponse.next();

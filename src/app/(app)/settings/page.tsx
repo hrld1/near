@@ -5,6 +5,7 @@ import { Download } from "lucide-react";
 import { PushToggle } from "@/features/settings/push-toggle";
 import { SoundToggle } from "@/features/settings/sound-toggle";
 import { AnniversaryForm } from "@/features/settings/anniversary-form";
+import { SecuritySettings } from "@/features/settings/security-settings";
 import { DangerZone } from "@/features/settings/danger-zone";
 
 export const metadata: Metadata = { title: "Ajustes" };
@@ -81,6 +82,13 @@ export default async function SettingsPage() {
               <dd className="font-medium text-ink">{partner?.name ?? "Sin vincular"}</dd>
             </div>
           </dl>
+        </Card>
+
+        <Card>
+          <CardTitle>Contraseña y acceso</CardTitle>
+          <div className="mt-3">
+            <SecuritySettings partnerName={partner?.name ?? null} />
+          </div>
         </Card>
 
         <Card>

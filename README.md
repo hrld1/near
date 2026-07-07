@@ -129,6 +129,12 @@ Catorce mejoras para que la app "se sienta" más cerca, en cuatro niveles:
 - **Español correcto y accesibilidad**: barrido de tildes/ñ/¿¡ por toda la interfaz, respeto de `prefers-reduced-motion` (sin confeti ni latidos para quien pide menos movimiento) y textos mínimos más legibles.
 - **Adaptadores de despliegue**: almacenamiento **S3** y bus **Redis** por entorno (ver *Despliegue*), dormidos por defecto.
 
+### Iteración 10: confianza y madurez — "vuestro, y podéis iros con dignidad"
+Para pedirle a una pareja que vuelque su intimidad, tienen que poder salir con cariño y llevarse (o borrar) lo suyo. Antes no existía nada de esto.
+- **Exportar** (`/api/export`, por sesión y pareja): descarga un JSON con **todo lo vuestro** (mensajes, momentos, cartas, fechas, notas, moods, fotos, quiz, scores…). La red de seguridad que hace que borrar no dé miedo.
+- **Desvincularse / borrar cuenta** (Ajustes → *Zona delicada*): disolver el espacio **borra lo compartido para los dos** (modelo honesto de ruptura: nadie se queda con la intimidad del otro), y borrar la cuenta te elimina y disuelve el espacio. Confirmación escrita + recordatorio de exportar. Apoyado en el borrado en cascada del `Couple` + limpieza best-effort de archivos.
+- **Contraseña y recuperación sin email**: cambiar la contraseña desde dentro, y —lo diferencial— **recuperación asistida por la pareja**: quien comparte tu espacio te genera un enlace de un solo uso (1 h) para volver a entrar en `/recover`. Sin infraestructura de correo; reutiliza `VerificationToken`.
+
 ### Iteración 9: "El momento de hoy" — el ritual diario recíproco
 Darle a Near una espina: un único gesto diario, recíproco, que hace que abrir la app cada día sea inevitable.
 - **El momento de hoy** (corazón de *Hoy*): cada día un **tema compartido** (`lib/moment-of-day.ts`, determinista por día de pareja, testeado) al que **los dos** respondéis con una foto y unas palabras.
