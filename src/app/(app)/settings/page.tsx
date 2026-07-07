@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { requireCouple } from "@/lib/couple";
 import { Card, CardTitle } from "@/components/ui/card";
+import { Download } from "lucide-react";
 import { PushToggle } from "@/features/settings/push-toggle";
 import { SoundToggle } from "@/features/settings/sound-toggle";
 import { AnniversaryForm } from "@/features/settings/anniversary-form";
@@ -42,6 +43,21 @@ export default async function SettingsPage() {
               current={couple.anniversary ? couple.anniversary.toISOString().slice(0, 10) : null}
             />
           </div>
+        </Card>
+
+        <Card>
+          <CardTitle>Vuestros datos</CardTitle>
+          <p className="mt-1 text-sm text-ink-soft">
+            Todo lo que habéis escrito y guardado es vuestro. Descargadlo cuando queráis.
+          </p>
+          <a
+            href="/api/export"
+            download
+            className="mt-3 inline-flex items-center gap-2 rounded-xl border border-sand-deep bg-paper px-4 py-2.5 text-sm font-medium text-ink transition hover:bg-sand"
+          >
+            <Download className="h-4 w-4" />
+            Descargar todo lo nuestro
+          </a>
         </Card>
 
         <Card>
