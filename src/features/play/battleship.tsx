@@ -243,14 +243,16 @@ export function Battleship({ myId, partnerName }: { myId: string; partnerName: s
             return (
               <div
                 className={cn(
-                  "flex h-full w-full items-center justify-center rounded-[3px] text-[10px]",
-                  !st && "bg-sky-500/15 hover:bg-sky-500/30",
-                  st === "miss" && "bg-sky-500/10",
-                  (st === "hit" || st === "sunk") && "bg-red-500/80"
+                  "flex h-full w-full items-center justify-center rounded-[3px] text-[11px] transition-colors",
+                  !st && "bg-sky-400/15 hover:bg-sky-400/35",
+                  st === "miss" && "bg-sky-400/10",
+                  st === "hit" && "bg-red-500/80",
+                  st === "sunk" && "bg-red-900/80"
                 )}
               >
-                {st === "miss" && <span className="h-1 w-1 rounded-full bg-sky-700/50" />}
-                {(st === "hit" || st === "sunk") && "💥"}
+                {st === "miss" && <span className="h-1.5 w-1.5 rounded-full bg-sky-700/50" />}
+                {st === "hit" && <span className="animate-pop-in">💥</span>}
+                {st === "sunk" && <span className="text-white/90">✖</span>}
               </div>
             );
           }}
@@ -269,15 +271,14 @@ export function Battleship({ myId, partnerName }: { myId: string; partnerName: s
             return (
               <div
                 className={cn(
-                  "flex h-full w-full items-center justify-center rounded-[3px] text-[10px]",
-                  !isShip && !shot && "bg-sky-500/10",
-                  !isShip && shot === "miss" && "bg-sky-500/10",
-                  isShip && !shot && "bg-slate-400/70",
-                  isShip && shot === "hit" && "bg-red-500/80"
+                  "flex h-full w-full items-center justify-center rounded-[3px] bg-gradient-to-br text-[11px]",
+                  !isShip && "from-sky-400/10 to-sky-500/10",
+                  isShip && !shot && "from-slate-300 to-slate-500 shadow-inner",
+                  isShip && shot === "hit" && "from-red-500 to-red-700"
                 )}
               >
-                {shot === "miss" && <span className="h-1 w-1 rounded-full bg-sky-700/50" />}
-                {isShip && shot === "hit" && "🔥"}
+                {shot === "miss" && <span className="h-1.5 w-1.5 rounded-full bg-sky-700/50" />}
+                {isShip && shot === "hit" && <span className="animate-pop-in">🔥</span>}
               </div>
             );
           }}
@@ -317,7 +318,7 @@ function Board({
   render: (r: number, c: number) => React.ReactNode;
 }) {
   return (
-    <div className="mx-auto grid aspect-square w-full max-w-[360px] grid-cols-8 gap-0.5 rounded-lg bg-sky-900/20 p-1">
+    <div className="mx-auto grid aspect-square w-full max-w-[360px] grid-cols-8 gap-0.5 rounded-lg bg-gradient-to-br from-sky-800/40 to-blue-950/50 p-1 shadow-inner">
       {Array.from({ length: GRID * GRID }, (_, i) => {
         const r = Math.floor(i / GRID);
         const c = i % GRID;

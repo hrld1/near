@@ -129,6 +129,13 @@ Catorce mejoras para que la app "se sienta" más cerca, en cuatro niveles:
 - **Español correcto y accesibilidad**: barrido de tildes/ñ/¿¡ por toda la interfaz, respeto de `prefers-reduced-motion` (sin confeti ni latidos para quien pide menos movimiento) y textos mínimos más legibles.
 - **Adaptadores de despliegue**: almacenamiento **S3** y bus **Redis** por entorno (ver *Despliegue*), dormidos por defecto.
 
+### Iteración 14: "Hundir la flota" — el primer 1v1 en vivo
+El primer juego que se juega **el uno contra el otro en tiempo real**, no cada uno por su lado contra el reloj.
+- **Duelo por turnos sobre el bus SSE**: tablero 8×8, flota de 4 barcos (11 celdas) colocada al azar sin solapes. Se reta a la pareja (con push si está desconectada), se acepta y a jugar. Acierto → repites; fallo → pasa turno; gana quien hunde toda la flota rival. Confeti al ganar y **revancha** en un toque.
+- **Diseño latencia-tolerante**: el defensor resuelve cada disparo (tocado/agua/hundido) y devuelve el resultado; nadie confía en el otro cliente para su propio estado. Mismo patrón de *relay* que Conecta 4, sin física en tiempo real (imposible fiable sobre SSE sin WebRTC).
+- **Acabado de videojuego**: agua con degradado y sombra interior, barcos con textura metálica, 💥/🔥 con *pop-in* al impactar, ✖ al hundir, punto de estela al fallar.
+- Lógica pura (`lib/battleship.ts`) con tests; **algoritmo del duelo verificado con 400 partidas simuladas** (todas terminan con un único ganador); tablero verificado con captura headless.
+
 ### Iteración 13: más juegos al nuevo nivel
 - **Eco** reconstruido: de pads DOM a un **Simon neón en canvas** — pads con degradado y glow que se encienden con brillo y **tono propio** (do-mi-sol-do), partículas al acertar, sacudida al fallar.
 - **Parejas** reconstruido: cartas con **volteo 3D real**, dorso con degradado rosa→plum y corazón, anillo verde + destello al emparejar, sonido por giro.
