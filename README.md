@@ -129,6 +129,14 @@ Catorce mejoras para que la app "se sienta" más cerca, en cuatro niveles:
 - **Español correcto y accesibilidad**: barrido de tildes/ñ/¿¡ por toda la interfaz, respeto de `prefers-reduced-motion` (sin confeti ni latidos para quien pide menos movimiento) y textos mínimos más legibles.
 - **Adaptadores de despliegue**: almacenamiento **S3** y bus **Redis** por entorno (ver *Despliegue*), dormidos por defecto.
 
+### Iteración 11: el lienzo — de roto a juego
+- **Arreglado**: el lienzo no dibujaba (dependía de un `requestAnimationFrame` diferido). Reescrito como `DrawSurface` reutilizable con **dibujo incremental** (cada trazo aparece al instante), DPR correcto y coords normalizadas. Verificado con captura headless.
+- **Dibujad a la vez**: la misma palabra para los dos, a ciegas y contrarreloj (60 s); al acabar se revelan los dos dibujos y cada uno guarda el suyo en el álbum.
+- **Dibuja y adivina**: quien dibuja tiene una palabra secreta y sus trazos viajan en vivo por SSE; quien adivina escribe; la validación la hace quien dibuja (la palabra no se filtra al cliente que adivina); al acertar, celebración y cambio de rol.
+- `CanvasRoom` con selector de modo que **arrastra a tu pareja** al reto (si te retan desde otra pestaña, entras con la ronda ya empezada). Palabras y aciertos en `lib/draw-words.ts` (normalización sin tildes, testeada).
+
+> Nota del apunte "la foto del día se subió también para Leo": no es un bug. En un mismo navegador solo hay **una** sesión; al entrar como Leo reemplazas la de Ana. Verificado en BD: solo existía la foto de Ana. Para probar dos usuarios: dos navegadores, o uno normal + uno de incógnito.
+
 ### Iteración 10: confianza y madurez — "vuestro, y podéis iros con dignidad"
 Para pedirle a una pareja que vuelque su intimidad, tienen que poder salir con cariño y llevarse (o borrar) lo suyo. Antes no existía nada de esto.
 - **Exportar** (`/api/export`, por sesión y pareja): descarga un JSON con **todo lo vuestro** (mensajes, momentos, cartas, fechas, notas, moods, fotos, quiz, scores…). La red de seguridad que hace que borrar no dé miedo.
