@@ -129,6 +129,14 @@ Catorce mejoras para que la app "se sienta" más cerca, en cuatro niveles:
 - **Español correcto y accesibilidad**: barrido de tildes/ñ/¿¡ por toda la interfaz, respeto de `prefers-reduced-motion` (sin confeti ni latidos para quien pide menos movimiento) y textos mínimos más legibles.
 - **Adaptadores de despliegue**: almacenamiento **S3** y bus **Redis** por entorno (ver *Despliegue*), dormidos por defecto.
 
+### Iteración 12: arcade con gráficos de videojuego
+Empezar a subir el listón visual de los minijuegos (los simples eran poco inmersivos).
+- **Meteoros** (nuevo, insignia): arcade espacial en canvas — nave que sigue el dedo con estela de propulsor, asteroides irregulares con cráteres que rotan, orbes con brillo y combo, nebulosa con parallax de estrellas, partículas, explosiones y *screen shake*. Best-score, entra en el sistema de duelos.
+- **Reflejos, reconstruido**: de un botón que cambiaba de color a un reactor en canvas que respira en calma y estalla en verde con ondas al armarse; partículas y lectura grande de ms. Mismo scoring.
+- Reutiliza `games/engine.ts` (HiDPI, partículas). Verificados con captura headless.
+
+> Siguiente en juegos: rebuild del resto de los simples (Eco, Sprint, Teclas, Parejas) a este nivel, y valorar un juego 1v1 en vivo estilo Plato.
+
 ### Iteración 11: el lienzo — de roto a juego
 - **Arreglado**: el lienzo no dibujaba (dependía de un `requestAnimationFrame` diferido). Reescrito como `DrawSurface` reutilizable con **dibujo incremental** (cada trazo aparece al instante), DPR correcto y coords normalizadas. Verificado con captura headless.
 - **Dibujad a la vez**: la misma palabra para los dos, a ciegas y contrarreloj (60 s); al acabar se revelan los dos dibujos y cada uno guarda el suyo en el álbum.
