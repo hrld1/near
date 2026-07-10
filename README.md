@@ -129,6 +129,13 @@ Catorce mejoras para que la app "se sienta" más cerca, en cuatro niveles:
 - **Español correcto y accesibilidad**: barrido de tildes/ñ/¿¡ por toda la interfaz, respeto de `prefers-reduced-motion` (sin confeti ni latidos para quien pide menos movimiento) y textos mínimos más legibles.
 - **Adaptadores de despliegue**: almacenamiento **S3** y bus **Redis** por entorno (ver *Despliegue*), dormidos por defecto.
 
+### Iteración 13: más juegos al nuevo nivel
+- **Eco** reconstruido: de pads DOM a un **Simon neón en canvas** — pads con degradado y glow que se encienden con brillo y **tono propio** (do-mi-sol-do), partículas al acertar, sacudida al fallar.
+- **Parejas** reconstruido: cartas con **volteo 3D real**, dorso con degradado rosa→plum y corazón, anillo verde + destello al emparejar, sonido por giro.
+- Ambos conservan su scoring. Verificados con captura headless.
+
+> Quedan por subir al nivel: Sprint y Teclas (más difíciles de "arcade" por ser de escritura); y sigue pendiente valorar un 1v1 en vivo (mejor por turnos/reveal, no físico en tiempo real: el bus SSE añade latencia).
+
 ### Iteración 12: arcade con gráficos de videojuego
 Empezar a subir el listón visual de los minijuegos (los simples eran poco inmersivos).
 - **Meteoros** (nuevo, insignia): arcade espacial en canvas — nave que sigue el dedo con estela de propulsor, asteroides irregulares con cráteres que rotan, orbes con brillo y combo, nebulosa con parallax de estrellas, partículas, explosiones y *screen shake*. Best-score, entra en el sistema de duelos.
