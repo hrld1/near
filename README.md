@@ -129,6 +129,14 @@ Catorce mejoras para que la app "se sienta" más cerca, en cuatro niveles:
 - **Español correcto y accesibilidad**: barrido de tildes/ñ/¿¡ por toda la interfaz, respeto de `prefers-reduced-motion` (sin confeti ni latidos para quien pide menos movimiento) y textos mínimos más legibles.
 - **Adaptadores de despliegue**: almacenamiento **S3** y bus **Redis** por entorno (ver *Despliegue*), dormidos por defecto.
 
+### Iteración 15: Sprint y Teclas suben al nivel arcade
+Los dos juegos que quedaban "simples" (de escritura, difíciles de volver arcade) pasan a lienzo con juice.
+- **Sprint** reconstruido: de botones DOM a **canvas neón** — la operación flota con brillo, las cuatro respuestas son orbes con degradado que se pulsan al tocar, aciertos encadenan **COMBO** (partículas y color en aumento), fallar **sacude la pantalla** y marca en verde la correcta. Barra de tiempo y HUD dibujados en el lienzo.
+- **Teclas** reconstruido: **escenario en canvas** con la palabra como teclas que se **encienden letra a letra** según tecleas (la letra actual pulsa con contorno), estallido al completarla y COMBO. Mantiene un `<input>` real con estilo neón debajo — el teclado (sobre todo en móvil) lo necesita.
+- **Mismo scoring** que antes en ambos (Sprint +1/−1 en 30 s, Teclas +1 por palabra en 45 s): el combo es solo vistoso, así las puntuaciones siguen siendo comparables con el histórico y los duelos. Verificados con captura headless.
+
+> Con esto, **toda la arcade** está al nuevo nivel visual (Meteoros, Reflejos, Eco, Parejas, Sprint, Teclas). Siguiente frente posible: más 1v1 en vivo, o el álbum con auto-etiquetado.
+
 ### Iteración 14: "Hundir la flota" — el primer 1v1 en vivo
 El primer juego que se juega **el uno contra el otro en tiempo real**, no cada uno por su lado contra el reloj.
 - **Duelo por turnos sobre el bus SSE**: tablero 8×8, flota de 4 barcos (11 celdas) colocada al azar sin solapes. Se reta a la pareja (con push si está desconectada), se acepta y a jugar. Acierto → repites; fallo → pasa turno; gana quien hunde toda la flota rival. Confeti al ganar y **revancha** en un toque.
