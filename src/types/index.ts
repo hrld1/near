@@ -145,6 +145,22 @@ export type StreamEvent =
   // --- iteracion 8 ---
   // co-presencia en la ventana "Estar juntos" (mirando el mismo cielo)
   | { type: "together:here"; payload: { userId: string; here: boolean } }
+  // --- iteracion 14 ---
+  // Hundir la flota en vivo (por turnos; el defensor resuelve cada disparo)
+  | {
+      type: "bs:signal";
+      payload: {
+        kind: "invite" | "accept" | "fire" | "result" | "quit" | "rematch";
+        byId: string;
+        byName: string;
+        seed?: number;
+        r?: number;
+        c?: number;
+        hit?: boolean;
+        sunk?: string[];
+        allSunk?: boolean;
+      };
+    }
   // --- iteracion 11 ---
   // juegos del lienzo: "dibujad a la vez" (blind duel) y "dibuja y adivina".
   // Efímero, relay por el bus. En "guess" la palabra NO viaja (es secreta
