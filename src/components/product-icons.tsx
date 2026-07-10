@@ -90,6 +90,12 @@ export const GAME_VISUALS: Record<
     accent: "from-orange-400 to-red-500",
     accentSoft: "bg-orange-500/12",
     accentText: "text-orange-600 dark:text-orange-400"
+  },
+  meteor: {
+    icon: Rocket,
+    accent: "from-indigo-500 to-fuchsia-600",
+    accentSoft: "bg-indigo-500/12",
+    accentText: "text-indigo-600 dark:text-indigo-400"
   }
 };
 

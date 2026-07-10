@@ -120,6 +120,17 @@ export const GAMES: GameDef[] = [
     maxAttemptsPerDay: 5,
     scoreBounds: { min: 0, max: 125 },
     format: (s) => `${Math.round(s)} pts`
+  },
+  {
+    key: "meteor",
+    name: "Meteoros",
+    tagline: "Pilota, esquiva y no te estrelles.",
+    rules: "Mueve el dedo para pilotar la nave. Esquiva los asteroides y recoge orbes para subir el combo. Un choque y se acaba: puntúas lo lejos que llegues.",
+    lowerIsBetter: false,
+    unit: "pts",
+    maxAttemptsPerDay: 5,
+    scoreBounds: { min: 0, max: 100_000 },
+    format: (s) => `${Math.round(s)} pts`
   }
 ];
 

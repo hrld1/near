@@ -18,6 +18,7 @@ import { SprintGame } from "@/features/play/games/sprint";
 import { TypingGame } from "@/features/play/games/typing";
 import { GolfGame } from "@/features/play/games/golf";
 import { CapsGame } from "@/features/play/games/caps";
+import { MeteorGame } from "@/features/play/games/meteor";
 
 export type GameHostProps = {
   gameKey: string;
@@ -155,6 +156,7 @@ export function GameHost(props: GameHostProps) {
               {props.gameKey === "typing" && <TypingGame onFinish={handleFinish} />}
               {props.gameKey === "golf" && <GolfGame onFinish={handleFinish} />}
               {props.gameKey === "caps" && <CapsGame onFinish={handleFinish} />}
+              {props.gameKey === "meteor" && <MeteorGame onFinish={handleFinish} />}
             </div>
           )}
 
