@@ -121,6 +121,11 @@ export const sfx = {
       tone(c, { freq: 118, at: 0.16, dur: 0.16, gain: 0.12 });
     });
   },
+  // tono por pad del juego Eco (do-mi-sol-do, tipo Simon)
+  pad(i: number) {
+    const notes = [392, 523.25, 659.25, 783.99];
+    play((c) => tone(c, { freq: notes[i % 4], type: "triangle", dur: 0.22, gain: 0.07 }));
+  },
   // arpegio ascendente: logro, victoria, misión
   success() {
     play((c) => {
