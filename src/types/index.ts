@@ -144,7 +144,27 @@ export type StreamEvent =
     }
   // --- iteracion 8 ---
   // co-presencia en la ventana "Estar juntos" (mirando el mismo cielo)
-  | { type: "together:here"; payload: { userId: string; here: boolean } };
+  | { type: "together:here"; payload: { userId: string; here: boolean } }
+  // --- iteracion 11 ---
+  // juegos del lienzo: "dibujad a la vez" (blind duel) y "dibuja y adivina".
+  // Efímero, relay por el bus. En "guess" la palabra NO viaja (es secreta
+  // para quien adivina); solo el que dibuja la conoce y valida el acierto.
+  | {
+      type: "draw:game";
+      payload: {
+        kind: "start" | "submit" | "quit" | "stroke" | "clear" | "guess" | "correct";
+        mode: "together" | "guess";
+        byId: string;
+        byName: string;
+        roundId: string;
+        word?: string;
+        startAt?: number;
+        duration?: number;
+        imageUrl?: string;
+        stroke?: CanvasStroke;
+        guess?: string;
+      };
+    };
 
 export type StreamEventType = StreamEvent["type"];
 
