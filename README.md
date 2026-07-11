@@ -129,6 +129,13 @@ Catorce mejoras para que la app "se sienta" más cerca, en cuatro niveles:
 - **Español correcto y accesibilidad**: barrido de tildes/ñ/¿¡ por toda la interfaz, respeto de `prefers-reduced-motion` (sin confeti ni latidos para quien pide menos movimiento) y textos mínimos más legibles.
 - **Adaptadores de despliegue**: almacenamiento **S3** y bus **Redis** por entorno (ver *Despliegue*), dormidos por defecto.
 
+### Iteración 20: "Duelo en vivo" — modo 1v1 para los juegos de puntuación
+Los juegos de marcador ganan un modo cara a cara en directo (como Plato), con un **único arnés reutilizable** en vez de reescribir cada juego.
+- **Arnés de carrera** (`features/play/race/`): evento genérico `race:signal` + acción de relay + hook `useRace` + sala con **cuenta atrás 3·2·1** y **barra "vs"** que muestra el marcador del rival en tiempo real. Ambos juegan la MISMA prueba a la vez; al terminar los dos, se compara según la dirección del juego y hay revancha.
+- **Contrato mínimo por juego**: cada juego reporta su marcador con un `onProgress(score)` opcional (una línea junto al `setScore`). Un único `ArcadeGameView` mapea clave→componente y lo comparten la arcade en solitario y la sala de duelo.
+- **Lote 1 habilitado** (marcador continuo): Meteoros, Esquí, Rompemuros, A las nubes, Pinball, Dianas, Sprint y Teclas. Botón "Retar en vivo" en la página de cada juego habilitado (`/play/[gameKey]/vs`).
+- Verificado con captura headless (barra vs + cuenta atrás). Nota: como los duelos de tablero, el flujo real de dos jugadores conviene probarlo a mano. Pendiente: cablear el resto (Reflejos, Parejas, Eco, Palabra oculta, Minigolf, Chapas) y, como mejora de justicia, misma semilla exacta por juego.
+
 ### Iteración 19: "Pinball" — físicas de máquina
 - **Pinball**: mesa neón en canvas con paredes en embudo, cinco bumpers que rebotan y suman, y dos **flippers** que golpean la bola con el impulso real de su giro (la velocidad del punto de contacto sale de la velocidad angular). Colisión bola-segmento por punto más cercano con restitución y *substeps* para no atravesar nada. **Multitáctil**: tocas la mitad izquierda o derecha (o las dos) para cada flipper. 3 bolas, drenaje por el centro, best-score. Verificado con captura headless.
 - Con esto la arcade solo llega a **14 juegos**.

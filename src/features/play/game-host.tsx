@@ -2,8 +2,9 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { ArrowLeft, RotateCcw, Trophy } from "lucide-react";
+import { ArrowLeft, RotateCcw, Swords, Trophy, Wifi } from "lucide-react";
 import { submitScoreAction } from "@/actions/games";
+import { raceEnabled } from "@/lib/race";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Confetti } from "@/features/play/confetti";
@@ -130,6 +131,17 @@ export function GameHost(props: GameHostProps) {
                 <p className="text-sm text-ink-soft">
                   Sin intentos por hoy. Mañana hay reto nuevo.
                 </p>
+              )}
+              {raceEnabled(props.gameKey) && (
+                <Link
+                  href={`/play/${props.gameKey}/vs`}
+                  className="flex items-center gap-1.5 rounded-full border border-sand-deep px-4 py-2 text-sm font-medium text-ink transition hover:bg-sand"
+                >
+                  <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                    <Wifi className="h-3.5 w-3.5" />
+                  </span>
+                  <Swords className="h-4 w-4" /> Retar a {props.partnerName} en vivo
+                </Link>
               )}
             </div>
           )}
