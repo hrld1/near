@@ -335,6 +335,17 @@ export default async function HomePage() {
         </Link>
       )}
 
+      {partner && (
+        <div className="mb-4 text-center">
+          <Link
+            href="/reparar"
+            className="text-xs font-medium text-ink-soft underline-offset-2 transition hover:text-emerald-700 hover:underline dark:hover:text-emerald-400"
+          >
+            ¿Un mal momento? Reparadlo juntos →
+          </Link>
+        </div>
+      )}
+
       <div className="grid gap-4 md:grid-cols-3">
         <Card className="md:row-span-2">
           <CardTitle>Racha y misiones</CardTitle>
