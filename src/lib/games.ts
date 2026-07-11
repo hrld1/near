@@ -153,6 +153,17 @@ export const GAMES: GameDef[] = [
     maxAttemptsPerDay: 5,
     scoreBounds: { min: 0, max: 100_000 },
     format: (s) => `${Math.round(s)} pts`
+  },
+  {
+    key: "climb",
+    name: "A las nubes",
+    tagline: "Rebota de plataforma en plataforma y sube sin parar.",
+    rules: "El personaje rebota solo; mueve el dedo para dirigirlo. Sube de plataforma en plataforma (las hay móviles, frágiles y con muelle). Si caes por abajo, se acaba: puntúas la altura en metros.",
+    lowerIsBetter: false,
+    unit: "m",
+    maxAttemptsPerDay: 5,
+    scoreBounds: { min: 0, max: 100_000 },
+    format: (s) => `${Math.round(s)} m`
   }
 ];
 

@@ -8,6 +8,7 @@ import {
   CalendarCheck,
   Calculator,
   Camera,
+  Cloud,
   Coffee,
   Disc,
   Flame,
@@ -110,6 +111,12 @@ export const GAME_VISUALS: Record<
     accent: "from-rose-400 to-orange-500",
     accentSoft: "bg-rose-500/12",
     accentText: "text-rose-600 dark:text-rose-400"
+  },
+  climb: {
+    icon: Cloud,
+    accent: "from-emerald-400 to-sky-500",
+    accentSoft: "bg-emerald-500/12",
+    accentText: "text-emerald-600 dark:text-emerald-400"
   }
 };
 
