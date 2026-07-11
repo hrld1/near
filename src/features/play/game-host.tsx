@@ -20,6 +20,7 @@ import { GolfGame } from "@/features/play/games/golf";
 import { CapsGame } from "@/features/play/games/caps";
 import { MeteorGame } from "@/features/play/games/meteor";
 import { SkiGame } from "@/features/play/games/ski";
+import { BricksGame } from "@/features/play/games/bricks";
 
 export type GameHostProps = {
   gameKey: string;
@@ -159,6 +160,7 @@ export function GameHost(props: GameHostProps) {
               {props.gameKey === "caps" && <CapsGame onFinish={handleFinish} />}
               {props.gameKey === "meteor" && <MeteorGame onFinish={handleFinish} />}
               {props.gameKey === "ski" && <SkiGame onFinish={handleFinish} />}
+              {props.gameKey === "bricks" && <BricksGame onFinish={handleFinish} />}
             </div>
           )}
 

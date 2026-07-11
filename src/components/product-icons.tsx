@@ -2,6 +2,7 @@
 // cada concepto del sistema tiene un icono lucide y un acento propio.
 import {
   AudioLines,
+  Blocks,
   Bookmark,
   BookOpen,
   CalendarCheck,
@@ -103,6 +104,12 @@ export const GAME_VISUALS: Record<
     accent: "from-sky-300 to-blue-500",
     accentSoft: "bg-sky-500/12",
     accentText: "text-sky-600 dark:text-sky-400"
+  },
+  bricks: {
+    icon: Blocks,
+    accent: "from-rose-400 to-orange-500",
+    accentSoft: "bg-rose-500/12",
+    accentText: "text-rose-600 dark:text-rose-400"
   }
 };
 

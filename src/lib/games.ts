@@ -142,6 +142,17 @@ export const GAMES: GameDef[] = [
     maxAttemptsPerDay: 5,
     scoreBounds: { min: 0, max: 100_000 },
     format: (s) => `${Math.round(s)} m`
+  },
+  {
+    key: "bricks",
+    name: "Rompemuros",
+    tagline: "Pala, bola y ladrillos por mapas. No la dejes caer.",
+    rules: "Mueve el dedo para la pala y rompe todos los ladrillos. Cada mapa que limpias sube de nivel y acelera. Caen power-ups (pala ancha, multibola, cámara lenta). Tienes 3 vidas: puntúas los puntos acumulados.",
+    lowerIsBetter: false,
+    unit: "pts",
+    maxAttemptsPerDay: 5,
+    scoreBounds: { min: 0, max: 100_000 },
+    format: (s) => `${Math.round(s)} pts`
   }
 ];
 
