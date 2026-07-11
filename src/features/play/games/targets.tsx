@@ -8,7 +8,7 @@ const TARGET_LIFE = 1500;
 
 type Target = { id: number; x: number; y: number; bornAt: number };
 
-export function TargetsGame({ onFinish }: { onFinish: (score: number) => void; onProgress?: (score: number) => void }) {
+export function TargetsGame({ onFinish, onProgress }: { onFinish: (score: number) => void; onProgress?: (score: number) => void }) {
   const [targets, setTargets] = useState<Target[]>([]);
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(DURATION);
@@ -62,6 +62,7 @@ export function TargetsGame({ onFinish }: { onFinish: (score: number) => void; o
     const value = small ? 2 : 1;
     scoreRef.current += value;
     setScore(scoreRef.current);
+    onProgress?.(scoreRef.current);
     setTargets((prev) => prev.filter((t) => t.id !== target.id));
     const pop = { id: target.id, x: target.x, y: target.y, value };
     setPops((prev) => [...prev.slice(-6), pop]);

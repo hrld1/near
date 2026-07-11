@@ -34,13 +34,15 @@ const WALLS: Seg[] = [
   [W - M, H - 150, 250, H - 58]
 ];
 
-export function PinballGame({ onFinish }: { onFinish: (score: number) => void; onProgress?: (score: number) => void }) {
+export function PinballGame({ onFinish, onProgress }: { onFinish: (score: number) => void; onProgress?: (score: number) => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [score, setScore] = useState(0);
   const [balls, setBalls] = useState(3);
   const [combo, setCombo] = useState(0);
   const onFinishRef = useRef(onFinish);
   onFinishRef.current = onFinish;
+  const onProgressRef = useRef(onProgress);
+  onProgressRef.current = onProgress;
 
   const s = useRef({
     ball: null as Ball | null,
@@ -172,6 +174,7 @@ export function PinballGame({ onFinish }: { onFinish: (score: number) => void; o
             st.combo += 1;
             st.score += bm.score + st.combo * 10;
             setScore(st.score);
+            onProgressRef.current?.(st.score);
             setCombo(st.combo);
             spawnBurst(st.parts, bm.x, bm.y, ["#facc15", "#fde68a", "#ffffff"], 12, 3);
           }

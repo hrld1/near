@@ -22,7 +22,7 @@ function shuffled(): string[] {
   return [...WORDS].sort(() => Math.random() - 0.5);
 }
 
-export function TypingGame({ onFinish }: { onFinish: (score: number) => void; onProgress?: (score: number) => void }) {
+export function TypingGame({ onFinish, onProgress }: { onFinish: (score: number) => void; onProgress?: (score: number) => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [value, setValue] = useState("");
@@ -30,6 +30,8 @@ export function TypingGame({ onFinish }: { onFinish: (score: number) => void; on
   const [combo, setCombo] = useState(0);
   const onFinishRef = useRef(onFinish);
   onFinishRef.current = onFinish;
+  const onProgressRef = useRef(onProgress);
+  onProgressRef.current = onProgress;
 
   const s = useRef({
     queue: shuffled(),
@@ -204,6 +206,7 @@ export function TypingGame({ onFinish }: { onFinish: (score: number) => void; on
       st.score += 1;
       st.combo += 1;
       setScore(st.score);
+      onProgressRef.current?.(st.score);
       setCombo(st.combo);
       spawnBurst(st.parts, W / 2, 150, ["#67e8f9", "#a5f3fc", "#ffffff", "#818cf8"], 24, 4);
       st.pops.push({ x: W / 2, y: 120, text: st.combo >= 3 ? `¡x${st.combo}!` : "+1", life: 1, vy: -1.1, color: st.combo >= 3 ? "#fde047" : "#a5f3fc" });

@@ -31,11 +31,13 @@ function pickType(heightM: number): PType {
   return "normal";
 }
 
-export function ClimbGame({ onFinish }: { onFinish: (score: number) => void; onProgress?: (score: number) => void }) {
+export function ClimbGame({ onFinish, onProgress }: { onFinish: (score: number) => void; onProgress?: (score: number) => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [score, setScore] = useState(0);
   const onFinishRef = useRef(onFinish);
   onFinishRef.current = onFinish;
+  const onProgressRef = useRef(onProgress);
+  onProgressRef.current = onProgress;
 
   const s = useRef({
     char: { x: W / 2, y: H - 120, vy: -JUMP, squash: 1 },
@@ -206,6 +208,7 @@ export function ClimbGame({ onFinish }: { onFinish: (score: number) => void; onP
           st.height += d;
           st.maxHeight = Math.max(st.maxHeight, st.height);
           setScore(Math.floor(st.maxHeight / 10));
+          onProgressRef.current?.(Math.floor(st.maxHeight / 10));
         }
 
         // rebotes (solo al caer)

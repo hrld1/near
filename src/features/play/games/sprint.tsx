@@ -68,12 +68,14 @@ function inRect(r: Rect, x: number, y: number) {
   return x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h;
 }
 
-export function SprintGame({ onFinish }: { onFinish: (score: number) => void; onProgress?: (score: number) => void }) {
+export function SprintGame({ onFinish, onProgress }: { onFinish: (score: number) => void; onProgress?: (score: number) => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [score, setScore] = useState(0);
   const [combo, setCombo] = useState(0);
   const onFinishRef = useRef(onFinish);
   onFinishRef.current = onFinish;
+  const onProgressRef = useRef(onProgress);
+  onProgressRef.current = onProgress;
 
   const s = useRef({
     q: makeQuestion(),
@@ -118,6 +120,7 @@ export function SprintGame({ onFinish }: { onFinish: (score: number) => void; on
         st.score += 1;
         st.combo += 1;
         setScore(st.score);
+        onProgressRef.current?.(st.score);
         setCombo(st.combo);
         spawnBurst(st.parts, cx, cy, ["#f0abfc", "#e879f9", "#ffffff", "#c084fc"], 22, 4);
         pop(cx, cy - 8, st.combo >= 3 ? `¡x${st.combo}!` : "+1", st.combo >= 3 ? "#fde047" : "#f5d0fe", st.combo >= 3 ? 34 : 28);
@@ -129,6 +132,7 @@ export function SprintGame({ onFinish }: { onFinish: (score: number) => void; on
         st.score = clamp(st.score - 1, 0, 999);
         st.combo = 0;
         setScore(st.score);
+        onProgressRef.current?.(st.score);
         setCombo(0);
         st.shake = 14;
         spawnBurst(st.parts, cx, cy, ["#f87171", "#fca5a5"], 14, 3);

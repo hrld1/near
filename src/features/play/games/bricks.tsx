@@ -55,13 +55,15 @@ function buildBricks(layout: string[]): Brick[] {
   return bricks;
 }
 
-export function BricksGame({ onFinish }: { onFinish: (score: number) => void; onProgress?: (score: number) => void }) {
+export function BricksGame({ onFinish, onProgress }: { onFinish: (score: number) => void; onProgress?: (score: number) => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [score, setScore] = useState(0);
   const [level, setLevel] = useState(1);
   const [lives, setLives] = useState(3);
   const onFinishRef = useRef(onFinish);
   onFinishRef.current = onFinish;
+  const onProgressRef = useRef(onProgress);
+  onProgressRef.current = onProgress;
 
   const s = useRef({
     paddle: { cx: W / 2, w: 78 },
@@ -135,6 +137,7 @@ export function BricksGame({ onFinish }: { onFinish: (score: number) => void; on
       if (br.hp <= 0) {
         st.score += br.points;
         setScore(st.score);
+        onProgressRef.current?.(st.score);
         // suelta power-up con baja probabilidad
         if (Math.random() < 0.12) {
           const types: Power["type"][] = ["wide", "multi", "slow"];
@@ -149,6 +152,7 @@ export function BricksGame({ onFinish }: { onFinish: (score: number) => void; on
       } else {
         st.score += 5;
         setScore(st.score);
+        onProgressRef.current?.(st.score);
       }
     }
 

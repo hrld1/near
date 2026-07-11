@@ -18,12 +18,14 @@ type Obstacle = { x: number; y: number; type: "tree" | "rock"; r: number };
 type Gate = { x: number; y: number; gap: number; done: boolean };
 type Flake = { x: number; y: number; r: number; sp: number };
 
-export function SkiGame({ onFinish }: { onFinish: (score: number) => void; onProgress?: (score: number) => void }) {
+export function SkiGame({ onFinish, onProgress }: { onFinish: (score: number) => void; onProgress?: (score: number) => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [score, setScore] = useState(0);
   const [combo, setCombo] = useState(0);
   const onFinishRef = useRef(onFinish);
   onFinishRef.current = onFinish;
+  const onProgressRef = useRef(onProgress);
+  onProgressRef.current = onProgress;
 
   const s = useRef({
     dist: 0,
@@ -225,6 +227,7 @@ export function SkiGame({ onFinish }: { onFinish: (score: number) => void; onPro
         }
 
         setScore(Math.floor(st.dist));
+        onProgressRef.current?.(Math.floor(st.dist));
       }
 
       st.shake = Math.max(0, st.shake - 0.9);
