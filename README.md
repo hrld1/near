@@ -129,6 +129,12 @@ Catorce mejoras para que la app "se sienta" más cerca, en cuatro niveles:
 - **Español correcto y accesibilidad**: barrido de tildes/ñ/¿¡ por toda la interfaz, respeto de `prefers-reduced-motion` (sin confeti ni latidos para quien pide menos movimiento) y textos mínimos más legibles.
 - **Adaptadores de despliegue**: almacenamiento **S3** y bus **Redis** por entorno (ver *Despliegue*), dormidos por defecto.
 
+### Iteración 17: juegos más dinámicos — minigolf con mapas y "Esquí"
+Menos tablero, más acción. Dos entregas de arcade con física.
+- **Minigolf 2.0 — mapas de verdad**: de 5 hoyos con solo paredes a **9 mapas** con tipos de obstáculo nuevos: **agua** (splash → vuelves al punto de tiro y +1 golpe), **arena** (frena la bola), **hielo** (resbala), **bumpers** (círculos que la patean con fuerza) y una **compuerta que se mueve** y hay que cronometrar. Cada hoyo con nombre y algunos con césped tematizado.
+- **"Esquí" (nuevo)**: bajada infinita en canvas. El esquiador sigue el dedo mientras árboles y rocas suben hacia él **cada vez más rápido**; cruzar las **puertas de eslalon** encadena combo. Un choque y se acaba: puntúas los metros. Spray de nieve, parallax de copos, *screen-shake* al chocar. Best-score, entra en el sistema de duelos diarios.
+- Ambos verificados con captura headless. El minigolf pasa a `scoreBounds` 9–99 (9 hoyos).
+
 ### Iteración 16: "Cara a cara" — la colección de duelos 1v1 (como Plato)
 Near tenía solo dos juegos en vivo (4 en raya, Hundir la flota). Para que se juegue *juntos* de verdad, esta iteración monta un arnés reutilizable y suma tres clásicos por turnos de golpe.
 - **Arnés de duelos** (`features/play/duel/`): un único evento genérico `duel:signal` + acción de relay + hook `useDuel` + marco visual compartido encapsulan TODO el ciclo de vida 1v1 (lobby, invitar, aceptar, turnos, revancha, abandono) que antes se copiaba a mano. Añadir un juego nuevo = solo su **lógica pura** + su **tablero**. Ambos clientes aplican el mismo reducer determinista sobre el bus SSE, así que los dos tableros avanzan igual.
