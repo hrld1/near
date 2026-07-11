@@ -177,6 +177,20 @@ export type StreamEvent =
         move?: number[];
       };
     }
+  // Duelo en vivo de un juego de puntuación: ambos juegan la misma prueba a la
+  // vez y se retransmite el marcador para la barra "vs". `score` viaja en
+  // "score" (en vivo, limitado) y en "done" (final).
+  | {
+      type: "race:signal";
+      payload: {
+        game: string;
+        kind: "invite" | "accept" | "score" | "done" | "quit" | "rematch";
+        byId: string;
+        byName: string;
+        seed?: number;
+        score?: number;
+      };
+    }
   // --- iteracion 11 ---
   // juegos del lienzo: "dibujad a la vez" (blind duel) y "dibuja y adivina".
   // Efímero, relay por el bus. En "guess" la palabra NO viaja (es secreta

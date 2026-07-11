@@ -18,7 +18,7 @@ type Obstacle = { x: number; y: number; type: "tree" | "rock"; r: number };
 type Gate = { x: number; y: number; gap: number; done: boolean };
 type Flake = { x: number; y: number; r: number; sp: number };
 
-export function SkiGame({ onFinish }: { onFinish: (score: number) => void }) {
+export function SkiGame({ onFinish }: { onFinish: (score: number) => void; onProgress?: (score: number) => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [score, setScore] = useState(0);
   const [combo, setCombo] = useState(0);

@@ -68,7 +68,7 @@ function inRect(r: Rect, x: number, y: number) {
   return x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h;
 }
 
-export function SprintGame({ onFinish }: { onFinish: (score: number) => void }) {
+export function SprintGame({ onFinish }: { onFinish: (score: number) => void; onProgress?: (score: number) => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [score, setScore] = useState(0);
   const [combo, setCombo] = useState(0);

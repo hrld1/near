@@ -34,7 +34,7 @@ const WALLS: Seg[] = [
   [W - M, H - 150, 250, H - 58]
 ];
 
-export function PinballGame({ onFinish }: { onFinish: (score: number) => void }) {
+export function PinballGame({ onFinish }: { onFinish: (score: number) => void; onProgress?: (score: number) => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [score, setScore] = useState(0);
   const [balls, setBalls] = useState(3);

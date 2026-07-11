@@ -8,7 +8,7 @@ const TARGET_LIFE = 1500;
 
 type Target = { id: number; x: number; y: number; bornAt: number };
 
-export function TargetsGame({ onFinish }: { onFinish: (score: number) => void }) {
+export function TargetsGame({ onFinish }: { onFinish: (score: number) => void; onProgress?: (score: number) => void }) {
   const [targets, setTargets] = useState<Target[]>([]);
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(DURATION);

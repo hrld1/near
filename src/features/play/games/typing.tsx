@@ -22,7 +22,7 @@ function shuffled(): string[] {
   return [...WORDS].sort(() => Math.random() - 0.5);
 }
 
-export function TypingGame({ onFinish }: { onFinish: (score: number) => void }) {
+export function TypingGame({ onFinish }: { onFinish: (score: number) => void; onProgress?: (score: number) => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [value, setValue] = useState("");

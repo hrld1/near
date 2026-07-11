@@ -24,7 +24,7 @@ const TOUCH_OFFSET = 46; // la nave va por encima del dedo para verla
 type Roid = { x: number; y: number; r: number; vy: number; rot: number; vrot: number; seed: number };
 type Orb = { x: number; y: number; r: number; vy: number; hue: number; born: number };
 
-export function MeteorGame({ onFinish }: { onFinish: (score: number) => void }) {
+export function MeteorGame({ onFinish, onProgress }: { onFinish: (score: number) => void; onProgress?: (score: number) => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [combo, setCombo] = useState(1);
   const stateRef = useRef({
@@ -45,6 +45,8 @@ export function MeteorGame({ onFinish }: { onFinish: (score: number) => void }) 
   });
   const onFinishRef = useRef(onFinish);
   onFinishRef.current = onFinish;
+  const onProgressRef = useRef(onProgress);
+  onProgressRef.current = onProgress;
 
   useEffect(() => {
     const canvas = canvasRef.current!;
@@ -53,6 +55,7 @@ export function MeteorGame({ onFinish }: { onFinish: (score: number) => void }) 
     s.started = performance.now();
     let raf = 0;
     let last = performance.now();
+    let lastProg = 0;
 
     // estrellas de fondo (dos profundidades para parallax)
     for (let i = 0; i < 70; i++) {
@@ -265,6 +268,11 @@ export function MeteorGame({ onFinish }: { onFinish: (score: number) => void }) 
       ctx.fillStyle = s.combo > 1 ? "#fbbf24" : "rgba(255,255,255,0.55)";
       ctx.font = "bold 16px sans-serif";
       ctx.fillText(`x${s.combo}`, W - 14, 28);
+
+      if (now - lastProg > 140) {
+        lastProg = now;
+        onProgressRef.current?.(Math.round(s.score));
+      }
 
       raf = requestAnimationFrame(frame);
     }

@@ -55,7 +55,7 @@ function buildBricks(layout: string[]): Brick[] {
   return bricks;
 }
 
-export function BricksGame({ onFinish }: { onFinish: (score: number) => void }) {
+export function BricksGame({ onFinish }: { onFinish: (score: number) => void; onProgress?: (score: number) => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [score, setScore] = useState(0);
   const [level, setLevel] = useState(1);

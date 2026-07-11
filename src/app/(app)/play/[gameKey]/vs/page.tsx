@@ -1,0 +1,31 @@
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { requireCouple } from "@/lib/couple";
+import { gameByKey } from "@/lib/games";
+import { raceEnabled } from "@/lib/race";
+import { RaceRoom } from "@/features/play/race/race-room";
+
+export const dynamic = "force-dynamic";
+
+export function generateMetadata({ params }: { params: { gameKey: string } }): Metadata {
+  const def = gameByKey(params.gameKey);
+  return { title: def ? `Duelo · ${def.name}` : "Duelo en vivo" };
+}
+
+export default async function RacePage({ params }: { params: { gameKey: string } }) {
+  const def = gameByKey(params.gameKey);
+  if (!def || !raceEnabled(def.key)) notFound();
+
+  const { user, partner } = await requireCouple();
+
+  return (
+    <div className="mx-auto max-w-2xl px-4 py-6 md:py-10">
+      <RaceRoom
+        def={def}
+        myId={user.id}
+        myName={user.name}
+        partnerName={partner?.name ?? "tu pareja"}
+      />
+    </div>
+  );
+}

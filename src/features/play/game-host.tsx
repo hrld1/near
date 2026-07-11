@@ -9,20 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Confetti } from "@/features/play/confetti";
 import { gameVisual } from "@/components/product-icons";
 import { cn } from "@/lib/utils";
-import { ReactionGame } from "@/features/play/games/reaction";
-import { MemoryGame } from "@/features/play/games/memory";
-import { TargetsGame } from "@/features/play/games/targets";
-import { EchoGame } from "@/features/play/games/echo";
-import { AnagramGame } from "@/features/play/games/anagram";
-import { SprintGame } from "@/features/play/games/sprint";
-import { TypingGame } from "@/features/play/games/typing";
-import { GolfGame } from "@/features/play/games/golf";
-import { CapsGame } from "@/features/play/games/caps";
-import { MeteorGame } from "@/features/play/games/meteor";
-import { SkiGame } from "@/features/play/games/ski";
-import { BricksGame } from "@/features/play/games/bricks";
-import { ClimbGame } from "@/features/play/games/climb";
-import { PinballGame } from "@/features/play/games/pinball";
+import { ArcadeGameView } from "@/features/play/games/arcade-view";
 
 export type GameHostProps = {
   gameKey: string;
@@ -149,22 +136,11 @@ export function GameHost(props: GameHostProps) {
 
           {phase === "playing" && (
             <div key={attempt}>
-              {props.gameKey === "reaction" && <ReactionGame onFinish={handleFinish} />}
-              {props.gameKey === "memory" && <MemoryGame onFinish={handleFinish} />}
-              {props.gameKey === "targets" && <TargetsGame onFinish={handleFinish} />}
-              {props.gameKey === "echo" && <EchoGame onFinish={handleFinish} />}
-              {props.gameKey === "anagram" && (
-                <AnagramGame onFinish={handleFinish} words={props.anagramWords ?? []} />
-              )}
-              {props.gameKey === "sprint" && <SprintGame onFinish={handleFinish} />}
-              {props.gameKey === "typing" && <TypingGame onFinish={handleFinish} />}
-              {props.gameKey === "golf" && <GolfGame onFinish={handleFinish} />}
-              {props.gameKey === "caps" && <CapsGame onFinish={handleFinish} />}
-              {props.gameKey === "meteor" && <MeteorGame onFinish={handleFinish} />}
-              {props.gameKey === "ski" && <SkiGame onFinish={handleFinish} />}
-              {props.gameKey === "bricks" && <BricksGame onFinish={handleFinish} />}
-              {props.gameKey === "climb" && <ClimbGame onFinish={handleFinish} />}
-              {props.gameKey === "pinball" && <PinballGame onFinish={handleFinish} />}
+              <ArcadeGameView
+                gameKey={props.gameKey}
+                onFinish={handleFinish}
+                anagramWords={props.anagramWords}
+              />
             </div>
           )}
 

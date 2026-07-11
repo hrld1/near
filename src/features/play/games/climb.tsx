@@ -31,7 +31,7 @@ function pickType(heightM: number): PType {
   return "normal";
 }
 
-export function ClimbGame({ onFinish }: { onFinish: (score: number) => void }) {
+export function ClimbGame({ onFinish }: { onFinish: (score: number) => void; onProgress?: (score: number) => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [score, setScore] = useState(0);
   const onFinishRef = useRef(onFinish);
