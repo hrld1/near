@@ -102,12 +102,12 @@ export const GAMES: GameDef[] = [
   {
     key: "golf",
     name: "Minigolf",
-    tagline: "5 hoyos, un dedo y buen pulso.",
-    rules: "Arrastra y suelta para golpear: mas arrastre, mas fuerza. 5 hoyos con rebotes, maximo 8 golpes por hoyo. Menos golpes es mejor.",
+    tagline: "9 mapas con agua, arena, hielo y bumpers.",
+    rules: "Arrastra y suelta para golpear: mas arrastre, mas fuerza. 9 hoyos con obstaculos (agua = +1 golpe y vuelves atras, arena frena, hielo resbala, bumpers rebotan). Maximo 8 golpes por hoyo. Menos golpes es mejor.",
     lowerIsBetter: true,
     unit: "golpes",
     maxAttemptsPerDay: 5,
-    scoreBounds: { min: 5, max: 45 },
+    scoreBounds: { min: 9, max: 99 },
     format: (s) => `${Math.round(s)} golpes`
   },
   {
