@@ -8,6 +8,7 @@ import {
   CalendarCheck,
   Calculator,
   Camera,
+  CircleDot,
   Cloud,
   Coffee,
   Disc,
@@ -117,6 +118,12 @@ export const GAME_VISUALS: Record<
     accent: "from-emerald-400 to-sky-500",
     accentSoft: "bg-emerald-500/12",
     accentText: "text-emerald-600 dark:text-emerald-400"
+  },
+  pinball: {
+    icon: CircleDot,
+    accent: "from-purple-500 to-indigo-700",
+    accentSoft: "bg-purple-500/12",
+    accentText: "text-purple-600 dark:text-purple-400"
   }
 };
 

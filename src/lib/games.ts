@@ -164,6 +164,17 @@ export const GAMES: GameDef[] = [
     maxAttemptsPerDay: 5,
     scoreBounds: { min: 0, max: 100_000 },
     format: (s) => `${Math.round(s)} m`
+  },
+  {
+    key: "pinball",
+    name: "Pinball",
+    tagline: "Flippers, bumpers y físicas de máquina.",
+    rules: "Toca la mitad izquierda o derecha de la mesa para cada flipper (o las dos a la vez). Rebota en los bumpers para sumar puntos y encadenar combo. Tienes 3 bolas: si se escapan por el centro, se acaba.",
+    lowerIsBetter: false,
+    unit: "pts",
+    maxAttemptsPerDay: 5,
+    scoreBounds: { min: 0, max: 1_000_000 },
+    format: (s) => `${Math.round(s)} pts`
   }
 ];
 
