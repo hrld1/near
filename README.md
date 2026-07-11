@@ -129,6 +129,13 @@ Catorce mejoras para que la app "se sienta" más cerca, en cuatro niveles:
 - **Español correcto y accesibilidad**: barrido de tildes/ñ/¿¡ por toda la interfaz, respeto de `prefers-reduced-motion` (sin confeti ni latidos para quien pide menos movimiento) y textos mínimos más legibles.
 - **Adaptadores de despliegue**: almacenamiento **S3** y bus **Redis** por entorno (ver *Despliegue*), dormidos por defecto.
 
+### Iteración 23: "Reparar" — cerrar bien una discusión
+Discutir a distancia duele el doble y es difícil de cerrar por mensajes. Tres herramientas con base Gottman, sobre infraestructura existente.
+- **Necesito un respiro** (anti-*stonewalling*): avisas con cariño de que necesitas parar, para que "parar" no se confunda con "irse". Llega al instante (aviso global + push).
+- **Tender la mano** (*repair attempts* + *turning toward*): mandas un gesto suave ("¿Podemos empezar de nuevo?", "Necesito un abrazo"…); tu pareja lo ve donde esté y puede **aceptarlo** de un toque.
+- **Después de la tormenta** (*aftermath of a fight*): en calma, cada uno deja cómo se sintió (emociones), su punto de vista sin culpar y qué necesita; **se revela solo al compartir la tuya**. Convierte una pelea en entendimiento. Modelos `Repair` + `RepairEntry`.
+- Todo en la ruta **`/reparar`** (tono verde salvia, distinto del rosa), con aviso global `RepairToast`, deep-links por push y entrada discreta en Hoy. Los gestos en caliente son efímeros (evento `repair:signal`); la reflexión se persiste. Migración `reparar`. Verificado con captura headless (typecheck, lint, 74 tests, build).
+
 ### Iteración 22: "Cerca de verdad" — la capa que une (aprecio + mapas de amor)
 Tras una auditoría de producto, el salto no era otro juego sino la capa que la evidencia (Gottman, Paired) demuestra que **mejora** una relación: expresar aprecio y conoceros más hondo. Todo sobre infraestructura existente, sin desplegar nada.
 - **Frasco de aprecio** (Gottman: *fondness & admiration*): dile a tu pareja algo que admiras; se guarda, llega en vivo (y por push si está fuera) y se acumula en un frasco que ambos podéis reabrir. Modelo `Appreciation`.
