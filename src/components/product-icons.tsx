@@ -21,6 +21,7 @@ import {
   Mic,
   Plane,
   Rocket,
+  Snowflake,
   Sparkles,
   Stars,
   Sun,
@@ -96,6 +97,12 @@ export const GAME_VISUALS: Record<
     accent: "from-indigo-500 to-fuchsia-600",
     accentSoft: "bg-indigo-500/12",
     accentText: "text-indigo-600 dark:text-indigo-400"
+  },
+  ski: {
+    icon: Snowflake,
+    accent: "from-sky-300 to-blue-500",
+    accentSoft: "bg-sky-500/12",
+    accentText: "text-sky-600 dark:text-sky-400"
   }
 };
 

@@ -131,6 +131,17 @@ export const GAMES: GameDef[] = [
     maxAttemptsPerDay: 5,
     scoreBounds: { min: 0, max: 100_000 },
     format: (s) => `${Math.round(s)} pts`
+  },
+  {
+    key: "ski",
+    name: "Esquí",
+    tagline: "Baja la ladera esquivando a toda velocidad.",
+    rules: "Mueve el dedo para esquivar árboles y rocas mientras bajas cada vez más rápido. Cruza las puertas de eslalon para encadenar combo. Un choque y se acaba: puntúas los metros de descenso.",
+    lowerIsBetter: false,
+    unit: "m",
+    maxAttemptsPerDay: 5,
+    scoreBounds: { min: 0, max: 100_000 },
+    format: (s) => `${Math.round(s)} m`
   }
 ];
 
