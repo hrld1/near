@@ -129,6 +129,12 @@ Catorce mejoras para que la app "se sienta" más cerca, en cuatro niveles:
 - **Español correcto y accesibilidad**: barrido de tildes/ñ/¿¡ por toda la interfaz, respeto de `prefers-reduced-motion` (sin confeti ni latidos para quien pide menos movimiento) y textos mínimos más legibles.
 - **Adaptadores de despliegue**: almacenamiento **S3** y bus **Redis** por entorno (ver *Despliegue*), dormidos por defecto.
 
+### Iteración 18: dos arcades de acción más — "Rompemuros" y "A las nubes"
+Más juegos dinámicos con física.
+- **Rompemuros (Breakout)**: pala que sigue el dedo, bola con rebotes y ladrillos por **mapas** (uno con forma de corazón, damero, reloj de arena…). Al romper un ladrillo puede caer un **power-up** (pala ancha, multibola, cámara lenta); limpiar el mapa sube de nivel y acelera. 3 vidas, best-score.
+- **A las nubes (climber)**: saltador infinito estilo *doodle jump* — el personaje rebota solo y lo diriges con el dedo mientras la cámara sube; puntúas la altura. Plataformas móviles, frágiles (se rompen) y con muelle (te lanzan). Caer por abajo, se acaba.
+- Ambos verificados con captura headless. La arcade solo llega a **13 juegos**.
+
 ### Iteración 17: juegos más dinámicos — minigolf con mapas y "Esquí"
 Menos tablero, más acción. Dos entregas de arcade con física.
 - **Minigolf 2.0 — mapas de verdad**: de 5 hoyos con solo paredes a **9 mapas** con tipos de obstáculo nuevos: **agua** (splash → vuelves al punto de tiro y +1 golpe), **arena** (frena la bola), **hielo** (resbala), **bumpers** (círculos que la patean con fuerza) y una **compuerta que se mueve** y hay que cronometrar. Cada hoyo con nombre y algunos con césped tematizado.
