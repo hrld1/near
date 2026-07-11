@@ -191,6 +191,9 @@ export type StreamEvent =
         score?: number;
       };
     }
+  // --- iteracion 22: Cerca de verdad ---
+  // un aprecio nuevo cae en el frasco de la pareja, en vivo
+  | { type: "appreciation:new"; payload: { id: string; fromId: string; fromName: string; body: string } }
   // --- iteracion 11 ---
   // juegos del lienzo: "dibujad a la vez" (blind duel) y "dibuja y adivina".
   // Efímero, relay por el bus. En "guess" la palabra NO viaja (es secreta
