@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Gamepad2, MonitorPlay, Moon, Paintbrush, Sparkles } from "lucide-react";
+import { Gamepad2, HeartHandshake, MonitorPlay, Moon, Paintbrush, Sparkles } from "lucide-react";
 import { requireCouple } from "@/lib/couple";
 import { isUserOnline } from "@/lib/realtime";
 import { PartnerOnline } from "@/features/presence/partner-online";
@@ -15,6 +15,15 @@ export default async function JuntosPage() {
   const partnerOnline = partner ? isUserOnline(partner.id) : false;
 
   const items: HubItem[] = [
+    {
+      href: "/cerca",
+      title: "Cerca de verdad",
+      description: "Aprecio, preguntas para conoceros más y el pulso de la semana.",
+      icon: HeartHandshake,
+      accent: "from-rose to-plum",
+      accentSoft: "bg-rose/12",
+      accentText: "text-rose-deep"
+    },
     {
       href: "/together",
       title: "Estar juntos",

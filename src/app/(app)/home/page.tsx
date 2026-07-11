@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { ArrowRight, BookHeart, Heart, Moon, StickyNote } from "lucide-react";
+import { ArrowRight, BookHeart, Heart, HeartHandshake, Moon, StickyNote } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { requireCouple } from "@/lib/couple";
 import { moodInfo, presenceInfo } from "@/lib/utils";
@@ -315,6 +315,24 @@ export default async function HomePage() {
             partnerPostedInitial={!!partnerPhotoRow}
           />
         </div>
+      )}
+
+      {/* CERCA DE VERDAD: aprecio, preguntas para conoceros y el pulso */}
+      {partner && (
+        <Link href="/cerca" className="group mb-4 block">
+          <div className="flex items-center gap-4 rounded-3xl border border-plum/20 bg-gradient-to-br from-plum/5 via-paper to-paper px-5 py-4 shadow-card transition group-hover:shadow-lift">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-rose to-plum text-white shadow-card">
+              <HeartHandshake className="h-6 w-6" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="font-display text-lg text-ink">Cerca de verdad</p>
+              <p className="text-sm text-ink-soft">
+                Un aprecio para {partner.name}, preguntas para conoceros más y el pulso de la semana.
+              </p>
+            </div>
+            <ArrowRight className="h-5 w-5 shrink-0 text-plum transition group-hover:translate-x-0.5" />
+          </div>
+        </Link>
       )}
 
       <div className="grid gap-4 md:grid-cols-3">

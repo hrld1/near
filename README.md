@@ -129,6 +129,13 @@ Catorce mejoras para que la app "se sienta" más cerca, en cuatro niveles:
 - **Español correcto y accesibilidad**: barrido de tildes/ñ/¿¡ por toda la interfaz, respeto de `prefers-reduced-motion` (sin confeti ni latidos para quien pide menos movimiento) y textos mínimos más legibles.
 - **Adaptadores de despliegue**: almacenamiento **S3** y bus **Redis** por entorno (ver *Despliegue*), dormidos por defecto.
 
+### Iteración 22: "Cerca de verdad" — la capa que une (aprecio + mapas de amor)
+Tras una auditoría de producto, el salto no era otro juego sino la capa que la evidencia (Gottman, Paired) demuestra que **mejora** una relación: expresar aprecio y conoceros más hondo. Todo sobre infraestructura existente, sin desplegar nada.
+- **Frasco de aprecio** (Gottman: *fondness & admiration*): dile a tu pareja algo que admiras; se guarda, llega en vivo (y por push si está fuera) y se acumula en un frasco que ambos podéis reabrir. Modelo `Appreciation`.
+- **Mazos de preguntas** (*love maps*): cinco mazos (Recuerdos, Tú y yo, Sueños, El futuro, e Intimidad opt-in) con **revelación por carta** — respondéis a ciegas y veis la del otro solo al compartir la vuestra. Progreso "X/N reveladas". Modelo `CardAnswer` (reciprocidad por carta); el contenido vive en `lib/decks.ts`.
+- **El pulso de la semana**: un termómetro suave ("¿cómo de cerca te has sentido?") por persona y semana, con las dos lecturas visibles. Modelo `WeeklyPulse`.
+- Todo vive en el hub **`/cerca`** (con entrada destacada en Hoy y en Juntos). Puntúa una vez al día/semana por concepto. Migración `cerca_de_verdad`. Verificado con captura headless (typecheck, lint, 74 tests, build).
+
 ### Iteración 20: "Duelo en vivo" — modo 1v1 para los juegos de puntuación
 Los juegos de marcador ganan un modo cara a cara en directo (como Plato), con un **único arnés reutilizable** en vez de reescribir cada juego.
 - **Arnés de carrera** (`features/play/race/`): evento genérico `race:signal` + acción de relay + hook `useRace` + sala con **cuenta atrás 3·2·1** y **barra "vs"** que muestra el marcador del rival en tiempo real. Ambos juegan la MISMA prueba a la vez; al terminar los dos, se compara según la dirección del juego y hay revancha.
