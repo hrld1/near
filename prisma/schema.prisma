@@ -102,6 +102,9 @@ model User {
   dailyPhotos     DailyPhoto[]
   lettersSent     Letter[]
   spotify         SpotifyAccount?
+  appreciations   Appreciation[]
+  cardAnswers     CardAnswer[]
+  weeklyPulses    WeeklyPulse[]
 
   @@index([coupleId])
 }
@@ -132,6 +135,9 @@ model Couple {
   achievementUnlocks AchievementUnlock[]
   dailyPhotos  DailyPhoto[]
   letters      Letter[]
+  appreciations Appreciation[]
+  cardAnswers   CardAnswer[]
+  weeklyPulses  WeeklyPulse[]
 }
 
 model Invite {
@@ -446,6 +452,56 @@ model Letter {
   createdAt  DateTime   @default(now())
 
   @@index([coupleId, deliverAt])
+}
+
+// ---- Cerca de verdad (iteracion 22): aprecio + mazos + pulso ----
+
+// Frasco de aprecio: cada mensaje de admiracion o gratitud que uno manda al
+// otro. Se acumulan y ambos pueden reabrir el frasco. Reutiliza push y puntos.
+model Appreciation {
+  id        String   @id @default(cuid())
+  coupleId  String
+  couple    Couple   @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  fromId    String
+  from      User     @relation(fields: [fromId], references: [id], onDelete: Cascade)
+  body      String
+  createdAt DateTime @default(now())
+
+  @@index([coupleId, createdAt])
+}
+
+// Mazos de preguntas (mapas de amor): una respuesta por persona y carta.
+// Reciprocidad POR CARTA: ves la del otro solo cuando has respondido la tuya.
+// cardId = "deckKey:index" (el contenido de las cartas vive en lib/decks.ts).
+model CardAnswer {
+  id        String   @id @default(cuid())
+  coupleId  String
+  couple    Couple   @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cardId    String
+  answer    String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, cardId])
+  @@index([coupleId, cardId])
+}
+
+// Pulso de la semana: como de cerca os sentis (1..5), por persona y semana.
+// weekKey = lunes de la semana en el dia de la pareja ("YYYY-MM-DD").
+model WeeklyPulse {
+  id        String   @id @default(cuid())
+  coupleId  String
+  couple    Couple   @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weekKey   String
+  value     Int
+  note      String?
+  createdAt DateTime @default(now())
+
+  @@unique([userId, weekKey])
+  @@index([coupleId, weekKey])
 }
 
 // ---- Spotify (opcional, activado por env) ----

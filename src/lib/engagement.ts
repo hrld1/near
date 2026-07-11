@@ -31,7 +31,10 @@ export const POINTS = {
   duelWon: 15,
   boxOpened: 5,
   missionBonus: 20,
-  weeklyBonus: 40
+  weeklyBonus: 40,
+  appreciation: 5,
+  card: 5,
+  pulse: 5
 } as const;
 
 // dateKey = día del usuario (su timezone): el libro mayor es personal.
