@@ -105,6 +105,7 @@ model User {
   appreciations   Appreciation[]
   cardAnswers     CardAnswer[]
   weeklyPulses    WeeklyPulse[]
+  repairEntries   RepairEntry[]
 
   @@index([coupleId])
 }
@@ -138,6 +139,7 @@ model Couple {
   appreciations Appreciation[]
   cardAnswers   CardAnswer[]
   weeklyPulses  WeeklyPulse[]
+  repairs       Repair[]
 }
 
 model Invite {
@@ -502,6 +504,37 @@ model WeeklyPulse {
 
   @@unique([userId, weekKey])
   @@index([coupleId, weekKey])
+}
+
+// ---- Reparar (iteracion 23): cerrar bien una discusion ----
+
+// "Despues de la tormenta": una discusion que se procesa en calma. Cada
+// miembro deja su reflexion (RepairEntry); reciprocidad: ves la del otro solo
+// cuando compartes la tuya. Los gestos en caliente (respiro / tender la mano)
+// son efimeros (evento repair:signal + push), no se persisten.
+model Repair {
+  id          String        @id @default(cuid())
+  coupleId    String
+  couple      Couple        @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  startedById String
+  createdAt   DateTime      @default(now())
+  entries     RepairEntry[]
+
+  @@index([coupleId, createdAt])
+}
+
+model RepairEntry {
+  id          String   @id @default(cuid())
+  repairId    String
+  repair      Repair   @relation(fields: [repairId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  feelings    String[] @default([])
+  perspective String
+  need        String
+  createdAt   DateTime @default(now())
+
+  @@unique([repairId, userId])
 }
 
 // ---- Spotify (opcional, activado por env) ----
