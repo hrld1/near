@@ -129,6 +129,10 @@ Catorce mejoras para que la app "se sienta" más cerca, en cuatro niveles:
 - **Español correcto y accesibilidad**: barrido de tildes/ñ/¿¡ por toda la interfaz, respeto de `prefers-reduced-motion` (sin confeti ni latidos para quien pide menos movimiento) y textos mínimos más legibles.
 - **Adaptadores de despliegue**: almacenamiento **S3** y bus **Redis** por entorno (ver *Despliegue*), dormidos por defecto.
 
+### Iteración 19: "Pinball" — físicas de máquina
+- **Pinball**: mesa neón en canvas con paredes en embudo, cinco bumpers que rebotan y suman, y dos **flippers** que golpean la bola con el impulso real de su giro (la velocidad del punto de contacto sale de la velocidad angular). Colisión bola-segmento por punto más cercano con restitución y *substeps* para no atravesar nada. **Multitáctil**: tocas la mitad izquierda o derecha (o las dos) para cada flipper. 3 bolas, drenaje por el centro, best-score. Verificado con captura headless.
+- Con esto la arcade solo llega a **14 juegos**.
+
 ### Iteración 18: dos arcades de acción más — "Rompemuros" y "A las nubes"
 Más juegos dinámicos con física.
 - **Rompemuros (Breakout)**: pala que sigue el dedo, bola con rebotes y ladrillos por **mapas** (uno con forma de corazón, damero, reloj de arena…). Al romper un ladrillo puede caer un **power-up** (pala ancha, multibola, cámara lenta); limpiar el mapa sube de nivel y acelera. 3 vidas, best-score.
