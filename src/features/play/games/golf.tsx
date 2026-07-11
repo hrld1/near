@@ -129,7 +129,7 @@ function moverRect(m: Mover, t: number): Rect {
   return m.axis === "x" ? { x: m.x + off, y: m.y, w: m.w, h: m.h } : { x: m.x, y: m.y + off, w: m.w, h: m.h };
 }
 
-export function GolfGame({ onFinish }: { onFinish: (score: number) => void }) {
+export function GolfGame({ onFinish, onProgress }: { onFinish: (score: number) => void; onProgress?: (score: number) => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [holeIndex, setHoleIndex] = useState(0);
   const [strokes, setStrokes] = useState(0);
@@ -153,6 +153,8 @@ export function GolfGame({ onFinish }: { onFinish: (score: number) => void }) {
   const bannerTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onFinishRef = useRef(onFinish);
   onFinishRef.current = onFinish;
+  const onProgressRef = useRef(onProgress);
+  onProgressRef.current = onProgress;
 
   useEffect(() => {
     const canvas = canvasRef.current!;
@@ -263,6 +265,7 @@ export function GolfGame({ onFinish }: { onFinish: (score: number) => void }) {
         s.ball = { x: s.lastRest.x, y: s.lastRest.y, vx: 0, vy: 0 };
         s.total += 1;
         setTotalStrokes(s.total);
+        onProgressRef.current?.(s.total);
         flash("¡Al agua! +1");
         return;
       }
@@ -494,6 +497,7 @@ export function GolfGame({ onFinish }: { onFinish: (score: number) => void }) {
       s.total += 1;
       setStrokes(s.strokes);
       setTotalStrokes(s.total);
+      onProgressRef.current?.(s.total);
       if (s.strokes >= MAX_STROKES) {
         const waitStop = setInterval(() => {
           if (!ballMoving() && s.sinking === 0 && !s.transitioning) {

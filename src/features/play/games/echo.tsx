@@ -27,7 +27,7 @@ function padRect(i: number) {
   return { x: P + col * (CELL + G), y: P + row * (CELL + G), w: CELL, h: CELL, cx: 0, cy: 0 };
 }
 
-export function EchoGame({ onFinish }: { onFinish: (score: number) => void }) {
+export function EchoGame({ onFinish, onProgress }: { onFinish: (score: number) => void; onProgress?: (score: number) => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [round, setRound] = useState(1);
   const [status, setStatus] = useState<"showing" | "input" | "failed">("showing");
@@ -44,6 +44,8 @@ export function EchoGame({ onFinish }: { onFinish: (score: number) => void }) {
   });
   const onFinishRef = useRef(onFinish);
   onFinishRef.current = onFinish;
+  const onProgressRef = useRef(onProgress);
+  onProgressRef.current = onProgress;
 
   useEffect(() => {
     const canvas = canvasRef.current!;
@@ -100,6 +102,7 @@ export function EchoGame({ onFinish }: { onFinish: (score: number) => void }) {
       st.inputIndex += 1;
       if (st.inputIndex >= st.seq.length) {
         st.rounds = st.seq.length;
+        onProgressRef.current?.(st.rounds);
         st.phase = "showing";
         setStatus("showing");
         await sleep(520);

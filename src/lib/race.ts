@@ -9,7 +9,13 @@ export const RACE_ENABLED = new Set<string>([
   "pinball",
   "targets",
   "sprint",
-  "typing"
+  "typing",
+  "reaction",
+  "memory",
+  "echo",
+  "anagram",
+  "golf",
+  "caps"
 ]);
 
 export function raceEnabled(key: string): boolean {

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { requireCouple } from "@/lib/couple";
-import { gameByKey } from "@/lib/games";
+import { dayKeyIn } from "@/lib/dates";
+import { gameByKey, scrambleWord, wordsOfDay } from "@/lib/games";
 import { raceEnabled } from "@/lib/race";
 import { RaceRoom } from "@/features/play/race/race-room";
 
@@ -16,7 +17,13 @@ export default async function RacePage({ params }: { params: { gameKey: string }
   const def = gameByKey(params.gameKey);
   if (!def || !raceEnabled(def.key)) notFound();
 
-  const { user, partner } = await requireCouple();
+  const { user, couple, partner } = await requireCouple();
+
+  // Palabra oculta: las mismas palabras del día para los dos (duelo justo).
+  const anagramWords =
+    def.key === "anagram"
+      ? wordsOfDay(dayKeyIn(couple.timezone)).map((word, i) => ({ word, scrambled: scrambleWord(word, i + 1) }))
+      : undefined;
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-6 md:py-10">
@@ -25,6 +32,7 @@ export default async function RacePage({ params }: { params: { gameKey: string }
         myId={user.id}
         myName={user.name}
         partnerName={partner?.name ?? "tu pareja"}
+        anagramWords={anagramWords}
       />
     </div>
   );

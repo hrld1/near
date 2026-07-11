@@ -118,8 +118,8 @@ export function RaceRoom({
             <div>
               {/* barra vs */}
               <div className="mb-3 space-y-2">
-                <VsRow name={myName} score={race.myScore} format={def.format} scale={scale} tone="me" leading={compareScores(def, race.myScore, race.oppScore) < 0} />
-                <VsRow name={partnerName} score={race.oppScore} format={def.format} scale={scale} tone="them" leading={compareScores(def, race.myScore, race.oppScore) > 0} />
+                <VsRow name={myName} score={race.myScore} format={def.format} scale={scale} lowerIsBetter={def.lowerIsBetter} tone="me" leading={compareScores(def, race.myScore, race.oppScore) < 0} />
+                <VsRow name={partnerName} score={race.oppScore} format={def.format} scale={scale} lowerIsBetter={def.lowerIsBetter} tone="them" leading={compareScores(def, race.myScore, race.oppScore) > 0} />
               </div>
 
               {phase === "playing" && (
@@ -176,6 +176,7 @@ function VsRow({
   score,
   format,
   scale,
+  lowerIsBetter,
   tone,
   leading
 }: {
@@ -183,10 +184,13 @@ function VsRow({
   score: number;
   format: (n: number) => string;
   scale: number;
+  lowerIsBetter: boolean;
   tone: "me" | "them";
   leading: boolean;
 }) {
-  const pct = Math.max(4, Math.min(100, (score / scale) * 100));
+  // en juegos de "menos es mejor", el que va MÁS bajo llena más la barra
+  const raw = lowerIsBetter ? 1 - score / scale : score / scale;
+  const pct = Math.max(4, Math.min(100, raw * 100));
   return (
     <div className="flex items-center gap-2.5">
       <Avatar name={name} size="sm" tone={tone === "them" ? 1 : 0} className={cn("ring-2", leading ? "ring-amber-400" : "ring-transparent")} />

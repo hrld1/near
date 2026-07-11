@@ -10,10 +10,12 @@ const SKIP_PENALTY = 10;
 
 export function AnagramGame({
   words,
-  onFinish
+  onFinish,
+  onProgress
 }: {
   words: { word: string; scrambled: string }[];
   onFinish: (score: number) => void;
+  onProgress?: (score: number) => void;
 }) {
   const [index, setIndex] = useState(0);
   const [guess, setGuess] = useState("");
@@ -43,6 +45,7 @@ export function AnagramGame({
   function advance(gained: number) {
     scoreRef.current = Math.max(0, scoreRef.current + gained);
     setScore(scoreRef.current);
+    onProgress?.(scoreRef.current);
     if (index + 1 >= words.length) {
       setTimeout(() => onFinish(scoreRef.current), 700);
     } else {

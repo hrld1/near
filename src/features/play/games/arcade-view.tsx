@@ -32,15 +32,15 @@ export function ArcadeGameView({
 }) {
   return (
     <>
-      {gameKey === "reaction" && <ReactionGame onFinish={onFinish} />}
-      {gameKey === "memory" && <MemoryGame onFinish={onFinish} />}
+      {gameKey === "reaction" && <ReactionGame onFinish={onFinish} onProgress={onProgress} />}
+      {gameKey === "memory" && <MemoryGame onFinish={onFinish} onProgress={onProgress} />}
       {gameKey === "targets" && <TargetsGame onFinish={onFinish} onProgress={onProgress} />}
-      {gameKey === "echo" && <EchoGame onFinish={onFinish} />}
-      {gameKey === "anagram" && <AnagramGame onFinish={onFinish} words={anagramWords ?? []} />}
+      {gameKey === "echo" && <EchoGame onFinish={onFinish} onProgress={onProgress} />}
+      {gameKey === "anagram" && <AnagramGame onFinish={onFinish} onProgress={onProgress} words={anagramWords ?? []} />}
       {gameKey === "sprint" && <SprintGame onFinish={onFinish} onProgress={onProgress} />}
       {gameKey === "typing" && <TypingGame onFinish={onFinish} onProgress={onProgress} />}
-      {gameKey === "golf" && <GolfGame onFinish={onFinish} />}
-      {gameKey === "caps" && <CapsGame onFinish={onFinish} />}
+      {gameKey === "golf" && <GolfGame onFinish={onFinish} onProgress={onProgress} />}
+      {gameKey === "caps" && <CapsGame onFinish={onFinish} onProgress={onProgress} />}
       {gameKey === "meteor" && <MeteorGame onFinish={onFinish} onProgress={onProgress} />}
       {gameKey === "ski" && <SkiGame onFinish={onFinish} onProgress={onProgress} />}
       {gameKey === "bricks" && <BricksGame onFinish={onFinish} onProgress={onProgress} />}

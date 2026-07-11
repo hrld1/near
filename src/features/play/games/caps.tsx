@@ -28,7 +28,7 @@ function ringPoints(cap: Cap): number {
   return 0;
 }
 
-export function CapsGame({ onFinish }: { onFinish: (score: number) => void }) {
+export function CapsGame({ onFinish, onProgress }: { onFinish: (score: number) => void; onProgress?: (score: number) => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [thrown, setThrown] = useState(0);
   const [score, setScore] = useState(0);
@@ -46,6 +46,8 @@ export function CapsGame({ onFinish }: { onFinish: (score: number) => void }) {
   const particlesRef = useRef<Particle[]>([]);
   const onFinishRef = useRef(onFinish);
   onFinishRef.current = onFinish;
+  const onProgressRef = useRef(onProgress);
+  onProgressRef.current = onProgress;
 
   useEffect(() => {
     const canvas = canvasRef.current!;
@@ -120,6 +122,7 @@ export function CapsGame({ onFinish }: { onFinish: (score: number) => void }) {
           s.settledFrames = 0;
           const total = s.caps.reduce((acc, cap) => acc + ringPoints(cap), 0);
           setScore(total);
+          onProgressRef.current?.(total);
           if (s.thrown >= TOTAL_CAPS) {
             if (!s.done) {
               s.done = true;

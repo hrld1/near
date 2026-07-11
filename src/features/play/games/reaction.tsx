@@ -16,7 +16,7 @@ const PENALTY_MS = 800;
 
 type Status = "waiting" | "armed" | "early" | "hit";
 
-export function ReactionGame({ onFinish }: { onFinish: (score: number) => void }) {
+export function ReactionGame({ onFinish, onProgress }: { onFinish: (score: number) => void; onProgress?: (score: number) => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [round, setRound] = useState(1);
   const [times, setTimes] = useState<number[]>([]);
@@ -35,6 +35,8 @@ export function ReactionGame({ onFinish }: { onFinish: (score: number) => void }
   const armTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onFinishRef = useRef(onFinish);
   onFinishRef.current = onFinish;
+  const onProgressRef = useRef(onProgress);
+  onProgressRef.current = onProgress;
 
   useEffect(() => {
     const canvas = canvasRef.current!;
@@ -56,6 +58,7 @@ export function ReactionGame({ onFinish }: { onFinish: (score: number) => void }
       st.times = [...st.times, ms];
       st.lastMs = ms;
       setTimes(st.times);
+      onProgressRef.current?.(Math.round(st.times.reduce((a, b) => a + b, 0) / st.times.length));
       if (st.times.length >= ROUNDS) {
         const avg = st.times.reduce((a, b) => a + b, 0) / st.times.length;
         if (!st.done) {

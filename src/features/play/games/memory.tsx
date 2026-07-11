@@ -22,7 +22,7 @@ function shuffle<T>(items: T[]): T[] {
   return arr;
 }
 
-export function MemoryGame({ onFinish }: { onFinish: (score: number) => void }) {
+export function MemoryGame({ onFinish, onProgress }: { onFinish: (score: number) => void; onProgress?: (score: number) => void }) {
   const [cards] = useState<CardState[]>(() =>
     shuffle([...EMOJIS, ...EMOJIS].map((emoji, id) => ({ id, emoji })))
   );
@@ -46,6 +46,7 @@ export function MemoryGame({ onFinish }: { onFinish: (score: number) => void }) 
     sfx.pad(index % 4);
     if (nextOpen.length === 2) {
       setMoves((m) => m + 1);
+      onProgress?.(Math.round(((Date.now() - startRef.current) / 1000 + (moves + 1) * 0.5) * 10) / 10);
       const [a, b] = nextOpen;
       if (cards[a].emoji === cards[b].emoji) {
         const nextMatched = new Set(matched);
