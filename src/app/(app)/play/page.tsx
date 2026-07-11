@@ -13,6 +13,7 @@ import { prisma } from "@/lib/db";
 import { requireCouple } from "@/lib/couple";
 import { dayKeyIn, shiftDayKey } from "@/lib/dates";
 import { GAMES, bestOf, compareScores, gameOfDay } from "@/lib/games";
+import { DUELS } from "@/lib/duels";
 import {
   ACHIEVEMENTS,
   DUEL_CLAIM_TYPE,
@@ -112,6 +113,38 @@ export default async function PlayPage() {
   const DailyVisual = gameVisual(daily.key);
   const DailyIcon = DailyVisual.icon;
   const LevelIcon = levelIcon(season.level.index);
+
+  // Colección "Cara a cara": 4 en raya y Hundir la flota (previos al arnés) +
+  // los duelos declarados en lib/duels. Todos son 1v1 por turnos en directo.
+  const liveDuels = [
+    {
+      key: "connect4",
+      name: "4 en raya",
+      tagline: "Cuatro fichas en línea antes que tu pareja.",
+      accent: "from-indigo-400 to-violet-600",
+      soft: "bg-indigo-500/12",
+      text: "text-indigo-600 dark:text-indigo-400",
+      Icon: Swords
+    },
+    {
+      key: "battleship",
+      name: "Hundir la flota",
+      tagline: "Encuentra su flota antes que ella la tuya.",
+      accent: "from-sky-400 to-blue-600",
+      soft: "bg-sky-500/12",
+      text: "text-sky-600 dark:text-sky-400",
+      Icon: Anchor
+    },
+    ...DUELS.map((d) => ({
+      key: d.key,
+      name: d.name,
+      tagline: d.tagline,
+      accent: d.accent,
+      soft: d.soft,
+      text: d.text,
+      Icon: d.icon
+    }))
+  ];
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 md:py-10">
@@ -273,6 +306,38 @@ export default async function PlayPage() {
         </Card>
       </div>
 
+      {/* Cara a cara: duelos 1v1 en vivo (lo que hace que Near se juegue juntos) */}
+      <section className="mt-7">
+        <h2 className="mb-1 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-ink-soft">
+          Cara a cara
+          <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+            en vivo
+          </span>
+        </h2>
+        <p className="mb-3 text-xs text-ink-soft">
+          Duelos por turnos en directo. Reta a {partner?.name ?? "tu pareja"} y jugad a la vez.
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {liveDuels.map((duel) => (
+            <Link key={duel.key} href={`/play/${duel.key}`} className="group">
+              <Card className="relative h-full overflow-hidden transition group-hover:-translate-y-0.5 group-hover:shadow-lift">
+                <div className={cn("absolute inset-x-0 top-0 h-1 bg-gradient-to-r opacity-80", duel.accent)} />
+                <div className="flex items-start justify-between">
+                  <span className={cn("flex h-11 w-11 items-center justify-center rounded-xl", duel.soft, duel.text)}>
+                    <duel.Icon className="h-5 w-5" />
+                  </span>
+                  <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
+                    En vivo
+                  </span>
+                </div>
+                <h3 className="mt-2.5 font-display text-lg text-ink">{duel.name}</h3>
+                <p className="mt-0.5 text-xs leading-relaxed text-ink-soft">{duel.tagline}</p>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* Sala de juegos */}
       <section className="mt-7">
         <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-ink-soft">
@@ -333,40 +398,6 @@ export default async function PlayPage() {
               </Link>
             );
           })}
-          <Link href="/play/connect4" className="group">
-            <Card className="relative h-full overflow-hidden transition group-hover:-translate-y-0.5 group-hover:shadow-lift">
-              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-indigo-400 to-violet-600 opacity-80" />
-              <div className="flex items-start justify-between">
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-500/12 text-indigo-600 dark:text-indigo-400">
-                  <Swords className="h-5 w-5" />
-                </span>
-                <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
-                  En vivo
-                </span>
-              </div>
-              <h3 className="mt-2.5 font-display text-lg text-ink">4 en raya</h3>
-              <p className="mt-0.5 text-xs leading-relaxed text-ink-soft">
-                Duelo por turnos en directo: retale y que caigan las fichas.
-              </p>
-            </Card>
-          </Link>
-          <Link href="/play/battleship" className="group">
-            <Card className="relative h-full overflow-hidden transition group-hover:-translate-y-0.5 group-hover:shadow-lift">
-              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-sky-400 to-blue-600 opacity-80" />
-              <div className="flex items-start justify-between">
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-sky-500/12 text-sky-600 dark:text-sky-400">
-                  <Anchor className="h-5 w-5" />
-                </span>
-                <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
-                  En vivo
-                </span>
-              </div>
-              <h3 className="mt-2.5 font-display text-lg text-ink">Hundir la flota</h3>
-              <p className="mt-0.5 text-xs leading-relaxed text-ink-soft">
-                Duelo naval por turnos: encuentra su flota antes que ella la tuya.
-              </p>
-            </Card>
-          </Link>
           <Link href="/play/quiz" className="group">
             <Card className="relative h-full overflow-hidden transition group-hover:-translate-y-0.5 group-hover:shadow-lift">
               <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-rose to-plum opacity-80" />

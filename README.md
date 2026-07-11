@@ -129,6 +129,16 @@ Catorce mejoras para que la app "se sienta" más cerca, en cuatro niveles:
 - **Español correcto y accesibilidad**: barrido de tildes/ñ/¿¡ por toda la interfaz, respeto de `prefers-reduced-motion` (sin confeti ni latidos para quien pide menos movimiento) y textos mínimos más legibles.
 - **Adaptadores de despliegue**: almacenamiento **S3** y bus **Redis** por entorno (ver *Despliegue*), dormidos por defecto.
 
+### Iteración 16: "Cara a cara" — la colección de duelos 1v1 (como Plato)
+Near tenía solo dos juegos en vivo (4 en raya, Hundir la flota). Para que se juegue *juntos* de verdad, esta iteración monta un arnés reutilizable y suma tres clásicos por turnos de golpe.
+- **Arnés de duelos** (`features/play/duel/`): un único evento genérico `duel:signal` + acción de relay + hook `useDuel` + marco visual compartido encapsulan TODO el ciclo de vida 1v1 (lobby, invitar, aceptar, turnos, revancha, abandono) que antes se copiaba a mano. Añadir un juego nuevo = solo su **lógica pura** + su **tablero**. Ambos clientes aplican el mismo reducer determinista sobre el bus SSE, así que los dos tableros avanzan igual.
+- **5 en raya (Gomoku)** 12×12: alinea cinco. Tablero estilo goban, racha ganadora resaltada.
+- **Reversi (Othello)** 8×8: encierra y voltea; fichas con **volteo 3D real**, pistas de jugada legal, paso de turno automático y fin por conteo.
+- **Puntos y cajas** 5×5: cierra cajas para robar turno; aristas y cajas con la inicial de cada uno.
+- Nueva sección **"Cara a cara · en vivo"** en la arcade con los cinco duelos, destacada arriba. Cada juego con lógica pura testeada (13 tests nuevos) y tablero verificado con captura headless.
+
+> El 4 en raya y Hundir la flota conservan su propio evento/acción (nacieron antes del arnés y funcionan; no se migran para no arriesgar). Hundir la flota además no encaja en el modelo "ambos computan la jugada" por su información oculta.
+
 ### Iteración 15: Sprint y Teclas suben al nivel arcade
 Los dos juegos que quedaban "simples" (de escritura, difíciles de volver arcade) pasan a lienzo con juice.
 - **Sprint** reconstruido: de botones DOM a **canvas neón** — la operación flota con brillo, las cuatro respuestas son orbes con degradado que se pulsan al tocar, aciertos encadenan **COMBO** (partículas y color en aumento), fallar **sacude la pantalla** y marca en verde la correcta. Barra de tiempo y HUD dibujados en el lienzo.
