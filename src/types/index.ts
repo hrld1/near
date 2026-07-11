@@ -161,6 +161,22 @@ export type StreamEvent =
         allSunk?: boolean;
       };
     }
+  // --- iteracion 16 ---
+  // Arnés genérico de duelos 1v1 por turnos (5 en raya, Reversi, Puntos y
+  // cajas...). Un solo evento para todos: `game` discrimina el juego. La
+  // jugada viaja como un array corto de enteros (coordenadas) y AMBOS clientes
+  // aplican el mismo reducer puro, así que los dos tableros avanzan igual.
+  | {
+      type: "duel:signal";
+      payload: {
+        game: string;
+        kind: "invite" | "accept" | "move" | "quit";
+        byId: string;
+        byName: string;
+        seed?: number;
+        move?: number[];
+      };
+    }
   // --- iteracion 11 ---
   // juegos del lienzo: "dibujad a la vez" (blind duel) y "dibuja y adivina".
   // Efímero, relay por el bus. En "guess" la palabra NO viaja (es secreta
