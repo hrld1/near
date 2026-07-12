@@ -129,6 +129,12 @@ Catorce mejoras para que la app "se sienta" más cerca, en cuatro niveles:
 - **Español correcto y accesibilidad**: barrido de tildes/ñ/¿¡ por toda la interfaz, respeto de `prefers-reduced-motion` (sin confeti ni latidos para quien pide menos movimiento) y textos mínimos más legibles.
 - **Adaptadores de despliegue**: almacenamiento **S3** y bus **Redis** por entorno (ver *Despliegue*), dormidos por defecto.
 
+### Iteración 24: "Coincidir" — cuándo estáis libres los dos
+La fricción número uno de la distancia: cuadrar horarios entre husos (el hueco de Cupla), resuelto sobre lo que ya había.
+- **Franjas libres + solapamiento**: cada uno marca cuándo está libre (presets como "esta noche" / "este sábado", o una franja a medida). Near calcula la **intersección** de ambas disponibilidades y muestra **cuándo podéis hablar los dos**, siempre en **las dos horas locales** ("20:00 tu hora · 15:00 la de Leo"). Modelo `FreeSlot` (instantes UTC → el solape es intersección de intervalos, siempre correcta; `lib/overlap.ts` puro y testeado).
+- **Proponer llamada** de un toque desde una coincidencia: crea un evento en el calendario con countdown y avisa por push.
+- En vivo (`free:changed`) y con **la próxima ventana en común** destacada en Hoy. Ruta **`/coincidir`** (con el reloj de la pareja), entrada en el hub Juntos. Migración `coincidir`. Verificado con captura headless (typecheck, lint, 80 tests, build).
+
 ### Iteración 23: "Reparar" — cerrar bien una discusión
 Discutir a distancia duele el doble y es difícil de cerrar por mensajes. Tres herramientas con base Gottman, sobre infraestructura existente.
 - **Necesito un respiro** (anti-*stonewalling*): avisas con cariño de que necesitas parar, para que "parar" no se confunda con "irse". Llega al instante (aviso global + push).

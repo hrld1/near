@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Gamepad2, HeartHandshake, MonitorPlay, Moon, Paintbrush, Sparkles } from "lucide-react";
+import { CalendarClock, Gamepad2, HeartHandshake, MonitorPlay, Moon, Paintbrush, Sparkles } from "lucide-react";
 import { requireCouple } from "@/lib/couple";
 import { isUserOnline } from "@/lib/realtime";
 import { PartnerOnline } from "@/features/presence/partner-online";
@@ -23,6 +23,15 @@ export default async function JuntosPage() {
       accent: "from-rose to-plum",
       accentSoft: "bg-rose/12",
       accentText: "text-rose-deep"
+    },
+    {
+      href: "/coincidir",
+      title: "Coincidir",
+      description: "Marcad cuándo estáis libres y encontrad un hueco para hablar, en las dos horas.",
+      icon: CalendarClock,
+      accent: "from-emerald-400 to-teal-600",
+      accentSoft: "bg-emerald-500/12",
+      accentText: "text-emerald-600 dark:text-emerald-400"
     },
     {
       href: "/together",

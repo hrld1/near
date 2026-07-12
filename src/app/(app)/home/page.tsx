@@ -2,14 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { ArrowRight, BookHeart, Heart, HeartHandshake, Moon, StickyNote } from "lucide-react";
+import { ArrowRight, BookHeart, CalendarClock, Heart, HeartHandshake, Moon, StickyNote } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { requireCouple } from "@/lib/couple";
 import { moodInfo, presenceInfo } from "@/lib/utils";
 import { dayKeyIn, nextAnniversary, shiftDayKey } from "@/lib/dates";
 import { effectivePresence } from "@/lib/presence";
 import { isUserOnline } from "@/lib/realtime";
-import { agoLabel, dateLong } from "@/lib/format";
+import { agoLabel, dateLong, dayInTz, timeInTz } from "@/lib/format";
+import { futureIntervals, overlapIntervals } from "@/lib/overlap";
 import { getCoupleStreak, getDailyMissions, getWeeklyBonusStatus, POINTS } from "@/lib/engagement";
 import { computeStreak } from "@/lib/engagement-core";
 import { momentThemeOfDay } from "@/lib/moment-of-day";
@@ -166,6 +167,21 @@ export default async function HomePage() {
   const momentStreak = partner
     ? computeStreak(photoByDay, couple.members.map((m) => m.id), coupleDay).streak
     : 0;
+
+  // Coincidir: la próxima franja libre en común
+  const freeSlots = partner
+    ? await prisma.freeSlot.findMany({
+        where: { coupleId: couple.id, endsAt: { gte: now } },
+        orderBy: { startsAt: "asc" }
+      })
+    : [];
+  const nowMs = now.getTime();
+  const freeIv = (uid: string) =>
+    futureIntervals(
+      freeSlots.filter((s) => s.userId === uid).map((s) => ({ start: s.startsAt.getTime(), end: s.endsAt.getTime() })),
+      nowMs
+    );
+  const nextOverlap = partner ? overlapIntervals(freeIv(user.id), freeIv(partner.id))[0] ?? null : null;
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 md:px-8 md:py-8">
@@ -390,6 +406,43 @@ export default async function HomePage() {
             <MoodCheck currentMood={myMood?.mood ?? null} currentNote={myMood?.note ?? null} />
           </div>
         </Card>
+
+        {partner && (
+          <Card>
+            <CardTitle>Coincidir</CardTitle>
+            <div className="mt-3">
+              {nextOverlap ? (
+                <Link href="/coincidir" className="group block">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
+                    Próxima ventana en común
+                  </p>
+                  <p className="mt-1 font-display text-xl capitalize text-ink">
+                    {dayInTz(new Date(nextOverlap.start), user.timezone)}
+                  </p>
+                  <p className="text-sm text-ink-soft">
+                    {timeInTz(new Date(nextOverlap.start), user.timezone)}–
+                    {timeInTz(new Date(nextOverlap.end), user.timezone)} tu hora
+                  </p>
+                  <span className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-emerald-700 transition group-hover:gap-1.5 dark:text-emerald-400">
+                    Ver y proponer llamada <ArrowRight className="h-3 w-3" />
+                  </span>
+                </Link>
+              ) : (
+                <Link href="/coincidir" className="group flex items-center gap-3">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-500/12 text-emerald-700 dark:text-emerald-400">
+                    <CalendarClock className="h-5 w-5" />
+                  </span>
+                  <div>
+                    <p className="text-sm font-medium text-ink group-hover:text-emerald-700 dark:group-hover:text-emerald-400">
+                      ¿Cuándo habláis?
+                    </p>
+                    <p className="text-xs text-ink-soft">Marcad cuándo estáis libres y encontrad un hueco.</p>
+                  </div>
+                </Link>
+              )}
+            </div>
+          </Card>
+        )}
 
         {milestone && (
           <Card>
