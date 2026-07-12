@@ -197,6 +197,9 @@ export type StreamEvent =
   // --- iteracion 24: Coincidir ---
   // alguien cambió sus franjas libres: la otra vista se refresca
   | { type: "free:changed"; payload: { byId: string } }
+  // --- iteracion 25: Citas con IA ---
+  // se propuso/aceptó/borró un plan de cita: refrescar /citas y calendario
+  | { type: "cita:update"; payload: { byId: string } }
   // --- iteracion 23: Reparar ---
   // gestos en caliente para cerrar bien una discusion (efimeros):
   // pause = "necesito un respiro"; reach = tender la mano (con frase);

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { CalendarClock, Gamepad2, HeartHandshake, MonitorPlay, Moon, Paintbrush, Sparkles } from "lucide-react";
+import { CalendarClock, Gamepad2, HeartHandshake, MonitorPlay, Moon, Paintbrush, Sparkles, WandSparkles } from "lucide-react";
 import { requireCouple } from "@/lib/couple";
+import { aiEnabled } from "@/lib/ai";
 import { isUserOnline } from "@/lib/realtime";
 import { PartnerOnline } from "@/features/presence/partner-online";
 import { HubCard, type HubItem } from "@/features/hub/hub-card";
@@ -15,6 +16,20 @@ export default async function JuntosPage() {
   const partnerOnline = partner ? isUserOnline(partner.id) : false;
 
   const items: HubItem[] = [
+    // La planificadora de citas con IA: solo si la instancia tiene clave
+    ...(aiEnabled()
+      ? [
+          {
+            href: "/citas",
+            title: "Planear una cita",
+            description: "Cuéntale la cita que os apetece y os la deja lista: sitios reales o una cita a distancia.",
+            icon: WandSparkles,
+            accent: "from-rose to-plum",
+            accentSoft: "bg-rose/12",
+            accentText: "text-rose-deep"
+          } satisfies HubItem
+        ]
+      : []),
     {
       href: "/cerca",
       title: "Cerca de verdad",
