@@ -27,3 +27,24 @@ export function monthLabel(date: Date | string) {
 export function agoLabel(date: Date | string) {
   return formatDistanceToNow(new Date(date), { addSuffix: true, locale: es });
 }
+
+// Hora (HH:mm) de un instante en una zona horaria concreta — para mostrar la
+// misma franja en las dos horas locales de la pareja.
+export function timeInTz(date: Date | string, timeZone: string): string {
+  return new Intl.DateTimeFormat("es-ES", {
+    timeZone,
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  }).format(new Date(date));
+}
+
+// Día (p. ej. "jueves, 12 jul") de un instante en una zona horaria concreta.
+export function dayInTz(date: Date | string, timeZone: string): string {
+  return new Intl.DateTimeFormat("es-ES", {
+    timeZone,
+    weekday: "long",
+    day: "numeric",
+    month: "short"
+  }).format(new Date(date));
+}

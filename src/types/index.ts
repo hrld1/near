@@ -194,6 +194,9 @@ export type StreamEvent =
   // --- iteracion 22: Cerca de verdad ---
   // un aprecio nuevo cae en el frasco de la pareja, en vivo
   | { type: "appreciation:new"; payload: { id: string; fromId: string; fromName: string; body: string } }
+  // --- iteracion 24: Coincidir ---
+  // alguien cambió sus franjas libres: la otra vista se refresca
+  | { type: "free:changed"; payload: { byId: string } }
   // --- iteracion 23: Reparar ---
   // gestos en caliente para cerrar bien una discusion (efimeros):
   // pause = "necesito un respiro"; reach = tender la mano (con frase);
