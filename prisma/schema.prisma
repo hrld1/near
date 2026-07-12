@@ -107,6 +107,7 @@ model User {
   weeklyPulses    WeeklyPulse[]
   repairEntries   RepairEntry[]
   freeSlots       FreeSlot[]
+  datePlans       DatePlan[]
 
   @@index([coupleId])
 }
@@ -142,6 +143,8 @@ model Couple {
   weeklyPulses  WeeklyPulse[]
   repairs       Repair[]
   freeSlots     FreeSlot[]
+  datePlans     DatePlan[]
+  aiUsage       AiUsage[]
 }
 
 model Invite {
@@ -555,6 +558,41 @@ model FreeSlot {
   createdAt DateTime @default(now())
 
   @@index([coupleId, startsAt])
+}
+
+// ---- Citas con IA (iteracion 25; dormida sin ANTHROPIC_API_KEY) ----
+
+// Un plan de cita creado con la planificadora. Los pasos del itinerario van
+// como JSON tipado (se validan con Zod en lib/citas.ts). La conversacion NO
+// se persiste (privacidad): solo el plan resultante.
+model DatePlan {
+  id        String   @id @default(cuid())
+  coupleId  String
+  couple    Couple   @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  mode      String   // "juntos" | "distancia"
+  title     String
+  city      String?
+  planDate  DateTime?
+  budget    String?
+  steps     Json
+  status    String   @default("PROPUESTA") // PROPUESTA | ACEPTADA
+  eventId   String?  // CalendarEvent enlazado (countdown)
+  createdAt DateTime @default(now())
+
+  @@index([coupleId, createdAt])
+}
+
+// Contador de mensajes de IA por pareja y dia (limite de gasto).
+model AiUsage {
+  id       String @id @default(cuid())
+  coupleId String
+  couple   Couple @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  dateKey  String
+  count    Int    @default(0)
+
+  @@unique([coupleId, dateKey])
 }
 
 // ---- Spotify (opcional, activado por env) ----
