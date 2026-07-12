@@ -106,6 +106,7 @@ model User {
   cardAnswers     CardAnswer[]
   weeklyPulses    WeeklyPulse[]
   repairEntries   RepairEntry[]
+  freeSlots       FreeSlot[]
 
   @@index([coupleId])
 }
@@ -140,6 +141,7 @@ model Couple {
   cardAnswers   CardAnswer[]
   weeklyPulses  WeeklyPulse[]
   repairs       Repair[]
+  freeSlots     FreeSlot[]
 }
 
 model Invite {
@@ -535,6 +537,24 @@ model RepairEntry {
   createdAt   DateTime @default(now())
 
   @@unique([repairId, userId])
+}
+
+// ---- Coincidir (iteracion 24): cuando estais libres los dos ----
+
+// Ventana libre concreta (instantes UTC). Cada uno marca cuando esta libre en
+// los proximos dias; el solapamiento se calcula como interseccion de intervalos
+// en UTC (siempre correcto) y se muestra en las dos horas locales.
+model FreeSlot {
+  id        String   @id @default(cuid())
+  coupleId  String
+  couple    Couple   @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  startsAt  DateTime
+  endsAt    DateTime
+  createdAt DateTime @default(now())
+
+  @@index([coupleId, startsAt])
 }
 
 // ---- Spotify (opcional, activado por env) ----
