@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { ArrowRight, BookHeart, CalendarClock, Heart, HeartHandshake, Moon, Sprout, StickyNote } from "lucide-react";
+import { ArrowRight, BookHeart, CalendarClock, Heart, HeartHandshake, Sprout, StickyNote } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { requireCouple } from "@/lib/couple";
 import { moodInfo, presenceInfo } from "@/lib/utils";
@@ -30,6 +30,7 @@ import { StreakMissions } from "@/features/home/streak-missions";
 import { DailyBox } from "@/features/home/daily-box";
 import { MomentOfDay } from "@/features/home/moment-of-day";
 import { MoreOfToday } from "@/features/home/more-of-today";
+import { PartnerSky } from "@/features/home/partner-sky";
 import { PartnerClock } from "@/features/home/partner-clock";
 
 export const metadata: Metadata = { title: "Inicio" };
@@ -193,8 +194,8 @@ export default async function HomePage() {
           <p className="text-xs font-medium uppercase tracking-widest text-ink-soft">
             {format(now, "EEEE, d 'de' MMMM", { locale: es })}
           </p>
-          <h1 className="mt-1 font-display text-3xl text-ink md:text-4xl">
-            {greeting()}, {user.name}
+          <h1 className="mt-1 font-display text-4xl tracking-tight text-ink md:text-5xl">
+            {greeting()}, <em className="italic text-rose-deep">{user.name}</em>
           </h1>
         </div>
         <PresencePicker current={effectivePresence(user.presence, user.presenceUpdatedAt)} />
@@ -252,7 +253,11 @@ export default async function HomePage() {
                     </div>
                   </div>
                 )}
-                <div className="mt-4 flex max-w-xs flex-col gap-2">
+                {/* su cielo, vivo, aquí mismo (it27) — sustituye al botón plano */}
+                <div className="mt-4">
+                  <PartnerSky name={partner.name} timezone={partner.timezone} />
+                </div>
+                <div className="mt-3 flex max-w-xs flex-col gap-2">
                   <NudgeButton
                     partnerName={partner.name}
                     lastNudge={
@@ -261,17 +266,7 @@ export default async function HomePage() {
                         : null
                     }
                   />
-                  <div className="flex gap-2">
-                    <div className="flex-1">
-                      <TouchButton partnerName={partner.name} />
-                    </div>
-                    <Link
-                      href="/together"
-                      className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-indigo-400/40 bg-indigo-500/5 px-4 py-3 text-sm font-medium text-indigo-700 transition hover:bg-indigo-500/10 dark:text-indigo-300"
-                    >
-                      <Moon className="h-4 w-4" /> Estar juntos
-                    </Link>
-                  </div>
+                  <TouchButton partnerName={partner.name} />
                 </div>
               </>
             ) : (
