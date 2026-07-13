@@ -324,6 +324,7 @@ export default async function HomePage() {
       {partner && (
         <div className="mb-4">
           <MomentOfDay
+            myId={user.id}
             theme={momentTheme}
             partnerName={partner.name}
             streak={momentStreak}

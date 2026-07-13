@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ArrowLeft, Wifi } from "lucide-react";
-import { compareScores, type GameDef } from "@/lib/games";
+import { compareScores, gameByKey } from "@/lib/games";
 import { gameVisual } from "@/components/product-icons";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -13,18 +13,21 @@ import { cn } from "@/lib/utils";
 import { useRace } from "./use-race";
 
 export function RaceRoom({
-  def,
+  gameKey,
   myId,
   myName,
   partnerName,
   anagramWords
 }: {
-  def: GameDef;
+  // la clave, no el GameDef: un objeto con funciones (format) no puede
+  // cruzar la frontera servidor→cliente; el def se resuelve aquí dentro
+  gameKey: string;
   myId: string;
   myName: string;
   partnerName: string;
   anagramWords?: { word: string; scrambled: string }[];
 }) {
+  const def = gameByKey(gameKey)!;
   const visual = gameVisual(def.key);
   const Icon = visual.icon;
   const race = useRace(def, myId);

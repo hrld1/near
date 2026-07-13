@@ -15,6 +15,7 @@ type Photo = { imageUrl: string; caption: string | null };
 // compartir el tuyo (esa reciprocidad es el gancho). Racha de días seguidos
 // en que los dos lo hacéis. Reutiliza la foto del día (modelo, acción, push).
 export function MomentOfDay({
+  myId,
   theme,
   partnerName,
   streak,
@@ -22,6 +23,7 @@ export function MomentOfDay({
   initialPartnerPhoto,
   partnerPostedInitial
 }: {
+  myId: string;
   theme: string;
   partnerName: string;
   streak: number;
@@ -42,6 +44,9 @@ export function MomentOfDay({
 
   useCoupleStream((event) => {
     if (event.type !== "photo:new") return;
+    // el eco de MI propia foto no es el momento de mi pareja (bug cazado por
+    // el harness E2E de it26: sin este filtro, tu foto aparecía como la suya)
+    if (event.payload.userId === myId) return;
     setPartnerPosted(true);
     // guardo su contenido; solo se RENDERIZA si ya he compartido el mío
     setPartnerPhoto({ imageUrl: event.payload.imageUrl, caption: event.payload.caption });

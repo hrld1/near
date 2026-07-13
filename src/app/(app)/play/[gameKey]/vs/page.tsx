@@ -28,7 +28,7 @@ export default async function RacePage({ params }: { params: { gameKey: string }
   return (
     <div className="mx-auto max-w-2xl px-4 py-6 md:py-10">
       <RaceRoom
-        def={def}
+        gameKey={def.key}
         myId={user.id}
         myName={user.name}
         partnerName={partner?.name ?? "tu pareja"}

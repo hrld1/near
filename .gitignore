@@ -6,3 +6,7 @@ uploads/*
 *.tsbuildinfo
 next-env.d.ts
 backups/
+
+# playwright
+/test-results/
+/playwright-report/

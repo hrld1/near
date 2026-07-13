@@ -99,6 +99,7 @@ export function Gomoku({ myId, partnerName }: { myId: string; partnerName: strin
             return (
               <button
                 key={at}
+                data-cell={at}
                 disabled={!myTurn || owner !== null}
                 onClick={() => tap(at)}
                 className="group relative flex aspect-square items-center justify-center rounded-[3px] bg-amber-300/30 transition enabled:hover:bg-amber-300/60 disabled:cursor-default dark:bg-amber-100/5"
