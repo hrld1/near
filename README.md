@@ -129,6 +129,15 @@ Catorce mejoras para que la app "se sienta" más cerca, en cuatro niveles:
 - **Español correcto y accesibilidad**: barrido de tildes/ñ/¿¡ por toda la interfaz, respeto de `prefers-reduced-motion` (sin confeti ni latidos para quien pide menos movimiento) y textos mínimos más legibles.
 - **Adaptadores de despliegue**: almacenamiento **S3** y bus **Redis** por entorno (ver *Despliegue*), dormidos por defecto.
 
+### Iteración 29: "La piel, parte 2" — de bonita a inductiva
+La it27 arregló la estética; esta arregla lo que aún había que *saberse*: auditoría con capturas reales y ojos de usuario nuevo.
+- **Los hubs cobran vida**: `HubCard` gana una **señal viva** (punto que late + una línea con lo que pasa ahí ahora): en Juntos, el aprecio reciente de tu pareja, la próxima ventana en común, **su cielo y su hora** ("Allí atardece · son las 20:04"), lo que suena en la sala y el reto del día; en Recuerdos, momentos guardados, cartas en camino y la próxima fecha. Un hub sin contexto es un menú; con él, es producto.
+- **Escritorio de verdad**: los hubs pasan de columna estrecha centrada a **rejilla de 2 columnas** (max-w-4xl) a partir de md.
+- **El estado se explica**: las píldoras Libre/A tope/Estudiando/Durmiendo ganan la etiqueta "¿Qué haces ahora? · lo ve Leo" — antes flotaban sin contexto junto al saludo.
+- **Fechas bien escritas**: `capFirst` en `dateLong`/`dayInTz` sustituye al `capitalize` de CSS, que producía "Jueves 30 De Julio A Las 23:14". Barrido de tildes restantes (Allí, pensó, cumplís, entráis, habéis, números, quién, Últimos, Tú…).
+- **"Últimos duelos" vacío ya no son 8 cajas grises**: explica qué será cuando juguéis.
+- Verificación: 111 tests, 8/8 E2E (endurecido un selector del spec de vincular que casaba por subcadena con una misión elegida por semilla), build y capturas reales del después.
+
 ### Iteración 28: "Vuestro libro" — el Wrapped de los dos
 El recap mensual (6 números sobre canvas) crece hasta ser un objeto con valor propio: **un libro del período**, por capítulos y con la piel nueva, pensado para releerse y **regalarse en papel**.
 - **`/libro` con selector de período**: este mes, el mes pasado o todo el año, resuelto en la zona horaria de la pareja (`parsePeriod` puro, con fallback amable ante cualquier `?p=` inválido).

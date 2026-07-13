@@ -9,9 +9,10 @@ test("dos personas se registran y quedan vinculadas", async ({ browser }) => {
     // cada uno ve el nombre del otro en su Hoy
     await expect(couple.a.getByText("Leo").first()).toBeVisible();
     await expect(couple.b.getByText("Ana").first()).toBeVisible();
-    // y el ritual del día está arriba
+    // y el ritual del día está arriba (por rol: getByText casaría también con
+    // la misión "Responde la pregunta del día" cuando la semilla la elige)
     await expect(couple.a.getByText("El momento de hoy")).toBeVisible();
-    await expect(couple.b.getByText("Pregunta del día")).toBeVisible();
+    await expect(couple.b.getByRole("heading", { name: "Pregunta del día" })).toBeVisible();
   } finally {
     await couple.dispose();
   }
