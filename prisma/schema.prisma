@@ -108,6 +108,7 @@ model User {
   repairEntries   RepairEntry[]
   freeSlots       FreeSlot[]
   datePlans       DatePlan[]
+  feedback        Feedback[]
 
   @@index([coupleId])
 }
@@ -558,6 +559,22 @@ model FreeSlot {
   createdAt DateTime @default(now())
 
   @@index([coupleId, startsAt])
+}
+
+// ---- Feedback (iteracion 26): escuchar a las primeras parejas ----
+
+// "¿Que le falta a Near?" — se guarda tal cual, con quien y donde. Sin
+// relaciones en cascada al Couple a proposito: el feedback sobrevive aunque
+// la pareja se disuelva (es del producto, no del espacio).
+model Feedback {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  coupleId  String?
+  body      String
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
 }
 
 // ---- Citas con IA (iteracion 25; dormida sin ANTHROPIC_API_KEY) ----

@@ -7,6 +7,7 @@ import { SoundToggle } from "@/features/settings/sound-toggle";
 import { AnniversaryForm } from "@/features/settings/anniversary-form";
 import { SecuritySettings } from "@/features/settings/security-settings";
 import { DangerZone } from "@/features/settings/danger-zone";
+import { FeedbackForm } from "@/features/settings/feedback-form";
 
 export const metadata: Metadata = { title: "Ajustes" };
 export const dynamic = "force-dynamic";
@@ -88,6 +89,13 @@ export default async function SettingsPage() {
           <CardTitle>Contraseña y acceso</CardTitle>
           <div className="mt-3">
             <SecuritySettings partnerName={partner?.name ?? null} />
+          </div>
+        </Card>
+
+        <Card>
+          <CardTitle>¿Qué le falta a Near?</CardTitle>
+          <div className="mt-3">
+            <FeedbackForm />
           </div>
         </Card>
 
