@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { ArrowRight, BookHeart, CalendarClock, Heart, HeartHandshake, Moon, StickyNote } from "lucide-react";
+import { ArrowRight, BookHeart, CalendarClock, Heart, HeartHandshake, Moon, Sprout, StickyNote } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { requireCouple } from "@/lib/couple";
 import { moodInfo, presenceInfo } from "@/lib/utils";
@@ -29,6 +29,7 @@ import { NoteForm } from "@/features/home/note-form";
 import { StreakMissions } from "@/features/home/streak-missions";
 import { DailyBox } from "@/features/home/daily-box";
 import { MomentOfDay } from "@/features/home/moment-of-day";
+import { MoreOfToday } from "@/features/home/more-of-today";
 import { PartnerClock } from "@/features/home/partner-clock";
 
 export const metadata: Metadata = { title: "Inicio" };
@@ -333,35 +334,67 @@ export default async function HomePage() {
         </div>
       )}
 
-      {/* CERCA DE VERDAD: aprecio, preguntas para conoceros y el pulso */}
-      {partner && (
-        <Link href="/cerca" className="group mb-4 block">
-          <div className="flex items-center gap-4 rounded-3xl border border-plum/20 bg-gradient-to-br from-plum/5 via-paper to-paper px-5 py-4 shadow-card transition group-hover:shadow-lift">
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-rose to-plum text-white shadow-card">
-              <HeartHandshake className="h-6 w-6" />
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="font-display text-lg text-ink">Cerca de verdad</p>
+      {/* RITUAL, parte 2: la pregunta del día y tu ánimo, sin scroll */}
+      <div className="mb-4 grid gap-4 md:grid-cols-2">
+        <Card>
+          <CardTitle>Pregunta del día</CardTitle>
+          <div className="mt-3">
+            {prompt ? (
+              <PromptCard
+                promptId={prompt.id}
+                question={prompt.text}
+                myAnswer={myPromptAnswer?.answer ?? null}
+                partnerAnswer={partnerPromptAnswer?.answer ?? null}
+                partnerName={partner?.name ?? null}
+              />
+            ) : (
               <p className="text-sm text-ink-soft">
-                Un aprecio para {partner.name}, preguntas para conoceros más y el pulso de la semana.
+                No hay preguntas cargadas. Ejecuta el seed: npm run db:seed
               </p>
-            </div>
-            <ArrowRight className="h-5 w-5 shrink-0 text-plum transition group-hover:translate-x-0.5" />
+            )}
           </div>
-        </Link>
-      )}
+        </Card>
+        <Card>
+          <CardTitle>¿Cómo estás hoy?</CardTitle>
+          <div className="mt-3">
+            <MoodCheck currentMood={myMood?.mood ?? null} currentNote={myMood?.note ?? null} />
+          </div>
+        </Card>
+      </div>
 
+      {/* Cuidaros y quereros, a un toque (compacto) */}
       {partner && (
-        <div className="mb-4 text-center">
+        <div className="grid gap-2 sm:grid-cols-2">
+          <Link
+            href="/cerca"
+            className="group flex items-center gap-3 rounded-2xl border border-plum/20 bg-gradient-to-br from-plum/5 to-paper px-4 py-3 shadow-card transition hover:shadow-lift"
+          >
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-rose to-plum text-white">
+              <HeartHandshake className="h-5 w-5" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-sm font-medium text-ink">Cerca de verdad</span>
+              <span className="block truncate text-xs text-ink-soft">Un aprecio, una pregunta, el pulso</span>
+            </span>
+            <ArrowRight className="h-4 w-4 shrink-0 text-plum transition group-hover:translate-x-0.5" />
+          </Link>
           <Link
             href="/reparar"
-            className="text-xs font-medium text-ink-soft underline-offset-2 transition hover:text-emerald-700 hover:underline dark:hover:text-emerald-400"
+            className="group flex items-center gap-3 rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 to-paper px-4 py-3 shadow-card transition hover:shadow-lift"
           >
-            ¿Un mal momento? Reparadlo juntos →
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500/12 text-emerald-700 dark:text-emerald-400">
+              <Sprout className="h-5 w-5" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-sm font-medium text-ink">Reparar</span>
+              <span className="block truncate text-xs text-ink-soft">Si hoy ha costado, cerradlo bien</span>
+            </span>
+            <ArrowRight className="h-4 w-4 shrink-0 text-emerald-600 transition group-hover:translate-x-0.5 dark:text-emerald-400" />
           </Link>
         </div>
       )}
 
+      <MoreOfToday>
       <div className="grid gap-4 md:grid-cols-3">
         <Card className="md:row-span-2">
           <CardTitle>Racha y misiones</CardTitle>
@@ -397,13 +430,6 @@ export default async function HomePage() {
                   : null
               }
             />
-          </div>
-        </Card>
-
-        <Card>
-          <CardTitle>¿Cómo estás hoy?</CardTitle>
-          <div className="mt-3">
-            <MoodCheck currentMood={myMood?.mood ?? null} currentNote={myMood?.note ?? null} />
           </div>
         </Card>
 
@@ -469,25 +495,6 @@ export default async function HomePage() {
           </Card>
         )}
 
-        <Card className="md:col-span-2">
-          <CardTitle>Pregunta del día</CardTitle>
-          <div className="mt-3">
-            {prompt ? (
-              <PromptCard
-                promptId={prompt.id}
-                question={prompt.text}
-                myAnswer={myPromptAnswer?.answer ?? null}
-                partnerAnswer={partnerPromptAnswer?.answer ?? null}
-                partnerName={partner?.name ?? null}
-              />
-            ) : (
-              <p className="text-sm text-ink-soft">
-                No hay preguntas cargadas. Ejecuta el seed: npm run db:seed
-              </p>
-            )}
-          </div>
-        </Card>
-
         <Card className="overflow-hidden p-0">
           {latestMoment ? (
             <Link href="/moments" className="group block h-full">
@@ -537,6 +544,7 @@ export default async function HomePage() {
           </div>
         </Card>
       </div>
+      </MoreOfToday>
     </div>
   );
 }
