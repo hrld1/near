@@ -23,6 +23,11 @@ export function hashString(input: string) {
 // Racha de pareja sobre un mapa día -> miembros activos. El día de hoy
 // cuenta si ambos ya entraron; si no, la racha sigue viva mientras ayer
 // fuera completo. Ventana maxima: 120 días.
+//
+// EL PERDÓN (it26): un único día incompleto NO rompe la racha si (a) es un
+// hueco interior (el día anterior al hueco sí fue completo: la pareja volvió)
+// y (b) no se usó otro perdón en los 30 días siguientes. La vida real —un
+// vuelo, una guardia, un mal día— no debería costar 40 días de racha.
 export function computeStreak(
   byDay: Map<string, Set<string>>,
   memberIds: string[],
@@ -32,16 +37,29 @@ export function computeStreak(
     memberIds.length === 2 && memberIds.every((id) => byDay.get(key)?.has(id));
 
   let streak = 0;
+  let graceDay: string | null = null; // el hueco perdonado más reciente
+  let lastGraceCursor: number | null = null;
   let cursor = complete(today) ? 0 : 1; // si hoy aún no esta completo, empezamos en ayer
   while (cursor <= 120) {
-    if (complete(shiftDayKey(today, -cursor))) {
+    const key = shiftDayKey(today, -cursor);
+    if (complete(key)) {
       streak++;
       cursor++;
-    } else {
-      break;
+      continue;
     }
+    // ¿se puede perdonar este hueco?
+    const isInnerGap = streak > 0 && complete(shiftDayKey(today, -(cursor + 1)));
+    const graceAvailable = lastGraceCursor === null || cursor - lastGraceCursor >= 30;
+    if (isInnerGap && graceAvailable) {
+      if (graceDay === null) graceDay = key;
+      lastGraceCursor = cursor;
+      streak++;
+      cursor++;
+      continue;
+    }
+    break;
   }
-  return { streak, todayComplete: complete(today) };
+  return { streak, todayComplete: complete(today), graceDay };
 }
 
 // 3 misiones deterministas por semilla (el reto diario siempre entra).

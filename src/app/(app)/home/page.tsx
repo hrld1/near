@@ -90,7 +90,7 @@ export default async function HomePage() {
       prisma.promptAnswer.findMany({ where: { coupleId: couple.id, dateKey: coupleDay } }),
       // racha/misiones/bonus degradan sin tumbar la home
       getCoupleStreak(couple.id, couple.members.map((m) => m.id), couple.timezone).catch(
-        () => ({ streak: 0, todayComplete: false })
+        () => ({ streak: 0, todayComplete: false, graceDay: null })
       ),
       getDailyMissions(couple.id, user.id, { coupleDay, userDay, userTimezone: user.timezone }).catch(
         () => ({ missions: [], allDone: false, bonusClaimed: false })
@@ -402,6 +402,7 @@ export default async function HomePage() {
             <StreakMissions
               streak={streakInfo.streak}
               todayComplete={streakInfo.todayComplete}
+              graceDay={streakInfo.graceDay}
               missions={missionInfo.missions}
               allDone={missionInfo.allDone}
               bonusClaimed={missionInfo.bonusClaimed}

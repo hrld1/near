@@ -18,6 +18,7 @@ export type WeeklyBonusInfo = {
 export function StreakMissions({
   streak,
   todayComplete,
+  graceDay = null,
   missions,
   allDone,
   bonusClaimed,
@@ -26,6 +27,8 @@ export function StreakMissions({
 }: {
   streak: number;
   todayComplete: boolean;
+  // día perdonado más reciente (el "perdón" de la racha), si lo hubo
+  graceDay?: string | null;
   missions: Mission[];
   allDone: boolean;
   bonusClaimed: boolean;
@@ -81,6 +84,12 @@ export function StreakMissions({
           </p>
         </div>
       </div>
+
+      {graceDay && (
+        <p className="mt-2 rounded-xl bg-amber-500/10 px-3 py-2 text-xs font-medium text-amber-700 dark:text-amber-400">
+          Un día flojo no os la quitó: os guardamos la racha 💛 (un perdón cada 30 días)
+        </p>
+      )}
 
       <ul className="mt-4 space-y-1.5">
         {missions.map((mission) => (
