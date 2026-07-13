@@ -2,34 +2,43 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Paleta it27 "La piel": más luminosa y viva — rosa con sangre (no terracota
+   apagado), ciruela más rica, papel cálido. Dark = noche ciruela, no gris. */
 :root {
-  --c-cream: 250 246 240;
-  --c-paper: 255 255 255;
-  --c-sand: 240 232 221;
-  --c-sand-deep: 227 215 200;
-  --c-ink: 55 49 43;
-  --c-ink-soft: 122 111 99;
-  --c-rose: 196 117 107;
-  --c-rose-deep: 168 93 84;
-  --c-rose-soft: 243 226 223;
-  --c-rose-faint: 250 240 238;
-  --c-plum: 110 90 114;
-  --c-shadow: 55 49 43;
+  --c-cream: 251 245 239;
+  --c-paper: 255 253 250;
+  --c-sand: 244 234 224;
+  --c-sand-deep: 229 214 199;
+  --c-ink: 47 38 45;
+  --c-ink-soft: 128 111 121;
+  --c-rose: 224 105 122;
+  --c-rose-deep: 178 62 85;
+  --c-rose-soft: 249 219 224;
+  --c-rose-faint: 253 241 243;
+  --c-plum: 126 92 146;
+  --c-shadow: 95 55 75;
+  /* la aurora ambiental (solo la usa el fondo del body) */
+  --aurora-a: 236 140 155;
+  --aurora-b: 150 116 178;
+  --aurora-c: 240 190 130;
 }
 
 .dark {
-  --c-cream: 22 20 26;
-  --c-paper: 33 30 39;
-  --c-sand: 44 40 51;
-  --c-sand-deep: 60 54 68;
-  --c-ink: 237 231 224;
-  --c-ink-soft: 168 157 175;
-  --c-rose: 217 138 128;
-  --c-rose-deep: 228 164 156;
-  --c-rose-soft: 74 50 47;
-  --c-rose-faint: 50 36 40;
-  --c-plum: 179 157 184;
+  --c-cream: 21 17 27;
+  --c-paper: 32 27 40;
+  --c-sand: 45 38 56;
+  --c-sand-deep: 63 53 76;
+  --c-ink: 240 233 238;
+  --c-ink-soft: 173 158 177;
+  --c-rose: 242 139 154;
+  --c-rose-deep: 248 168 180;
+  --c-rose-soft: 84 48 60;
+  --c-rose-faint: 56 38 48;
+  --c-plum: 192 164 216;
   --c-shadow: 0 0 0;
+  --aurora-a: 190 90 120;
+  --aurora-b: 110 80 160;
+  --aurora-c: 170 120 80;
 }
 
 @layer base {
@@ -38,10 +47,60 @@
   }
   body {
     @apply bg-cream text-ink antialiased;
+    position: relative;
   }
   ::selection {
     @apply bg-rose-soft text-rose-deep;
   }
+  /* Foco visible coherente en toda la app */
+  :focus-visible {
+    outline: 2px solid rgb(var(--c-rose) / 0.7);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   La AURORA: el fondo vivo de Near (it27). Dos velos de luz rosa/ciruela/ámbar
+   que respiran muy despacio detrás de todo, más un grano finísimo de papel.
+   Fijos, sin bloquear clics, y quietos si el sistema pide menos movimiento.
+--------------------------------------------------------------------------- */
+body::before {
+  content: "";
+  position: fixed;
+  inset: -25%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(38% 32% at 18% 22%, rgb(var(--aurora-a) / 0.16), transparent 70%),
+    radial-gradient(42% 36% at 82% 12%, rgb(var(--aurora-b) / 0.13), transparent 70%),
+    radial-gradient(36% 30% at 70% 85%, rgb(var(--aurora-c) / 0.11), transparent 70%),
+    radial-gradient(30% 26% at 8% 78%, rgb(var(--aurora-a) / 0.09), transparent 70%);
+  animation: aurora 46s ease-in-out infinite alternate;
+}
+.dark body::before {
+  opacity: 0.8;
+}
+@keyframes aurora {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(2.5%, -1.5%, 0) scale(1.06);
+  }
+  100% {
+    transform: translate3d(-2%, 2%, 0) scale(1.02);
+  }
+}
+/* grano de papel: textura casi imperceptible que quita lo "plano" */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
 }
 
 /* Accesibilidad: quien pide menos movimiento (ajuste del sistema) no ve
@@ -67,6 +126,16 @@
   .scrollbar-thin::-webkit-scrollbar-thumb {
     background: rgb(var(--c-sand-deep));
     border-radius: 9999px;
+  }
+  /* cristal cálido: paneles del shell y flotantes */
+  .glass {
+    background: rgb(var(--c-paper) / 0.72);
+    backdrop-filter: blur(18px) saturate(1.3);
+    -webkit-backdrop-filter: blur(18px) saturate(1.3);
+    border: 1px solid rgb(var(--c-sand-deep) / 0.5);
+  }
+  .text-balance {
+    text-wrap: balance;
   }
 }
 

@@ -25,12 +25,15 @@ const config: Config = {
         plum: v("c-plum")
       },
       fontFamily: {
-        sans: ["-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", "sans-serif"],
-        display: ["Georgia", "Times New Roman", "serif"]
+        sans: ["var(--font-sans)", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
+        display: ["var(--font-display)", "Georgia", "serif"]
       },
       boxShadow: {
-        card: "0 1px 2px rgb(var(--c-shadow) / 0.04), 0 4px 16px rgb(var(--c-shadow) / 0.05)",
-        lift: "0 2px 4px rgb(var(--c-shadow) / 0.06), 0 8px 28px rgb(var(--c-shadow) / 0.09)"
+        // capas suaves con tinte cálido (el --c-shadow ya no es gris)
+        card: "0 1px 2px rgb(var(--c-shadow) / 0.05), 0 4px 14px rgb(var(--c-shadow) / 0.06), 0 12px 32px rgb(var(--c-shadow) / 0.04)",
+        lift: "0 2px 4px rgb(var(--c-shadow) / 0.07), 0 10px 24px rgb(var(--c-shadow) / 0.10), 0 24px 56px rgb(var(--c-shadow) / 0.07)",
+        // el resplandor de lo importante (botón primario, activo del nav)
+        glow: "0 2px 8px rgb(var(--c-rose) / 0.35), 0 8px 28px rgb(var(--c-rose) / 0.28)"
       },
       keyframes: {
         "fade-up": {

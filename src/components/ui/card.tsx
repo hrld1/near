@@ -6,7 +6,7 @@ export function Card({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("rounded-2xl border border-sand bg-paper p-5 shadow-card", className)}
+      className={cn("rounded-3xl border border-sand/70 bg-paper p-5 shadow-card", className)}
       {...props}
     />
   );

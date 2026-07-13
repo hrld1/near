@@ -1,6 +1,10 @@
 import { cn } from "@/lib/utils";
 
-const palette = ["bg-rose-soft text-rose-deep", "bg-sand text-plum"];
+// dos tonos con vida: tú (rosa) y tu pareja (ciruela), en degradado suave
+const palette = [
+  "bg-gradient-to-br from-rose-soft to-rose/30 text-rose-deep",
+  "bg-gradient-to-br from-sand to-plum/25 text-plum"
+];
 
 export function Avatar({
   name,
