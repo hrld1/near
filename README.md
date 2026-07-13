@@ -129,6 +129,16 @@ Catorce mejoras para que la app "se sienta" más cerca, en cuatro niveles:
 - **Español correcto y accesibilidad**: barrido de tildes/ñ/¿¡ por toda la interfaz, respeto de `prefers-reduced-motion` (sin confeti ni latidos para quien pide menos movimiento) y textos mínimos más legibles.
 - **Adaptadores de despliegue**: almacenamiento **S3** y bus **Redis** por entorno (ver *Despliegue*), dormidos por defecto.
 
+### Iteración 27: "La piel" — la interfaz a la altura del producto
+La interfaz era funcional pero plana (Georgia del sistema, paleta terrosa, fondo liso). Rediseño desde los cimientos — tokens y primitivos — para que las ~30 pantallas se eleven a la vez. Dirección: **"el cielo de los dos"**.
+- **Tipografía propia** (next/font, autoalojada): **Fraunces** (serif cálida con eje SOFT e itálica) para titulares y **Figtree** para todo lo demás. El saludo de Hoy pasa a editorial, con el nombre en itálica rosa.
+- **Paleta viva**: rosa con sangre, ciruela rica, papel cálido; el modo oscuro es una *noche ciruela*, no un gris. Sombras en capas con tinte cálido y un **resplandor rosa** para lo importante.
+- **La aurora**: un fondo vivo global — velos rosa/ciruela/ámbar que respiran muy despacio detrás de todo, más un grano de papel casi imperceptible. Quieto si el sistema pide menos movimiento.
+- **Shell de cristal**: raíl flotante en escritorio y barra inferior flotante en móvil (`glass` + blur), con el destino activo como **píldora en gradiente con resplandor**.
+- **El gesto característico**: en el hero de Hoy, una franja con el **cielo real de tu pareja ahora mismo** — su gradiente según su hora local, estrellas si allí es de noche, su sol o su luna donde de verdad están (reutiliza el motor de "Estar juntos"; componente de servidor, cero JS).
+- Primitivos elevados (Card, Button con gradiente + respuesta táctil, Avatar con degradados) y foco visible coherente.
+- Verificación: **los 8 E2E de dos jugadores en verde sobre la piel nueva**, 98 tests, build, y capturas reales autenticadas (escritorio + móvil + login).
+
 ### Iteración 26: "El ensayo general" — ensayar, podar y blindar
 La iteración que no estrena features (auditoría nº 3): hace fiable lo construido y devuelve a Hoy su ligereza.
 - **Harness E2E de dos jugadores** (`npm run test:e2e`): Playwright con dos contextos de navegador (= dos personas) contra el servidor de producción local. **8 flujos núcleo, 8/8 en verde en ~1,2 min**: vincular por código, chat en vivo, un duelo por turnos completo, carrera con abandono, aprecio en vivo, reparar con aftermath recíproco, coincidir hasta el calendario, y los rituales de Hoy con su revelación recíproca. Adiós a la coletilla "conviene probarlo a mano".
