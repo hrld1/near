@@ -129,6 +129,16 @@ Catorce mejoras para que la app "se sienta" más cerca, en cuatro niveles:
 - **Español correcto y accesibilidad**: barrido de tildes/ñ/¿¡ por toda la interfaz, respeto de `prefers-reduced-motion` (sin confeti ni latidos para quien pide menos movimiento) y textos mínimos más legibles.
 - **Adaptadores de despliegue**: almacenamiento **S3** y bus **Redis** por entorno (ver *Despliegue*), dormidos por defecto.
 
+### Iteración 26: "El ensayo general" — ensayar, podar y blindar
+La iteración que no estrena features (auditoría nº 3): hace fiable lo construido y devuelve a Hoy su ligereza.
+- **Harness E2E de dos jugadores** (`npm run test:e2e`): Playwright con dos contextos de navegador (= dos personas) contra el servidor de producción local. **8 flujos núcleo, 8/8 en verde en ~1,2 min**: vincular por código, chat en vivo, un duelo por turnos completo, carrera con abandono, aprecio en vivo, reparar con aftermath recíproco, coincidir hasta el calendario, y los rituales de Hoy con su revelación recíproca. Adiós a la coletilla "conviene probarlo a mano".
+- **Tres bugs reales cazados por el harness** (y arreglados): (1) la sala de duelo en vivo pasaba un objeto con funciones al cliente y **la serialización RSC fallaba en producción desde la it20**; (2) `LiveRefresh` descartaba eventos dentro del throttle y una vista podía quedarse desactualizada para siempre (ahora refresca en el borde de salida); (3) **el momento del día trataba el eco de tu propia foto como la de tu pareja** — el "bug" reportado en la it11 tenía una parte real de UI además del artefacto de sesión compartida. Rectificado con cariño.
+- **Hoy en tres capas**: el ritual (momento + pregunta + ánimo) arriba y sin scroll; el hero de pareja intacto; y todo lo demás plegado en "Más de hoy" (recordado por dispositivo). Cerca/Reparar pasan a accesos compactos.
+- **El perdón de la racha**: un único día flojo (si la pareja volvió al siguiente) no rompe la racha — un perdón por ventana de 30 días, contado con cariño ("os guardamos la racha 💛"). Aplica también a la racha del momento del día.
+- **Cerrojo del login**: 5 fallos por email → enfriamiento exponencial 1→15 min (puro, testeado; en memoria como el bus, con camino a Redis documentado). También cuenta fallos de emails inexistentes.
+- **Canal de feedback**: "¿Qué le falta a Near?" en Ajustes (5/día por usuario; el feedback sobrevive a la disolución de la pareja) — listo para el piloto con parejas reales.
+- Verificación: 98 tests unitarios + 8 E2E, typecheck, lint, build.
+
 ### Iteración 25: "Citas" — la planificadora con IA (dormida por defecto)
 El primer componente de inteligencia de Near, construido **sin clave** con el patrón de integraciones opcionales: sin `ANTHROPIC_API_KEY` la superficie ni aparece y `/api/citas` responde 503; con la clave, todo despierta.
 - **El chat de la planificadora** (`/citas`, entrada en Juntos): le cuentas la cita que os apetece — "bolos, cine y atardecer en Alicante" — y ella pregunta lo que falte (fecha, gustos, transporte, presupuesto), **busca sitios reales con la búsqueda web** (siempre con fuente; jamás afirma reservas) y conoce vuestro contexto: ciudades, husos y hora local de cada uno, **el atardecer del día** (cálculo NOAA propio, testeado), el calendario próximo y las **franjas de Coincidir**.
@@ -226,7 +236,7 @@ Empezar a subir el listón visual de los minijuegos (los simples eran poco inmer
 - **Dibuja y adivina**: quien dibuja tiene una palabra secreta y sus trazos viajan en vivo por SSE; quien adivina escribe; la validación la hace quien dibuja (la palabra no se filtra al cliente que adivina); al acertar, celebración y cambio de rol.
 - `CanvasRoom` con selector de modo que **arrastra a tu pareja** al reto (si te retan desde otra pestaña, entras con la ronda ya empezada). Palabras y aciertos en `lib/draw-words.ts` (normalización sin tildes, testeada).
 
-> Nota del apunte "la foto del día se subió también para Leo": no es un bug. En un mismo navegador solo hay **una** sesión; al entrar como Leo reemplazas la de Ana. Verificado en BD: solo existía la foto de Ana. Para probar dos usuarios: dos navegadores, o uno normal + uno de incógnito.
+> Nota del apunte "la foto del día se subió también para Leo": el diagnóstico de entonces fue parcial. La BD estaba bien (solo existía la foto de Ana; el artefacto de sesión compartida era real), **pero también había un bug de UI**: el momento del día trataba el eco SSE de tu propia foto como la de tu pareja. Lo cazó el harness E2E de la iteración 26 y quedó arreglado allí.
 
 ### Iteración 10: confianza y madurez — "vuestro, y podéis iros con dignidad"
 Para pedirle a una pareja que vuelque su intimidad, tienen que poder salir con cariño y llevarse (o borrar) lo suyo. Antes no existía nada de esto.
