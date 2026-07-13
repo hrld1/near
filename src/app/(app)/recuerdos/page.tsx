@@ -30,40 +30,43 @@ export default async function RecuerdosPage() {
     {
       href: "/moments",
       title: "Álbum y diario",
-      description:
-        momentCount > 0
-          ? `${momentCount} ${momentCount === 1 ? "momento guardado" : "momentos guardados"}.`
-          : "Guardad vuestra primera foto o recuerdo.",
+      description: "Vuestras fotos y recuerdos, guardados para siempre.",
       icon: BookHeart,
       accent: "from-rose to-plum",
       accentSoft: "bg-rose/12",
-      accentText: "text-rose-deep"
+      accentText: "text-rose-deep",
+      live:
+        momentCount > 0
+          ? `${momentCount} ${momentCount === 1 ? "momento guardado" : "momentos guardados"}`
+          : undefined
     },
     {
       href: "/letters",
       title: "Cartas",
-      description:
-        lettersInTransit > 0
-          ? `${lettersInTransit} ${lettersInTransit === 1 ? "carta en camino" : "cartas en camino"}.`
-          : "Escribe hoy, llega mañana. O una cápsula para el futuro.",
+      description: "Escribe hoy, llega mañana. O una cápsula para el futuro.",
       icon: Mail,
       accent: "from-amber-400 to-orange-500",
       accentSoft: "bg-amber-500/12",
-      accentText: "text-amber-600 dark:text-amber-400"
+      accentText: "text-amber-600 dark:text-amber-400",
+      live:
+        lettersInTransit > 0
+          ? `${lettersInTransit} ${lettersInTransit === 1 ? "carta en camino" : "cartas en camino"}`
+          : undefined
     },
     {
       href: "/calendar",
       title: "Fechas",
-      description:
-        daysToEvent !== null
-          ? daysToEvent === 0
-            ? "Vuestra próxima fecha es hoy."
-            : `Próxima fecha en ${daysToEvent} ${daysToEvent === 1 ? "día" : "días"}.`
-          : "Marcad vuestro próximo reencuentro.",
+      description: "Marcad vuestro próximo reencuentro y contad los días.",
       icon: CalendarHeart,
       accent: "from-fuchsia-400 to-pink-600",
       accentSoft: "bg-fuchsia-500/12",
-      accentText: "text-fuchsia-600 dark:text-fuchsia-400"
+      accentText: "text-fuchsia-600 dark:text-fuchsia-400",
+      live:
+        daysToEvent !== null
+          ? daysToEvent === 0
+            ? "Vuestra próxima fecha es hoy"
+            : `Próxima fecha en ${daysToEvent} ${daysToEvent === 1 ? "día" : "días"}`
+          : undefined
     },
     {
       href: "/map",
@@ -86,12 +89,12 @@ export default async function RecuerdosPage() {
   ];
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-6 md:py-10">
+    <div className="mx-auto max-w-2xl px-4 py-6 md:max-w-4xl md:px-8 md:py-10">
       <header className="mb-6">
         <h1 className="font-display text-3xl text-ink">Recuerdos</h1>
         <p className="mt-1 text-sm text-ink-soft">Vuestra historia, a un toque.</p>
       </header>
-      <div className="grid gap-3">
+      <div className="grid gap-3 md:grid-cols-2">
         {items.map((item) => (
           <HubCard key={item.href} item={item} />
         ))}

@@ -1,19 +1,63 @@
 import type { Metadata } from "next";
 import { CalendarClock, Gamepad2, HeartHandshake, MonitorPlay, Moon, Paintbrush, Sparkles, WandSparkles } from "lucide-react";
+import { prisma } from "@/lib/db";
 import { requireCouple } from "@/lib/couple";
 import { aiEnabled } from "@/lib/ai";
 import { isUserOnline } from "@/lib/realtime";
+import { dayKeyIn } from "@/lib/dates";
+import { gameOfDay } from "@/lib/games";
+import { skyForHour } from "@/lib/sky";
+import { agoLabel, dayInTz, timeInTz } from "@/lib/format";
+import { futureIntervals, overlapIntervals } from "@/lib/overlap";
 import { PartnerOnline } from "@/features/presence/partner-online";
 import { HubCard, type HubItem } from "@/features/hub/hub-card";
 
 export const metadata: Metadata = { title: "Juntos" };
 export const dynamic = "force-dynamic";
 
-// Hub "Juntos": todo lo que se hace A LA VEZ. Una pantalla, acciones claras.
+// Hub "Juntos": todo lo que se hace A LA VEZ. Una pantalla, acciones claras,
+// y en cada tarjeta una señal de lo que está vivo ahí ahora mismo (it29):
+// un hub sin contexto es un menú, no un producto.
 export default async function JuntosPage() {
-  const { partner } = await requireCouple();
+  const { user, couple, partner } = await requireCouple();
   const partnerName = partner?.name ?? "tu pareja";
   const partnerOnline = partner ? isUserOnline(partner.id) : false;
+  const now = new Date();
+
+  const [freeSlots, roomState, lastAppreciation] = await Promise.all([
+    partner
+      ? prisma.freeSlot.findMany({
+          where: { coupleId: couple.id, endsAt: { gte: now } },
+          orderBy: { startsAt: "asc" }
+        })
+      : [],
+    prisma.dateRoomState.findUnique({ where: { coupleId: couple.id } }),
+    partner
+      ? prisma.appreciation.findFirst({
+          where: { coupleId: couple.id, fromId: partner.id },
+          orderBy: { createdAt: "desc" }
+        })
+      : null
+  ]);
+
+  // la próxima ventana en común (misma intersección UTC que Hoy y /coincidir)
+  const nowMs = now.getTime();
+  const freeIv = (uid: string) =>
+    futureIntervals(
+      freeSlots.filter((s) => s.userId === uid).map((s) => ({ start: s.startsAt.getTime(), end: s.endsAt.getTime() })),
+      nowMs
+    );
+  const nextOverlap = partner ? overlapIntervals(freeIv(user.id), freeIv(partner.id))[0] ?? null : null;
+
+  // el cielo y la hora de tu pareja, para la tarjeta "Estar juntos"
+  const partnerHour = partner
+    ? Number(
+        new Intl.DateTimeFormat("en-GB", { timeZone: partner.timezone, hour: "2-digit", hour12: false }).format(now)
+      ) % 24
+    : null;
+  const partnerSky = partnerHour !== null && Number.isFinite(partnerHour) ? skyForHour(partnerHour) : null;
+
+  const dailyGame = gameOfDay(dayKeyIn(couple.timezone));
 
   const items: HubItem[] = [
     // La planificadora de citas con IA: solo si la instancia tiene clave
@@ -37,7 +81,10 @@ export default async function JuntosPage() {
       icon: HeartHandshake,
       accent: "from-rose to-plum",
       accentSoft: "bg-rose/12",
-      accentText: "text-rose-deep"
+      accentText: "text-rose-deep",
+      live: lastAppreciation
+        ? `Aprecio de ${partnerName} ${agoLabel(lastAppreciation.createdAt)}`
+        : undefined
     },
     {
       href: "/coincidir",
@@ -46,7 +93,10 @@ export default async function JuntosPage() {
       icon: CalendarClock,
       accent: "from-emerald-400 to-teal-600",
       accentSoft: "bg-emerald-500/12",
-      accentText: "text-emerald-600 dark:text-emerald-400"
+      accentText: "text-emerald-600 dark:text-emerald-400",
+      live: nextOverlap
+        ? `Próxima ventana: ${dayInTz(new Date(nextOverlap.start), user.timezone)} · ${timeInTz(new Date(nextOverlap.start), user.timezone)} tu hora`
+        : undefined
     },
     {
       href: "/together",
@@ -55,7 +105,11 @@ export default async function JuntosPage() {
       icon: Moon,
       accent: "from-indigo-400 to-violet-700",
       accentSoft: "bg-indigo-500/12",
-      accentText: "text-indigo-600 dark:text-indigo-400"
+      accentText: "text-indigo-600 dark:text-indigo-400",
+      live:
+        partner && partnerSky
+          ? `Allí ${partnerSky.label} · son las ${timeInTz(now, partner.timezone)}`
+          : undefined
     },
     {
       href: "/date-room",
@@ -64,7 +118,8 @@ export default async function JuntosPage() {
       icon: MonitorPlay,
       accent: "from-rose to-plum",
       accentSoft: "bg-rose/12",
-      accentText: "text-rose-deep"
+      accentText: "text-rose-deep",
+      live: roomState?.videoTitle ? `En la sala: ${roomState.videoTitle}` : undefined
     },
     {
       href: "/canvas",
@@ -78,16 +133,17 @@ export default async function JuntosPage() {
     {
       href: "/play",
       title: "Jugar",
-      description: "Arcade con retos diarios y el 4 en raya en directo.",
+      description: "Arcade con retos diarios y duelos en vivo, cara a cara.",
       icon: Gamepad2,
       accent: "from-amber-400 to-orange-500",
       accentSoft: "bg-amber-500/12",
-      accentText: "text-amber-600 dark:text-amber-400"
+      accentText: "text-amber-600 dark:text-amber-400",
+      live: `Reto de hoy: ${dailyGame.name}`
     }
   ];
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-6 md:py-10">
+    <div className="mx-auto max-w-2xl px-4 py-6 md:max-w-4xl md:px-8 md:py-10">
       <header className="mb-6">
         <h1 className="font-display text-3xl text-ink">Juntos</h1>
         <p className="mt-1 flex flex-wrap items-center gap-x-2 text-sm text-ink-soft">
@@ -107,7 +163,7 @@ export default async function JuntosPage() {
         </div>
       )}
 
-      <div className="grid gap-3">
+      <div className="grid gap-3 md:grid-cols-2">
         {items.map((item) => (
           <HubCard key={item.href} item={item} />
         ))}

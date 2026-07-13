@@ -15,6 +15,9 @@ export type HubItem = {
   accentSoft: string; // fondo suave del icono, p.ej. "bg-rose/12"
   accentText: string; // color del icono
   badge?: string;
+  // señal viva: qué pasa AHÍ ahora mismo ("Reto de hoy: Rompemuros",
+  // "Próxima ventana: jueves 20:00"). Convierte el menú en producto.
+  live?: string;
 };
 
 export function HubCard({ item }: { item: HubItem }) {
@@ -42,6 +45,15 @@ export function HubCard({ item }: { item: HubItem }) {
             )}
           </p>
           <p className="mt-0.5 text-sm leading-snug text-ink-soft">{item.description}</p>
+          {item.live && (
+            <p className={cn("mt-1.5 flex items-center gap-1.5 text-xs font-medium", item.accentText)}>
+              <span className="relative flex h-1.5 w-1.5 shrink-0">
+                <span className="absolute inline-flex h-full w-full rounded-full bg-current opacity-60 motion-safe:animate-ping" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-current" />
+              </span>
+              <span className="truncate">{item.live}</span>
+            </p>
+          )}
         </div>
         <ChevronRight className="h-5 w-5 shrink-0 text-ink-soft transition group-hover:translate-x-0.5 group-hover:text-rose" />
       </Card>
