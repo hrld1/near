@@ -117,7 +117,7 @@ Catorce mejoras para que la app "se sienta" más cerca, en cuatro niveles:
 **Rituales lentos y de vínculo**
 - **Foto del día** estilo Locket: mandas tu día como imagen; aparece en la home de tu pareja.
 - **Cartas lentas** (`/letters`): escribes hoy y llega mañana a las 08:00 (en la zona del receptor), o una **cápsula del tiempo** a una fecha elegida. Entrega on-read idempotente (sin cron); el cuerpo no entregado nunca llega al cliente.
-- **Recap mensual** (`/recap`): "vuestro mes en Near" dibujado sobre canvas y **exportable como imagen** (descargar o Web Share).
+- **Vuestro libro** (`/libro`): vuestro mes o vuestro año contado por capítulos — portada, momentos, palabras, juego, cuidaros, constancia — **imprimible como PDF** desde el navegador. (Sustituye al recap mensual; `/recap` redirige.)
 - **Mapa de la distancia** (`/map`): ciudades voluntarias (sin GPS), km reales, cuenta atrás a la próxima cita y **clima actual** de cada ciudad con **Open-Meteo** (sin API key), todo resuelto en cliente.
 
 **Crear juntos**
@@ -128,6 +128,14 @@ Catorce mejoras para que la app "se sienta" más cerca, en cuatro niveles:
 - **Enlace `/join/[code]`** con Web Share y **espera productiva**: mientras la pareja acepta, puedes fijar la fecha, dejar una nota y escribir una carta de bienvenida (se guardan en `Invite.prep` y se aplican al vincular).
 - **Español correcto y accesibilidad**: barrido de tildes/ñ/¿¡ por toda la interfaz, respeto de `prefers-reduced-motion` (sin confeti ni latidos para quien pide menos movimiento) y textos mínimos más legibles.
 - **Adaptadores de despliegue**: almacenamiento **S3** y bus **Redis** por entorno (ver *Despliegue*), dormidos por defecto.
+
+### Iteración 28: "Vuestro libro" — el Wrapped de los dos
+El recap mensual (6 números sobre canvas) crece hasta ser un objeto con valor propio: **un libro del período**, por capítulos y con la piel nueva, pensado para releerse y **regalarse en papel**.
+- **`/libro` con selector de período**: este mes, el mes pasado o todo el año, resuelto en la zona horaria de la pareja (`parsePeriod` puro, con fallback amable ante cualquier `?p=` inválido).
+- **Capítulos**: portada en degradado (nombres en itálica con `&`, días de vosotros, km y ciudades) → *Lo que visteis* (mosaico de hasta 9 fotos del día, muestreadas uniformemente para cubrir el período) → *Lo que os dijisteis* (mensajes, voces, preguntas respondidas y el **aprecio más largo como cita**) → *A lo que jugasteis* (duelos con corona al ganador) → *Cómo os cuidasteis* (pulso medio, cartas, citas, reparaciones) → *Constancia* (mejor racha del período) → contraportada con una frase de cierre elegida según los datos.
+- **Duelos sin 365 consultas**: `duelsFromScores` reagrupa los scores del período en memoria y resuelve cada duelo con `gameOfDay`/`bestOf`/`compareScores` — una consulta en vez de una por día.
+- **Imprimir · PDF**: `window.print()` + CSS de impresión (fuera navegación y aurora, capítulos que no se parten). El libro de papel sale gratis.
+- `/recap` redirige a `/libro`; el hub Recuerdos y el sidebar apuntan al libro. 111 tests (13 nuevos), 8/8 E2E, build y captura real autenticada con la pareja demo.
 
 ### Iteración 27: "La piel" — la interfaz a la altura del producto
 La interfaz era funcional pero plana (Georgia del sistema, paleta terrosa, fondo liso). Rediseño desde los cimientos — tokens y primitivos — para que las ~30 pantallas se eleven a la vez. Dirección: **"el cielo de los dos"**.
