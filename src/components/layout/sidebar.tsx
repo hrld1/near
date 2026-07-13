@@ -39,7 +39,7 @@ const PRIMARY: NavItem[] = [
     href: "/recuerdos",
     label: "Recuerdos",
     icon: BookHeart,
-    match: ["/recuerdos", "/moments", "/letters", "/calendar", "/map", "/recap"]
+    match: ["/recuerdos", "/moments", "/letters", "/calendar", "/map", "/recap", "/libro"]
   }
 ];
 

@@ -139,6 +139,31 @@ body::after {
   }
 }
 
+/* ---------------------------------------------------------------------------
+   Impresión (it28, "Vuestro libro"): la página se convierte en un documento —
+   sin navegación, sin aurora, capítulos sin partirse entre páginas.
+--------------------------------------------------------------------------- */
+@media print {
+  body::before,
+  body::after {
+    display: none !important;
+  }
+  aside,
+  nav,
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+  }
+  main {
+    padding: 0 !important;
+  }
+  .print-page {
+    break-inside: avoid;
+  }
+}
+
 /* Ficha del 4 en raya: cae desde arriba con un pequeno rebote. */
 .c4-disc {
   animation: c4-drop 0.45s cubic-bezier(0.55, 0, 0.65, 1.35) both;

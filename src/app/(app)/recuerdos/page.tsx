@@ -75,9 +75,9 @@ export default async function RecuerdosPage() {
       accentText: "text-sky-600 dark:text-sky-400"
     },
     {
-      href: "/recap",
-      title: "Vuestro mes",
-      description: "El resumen de vuestro mes en Near, listo para guardar.",
+      href: "/libro",
+      title: "Vuestro libro",
+      description: "Vuestro mes o vuestro año, contado por capítulos. Imprimible.",
       icon: BarChart3,
       accent: "from-emerald-400 to-teal-600",
       accentSoft: "bg-emerald-500/12",
