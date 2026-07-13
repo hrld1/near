@@ -45,15 +45,15 @@ export default async function CalendarPage() {
         <div>
           <h1 className="font-display text-3xl text-ink">Fechas</h1>
           <p className="mt-1 text-sm text-ink-soft">
-            Lo que os espera y lo que ya habeis vivido.
+            Lo que os espera y lo que ya habéis vivido.
           </p>
           {milestone && (
             <p className="mt-1.5 text-xs font-medium text-rose-deep">
               💗{" "}
               {milestone.daysLeft === 0
                 ? milestone.isAnnual
-                  ? `Hoy cumplis ${milestone.years} ${milestone.years === 1 ? "año" : "años"}`
-                  : `Hoy cumplis ${milestone.months} meses`
+                  ? `Hoy cumplís ${milestone.years} ${milestone.years === 1 ? "año" : "años"}`
+                  : `Hoy cumplís ${milestone.months} meses`
                 : `${milestone.isAnnual ? `${milestone.years} ${milestone.years === 1 ? "año" : "años"}` : `${milestone.months} meses`} el ${format(milestone.date, "d 'de' MMMM", { locale: es })}`}
             </p>
           )}
@@ -82,10 +82,10 @@ export default async function CalendarPage() {
                 <div className="mt-5">
                   <Countdown target={highlight.startsAt.toISOString()} />
                 </div>
-                <p className="mt-4 text-sm capitalize text-ink-soft">
+                <p className="mt-4 text-sm text-ink-soft">
                   {dateLong(highlight.startsAt)}
                   {highlight.endsAt && (
-                    <span className="normal-case"> — hasta las {format(highlight.endsAt, "HH:mm")}</span>
+                    <span> — hasta las {format(highlight.endsAt, "HH:mm")}</span>
                   )}
                 </p>
                 {highlight.description && (

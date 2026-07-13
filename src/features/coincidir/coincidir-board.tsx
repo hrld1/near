@@ -122,7 +122,7 @@ export function CoincidirBoard({
                 className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-paper/80 px-4 py-3 shadow-card"
               >
                 <div>
-                  <p className="font-display text-lg capitalize text-ink">{dayInTz(o.start, myTz)}</p>
+                  <p className="font-display text-lg text-ink">{dayInTz(o.start, myTz)}</p>
                   <p className="text-sm text-ink-soft">
                     <span className="font-medium text-ink">
                       {timeInTz(o.start, myTz)}–{timeInTz(o.end, myTz)}
@@ -261,7 +261,7 @@ function SlotList({
           {slots.map((s) => (
             <li key={s.id} className="flex items-center justify-between gap-2 rounded-xl bg-sand px-3 py-2 text-sm">
               <div className="min-w-0">
-                <span className="capitalize text-ink">{dayInTz(s.start, tz)}</span>{" "}
+                <span className="text-ink">{dayInTz(s.start, tz)}</span>{" "}
                 <span className="text-ink-soft">
                   {timeInTz(s.start, tz)}–{timeInTz(s.end, tz)}
                   {secondaryTz && ` · su hora ${timeInTz(s.start, secondaryTz)}`}

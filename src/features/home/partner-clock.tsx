@@ -36,7 +36,7 @@ export function PartnerClock({ timezone, name }: { timezone: string; name: strin
   if (!time) return null;
   return (
     <span className="text-xs text-ink-soft" title={`Zona horaria de ${name}: ${timezone}`}>
-      🕐 Alli son las {time}
+      🕐 Allí son las {time}
       {dayDiff}
     </span>
   );

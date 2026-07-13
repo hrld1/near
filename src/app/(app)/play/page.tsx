@@ -153,7 +153,7 @@ export default async function PlayPage() {
       <header className="mb-6">
         <h1 className="font-display text-3xl text-ink">Arcade</h1>
         <p className="mt-1 text-sm text-ink-soft">
-          Un reto nuevo cada día. Los numeros deciden quien manda esta semana.
+          Un reto nuevo cada día. Los números deciden quién manda esta semana.
         </p>
       </header>
 
@@ -176,7 +176,7 @@ export default async function PlayPage() {
             <div className="flex min-w-0 flex-1 items-center gap-2.5">
               <Avatar name={user.name} size="sm" className="ring-2 ring-white/40" />
               <div className="min-w-0">
-                <p className="truncate text-xs text-white/75">Tu</p>
+                <p className="truncate text-xs text-white/75">Tú</p>
                 <p className="font-display text-lg leading-tight">
                   {duel.myBest !== null ? daily.format(duel.myBest) : "—"}
                 </p>
@@ -197,7 +197,7 @@ export default async function PlayPage() {
           <div className="mt-3 flex items-center justify-between text-sm font-medium">
             <span className="text-white/90">
               {duelStatus === "me" && "Vas ganando el duelo de hoy"}
-              {duelStatus === "partner" && "Te esta ganando... remonta"}
+              {duelStatus === "partner" && "Te está ganando... remonta"}
               {duelStatus === "tie" && "Empate absoluto"}
               {duelStatus === "waiting" && "Esperando su marca"}
               {duelStatus === "pending" && "Hoy no te lo puedes perder"}
@@ -245,7 +245,7 @@ export default async function PlayPage() {
           <div className="mt-3 flex items-center justify-between rounded-xl bg-sand px-4 py-2.5 text-sm">
             <span className="flex items-center gap-1.5 text-ink">
               {myPoints >= partnerPoints && <Crown className="h-3.5 w-3.5 text-amber-500" />}
-              Tu: <b>{myPoints}</b>
+              Tú: <b>{myPoints}</b>
             </span>
             <span className="flex items-center gap-1.5 text-ink">
               {partnerPoints > myPoints && <Crown className="h-3.5 w-3.5 text-amber-500" />}
@@ -273,15 +273,21 @@ export default async function PlayPage() {
               </p>
               <p className="text-xs text-ink-soft">
                 {streakInfo.todayComplete
-                  ? "Hoy ya esta completo."
-                  : "Se mantiene si ambos entrais hoy."}
+                  ? "Hoy ya está completo."
+                  : "Se mantiene si ambos entráis hoy."}
               </p>
             </div>
           </div>
           <div className="mt-4">
             <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-ink-soft">
-              Ultimos duelos
+              Últimos duelos
             </p>
+            {history.every((day) => day.result === "none") ? (
+              <p className="rounded-xl bg-sand px-3 py-2.5 text-xs leading-relaxed text-ink-soft">
+                Aquí quedará el marcador de cada reto del día: quién ganó, quién perdió y los
+                empates. Jugad el de hoy para estrenarlo.
+              </p>
+            ) : (
             <div className="flex gap-1.5">
               {history.map((day) => (
                 <div key={day.key} className="flex flex-1 flex-col items-center gap-1">
@@ -302,6 +308,7 @@ export default async function PlayPage() {
                 </div>
               ))}
             </div>
+            )}
           </div>
         </Card>
       </div>

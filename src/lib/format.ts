@@ -12,8 +12,16 @@ export function dayLabel(date: Date | string) {
   return format(d, "EEEE d 'de' MMMM", { locale: es });
 }
 
+// Primera letra en mayúscula: los formatos largos empiezan por el día de la
+// semana, que date-fns/Intl devuelven en minúscula. Esto sustituye al
+// text-transform capitalize de CSS, que en español pone Mayúscula En Cada
+// Palabra ("Jueves 30 De Julio A Las 23:14").
+export function capFirst(s: string) {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
 export function dateLong(date: Date | string) {
-  return format(new Date(date), "EEEE d 'de' MMMM 'a las' HH:mm", { locale: es });
+  return capFirst(format(new Date(date), "EEEE d 'de' MMMM 'a las' HH:mm", { locale: es }));
 }
 
 export function dateShort(date: Date | string) {
@@ -41,10 +49,12 @@ export function timeInTz(date: Date | string, timeZone: string): string {
 
 // Día (p. ej. "jueves, 12 jul") de un instante en una zona horaria concreta.
 export function dayInTz(date: Date | string, timeZone: string): string {
-  return new Intl.DateTimeFormat("es-ES", {
-    timeZone,
-    weekday: "long",
-    day: "numeric",
-    month: "short"
-  }).format(new Date(date));
+  return capFirst(
+    new Intl.DateTimeFormat("es-ES", {
+      timeZone,
+      weekday: "long",
+      day: "numeric",
+      month: "short"
+    }).format(new Date(date))
+  );
 }

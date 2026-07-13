@@ -198,7 +198,12 @@ export default async function HomePage() {
             {greeting()}, <em className="italic text-rose-deep">{user.name}</em>
           </h1>
         </div>
-        <PresencePicker current={effectivePresence(user.presence, user.presenceUpdatedAt)} />
+        <div className="flex flex-col items-start gap-1.5 sm:items-end">
+          <p className="text-[11px] font-medium uppercase tracking-wider text-ink-soft">
+            ¿Qué haces ahora? · lo ve {partner?.name ?? "tu pareja"}
+          </p>
+          <PresencePicker current={effectivePresence(user.presence, user.presenceUpdatedAt)} />
+        </div>
       </header>
 
       {/* HERO: la otra persona + la próxima fecha */}
@@ -210,7 +215,7 @@ export default async function HomePage() {
                 {lastNudge && (
                   <p className="mb-4 inline-flex animate-fade-up items-center gap-2 rounded-full bg-rose/10 px-3.5 py-1.5 text-xs font-medium text-rose-deep">
                     <Heart className="h-3.5 w-3.5 fill-current" />
-                    {partner.name} penso en ti {agoLabel(lastNudge.createdAt)}
+                    {partner.name} pensó en ti {agoLabel(lastNudge.createdAt)}
                   </p>
                 )}
                 <div className="flex items-center gap-4">
@@ -284,7 +289,7 @@ export default async function HomePage() {
                 <div className="mt-4">
                   <Countdown target={countdownEvent.startsAt.toISOString()} />
                 </div>
-                <p className="mt-3 text-xs capitalize text-ink-soft">
+                <p className="mt-3 text-xs text-ink-soft">
                   {dateLong(countdownEvent.startsAt)}
                 </p>
                 <Link
@@ -439,7 +444,7 @@ export default async function HomePage() {
                   <p className="text-[11px] font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
                     Próxima ventana en común
                   </p>
-                  <p className="mt-1 font-display text-xl capitalize text-ink">
+                  <p className="mt-1 font-display text-xl text-ink">
                     {dayInTz(new Date(nextOverlap.start), user.timezone)}
                   </p>
                   <p className="text-sm text-ink-soft">
@@ -478,13 +483,13 @@ export default async function HomePage() {
                 <p className="font-display text-xl leading-tight text-ink">
                   {milestone.daysLeft === 0
                     ? milestone.isAnnual
-                      ? `Hoy cumplis ${milestone.years} ${milestone.years === 1 ? "año" : "años"} 🎉`
-                      : `Hoy cumplis ${milestone.months} meses 🎉`
+                      ? `Hoy cumplís ${milestone.years} ${milestone.years === 1 ? "año" : "años"} 🎉`
+                      : `Hoy cumplís ${milestone.months} meses 🎉`
                     : milestone.isAnnual
                       ? `${milestone.years} ${milestone.years === 1 ? "año" : "años"} en ${milestone.daysLeft} ${milestone.daysLeft === 1 ? "día" : "días"}`
                       : `${milestone.months} meses en ${milestone.daysLeft} ${milestone.daysLeft === 1 ? "día" : "días"}`}
                 </p>
-                <p className="mt-0.5 text-xs capitalize text-ink-soft">
+                <p className="mt-0.5 text-xs text-ink-soft">
                   {dateLong(milestone.date)}
                 </p>
               </div>
@@ -527,7 +532,7 @@ export default async function HomePage() {
           ) : (
             <Link href="/moments" className="flex h-full flex-col items-center justify-center gap-2 p-6 text-center">
               <BookHeart className="h-7 w-7 text-rose/60" />
-              <p className="text-sm font-medium text-ink">El diario esta vacio</p>
+              <p className="text-sm font-medium text-ink">El diario está vacío</p>
               <p className="text-xs text-ink-soft">Guardad la primera foto o recuerdo</p>
             </Link>
           )}

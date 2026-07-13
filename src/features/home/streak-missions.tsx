@@ -80,7 +80,7 @@ export function StreakMissions({
               ? "Racha asegurada hoy. Equipazo."
               : streak > 0
                 ? "Entrad ambos hoy para no perderla."
-                : "La racha empieza cuando ambos entrais el mismo día."}
+                : "La racha empieza cuando ambos entráis el mismo día."}
           </p>
         </div>
       </div>
