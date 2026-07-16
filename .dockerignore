@@ -1,0 +1,17 @@
+node_modules
+.next
+.git
+.github
+uploads
+test-results
+playwright-report
+e2e
+coverage
+.env
+.env.*
+!.env.example
+Dockerfile
+docker-compose.yml
+*.log
+.vscode
+.idea

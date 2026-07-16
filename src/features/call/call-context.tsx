@@ -105,6 +105,9 @@ export function CallProvider({
   const stateRef = useRef<CallState>("idle");
   const roleRef = useRef<"caller" | "callee" | null>(null);
   const pcRef = useRef<RTCPeerConnection | null>(null);
+  // Credenciales TURN frescas del servidor (Cloudflare, it31). Si /api/ice no
+  // trae nada (instancia sin claves, fallo de red), vale el fallback estático.
+  const iceRef = useRef<RTCIceServer[] | null>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
   const mediaModeRef = useRef<MediaMode>("full");
   const pendingIceRef = useRef<RTCIceCandidateInit[]>([]);
@@ -191,8 +194,21 @@ export function CallProvider({
     }
   }
 
+  async function refreshIceServers(): Promise<void> {
+    try {
+      const res = await fetch("/api/ice", { cache: "no-store" });
+      if (!res.ok) return;
+      const data = (await res.json()) as { iceServers?: RTCIceServer[] | null };
+      if (Array.isArray(data.iceServers) && data.iceServers.length > 0) {
+        iceRef.current = data.iceServers;
+      }
+    } catch {
+      // sin red o sin claves: el fallback estático sigue valiendo
+    }
+  }
+
   function createPeer(stream: MediaStream | null): RTCPeerConnection {
-    const pc = new RTCPeerConnection({ iceServers: iceServers() });
+    const pc = new RTCPeerConnection({ iceServers: iceRef.current ?? iceServers() });
     stream?.getTracks().forEach((track) => pc.addTrack(track, stream));
     // sin track propio de un tipo, seguimos queriendo RECIBIR el del otro
     const kinds = new Set(stream?.getTracks().map((t) => t.kind) ?? []);
@@ -372,7 +388,10 @@ export function CallProvider({
     if (stateRef.current !== "idle") return;
     setNotice(null);
     try {
+      // TURN fresco en paralelo con el permiso de cámara/micrófono
+      const icePromise = refreshIceServers();
       const { stream } = await ensureMedia(opts?.audioOnly ?? false);
+      await icePromise;
       createPeer(stream);
       roleRef.current = "caller";
       setCallState("outgoing");
@@ -396,7 +415,9 @@ export function CallProvider({
   async function acceptCall() {
     setNotice(null);
     try {
+      const icePromise = refreshIceServers();
       const { stream } = await ensureMedia();
+      await icePromise;
       createPeer(stream);
       roleRef.current = "callee";
       setCallState("connecting");
