@@ -53,7 +53,9 @@ const QUIZ: { text: string; options: string[] }[] = [
   { text: "Miedo confesable", options: ["Aranas / bichos", "Alturas", "Hablar en publico", "Peliculas de terror"] }
 ];
 
-async function main() {
+// El contenido (preguntas del día + quiz) es lo único que necesita PRODUCCIÓN.
+// Idempotente: solo siembra si la tabla está vacía.
+async function seedContent() {
   console.log("Sembrando prompts y quiz...");
   const promptCount = await prisma.dailyPrompt.count();
   if (promptCount === 0) {
@@ -63,7 +65,11 @@ async function main() {
   if (quizCount === 0) {
     await prisma.quizQuestion.createMany({ data: QUIZ });
   }
+}
 
+// La pareja demo es solo para desarrollo y capturas. En producción NO se
+// siembra (SEED_DEMO=false): una instancia real no debe traer datos ficticios.
+async function seedDemo() {
   console.log("Creando pareja demo (ana@near.demo / leo@near.demo, password: neardemo123)...");
   const existing = await prisma.user.findUnique({ where: { email: "ana@near.demo" } });
   if (existing) {
@@ -147,7 +153,16 @@ async function main() {
     ]
   });
 
-  console.log("Seed completado.");
+  console.log("Seed de la pareja demo completado.");
+}
+
+async function main() {
+  await seedContent();
+  if (process.env.SEED_DEMO === "false") {
+    console.log("SEED_DEMO=false: se omite la pareja demo (modo producción).");
+    return;
+  }
+  await seedDemo();
 }
 
 main()
