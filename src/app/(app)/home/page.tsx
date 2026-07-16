@@ -242,10 +242,16 @@ export default async function HomePage() {
         </div>
       </header>
 
-      {/* VUESTRO PRIMER DÍA (it30): la guía de la primera semana, arriba del todo */}
+      {/* VUESTRO PRIMER DÍA / LA PRIMERA SEMANA (it30): el mismo hueco, arriba
+          del todo — la lista el día 1, un descubrimiento al día después */}
       {partner && firstDay && (
         <div className="mb-4">
           <FirstDay partnerName={partner.name} me={firstDay.me} partner={firstDay.partner} />
+        </div>
+      )}
+      {discovery && (
+        <div className="mb-4">
+          <DiscoveryCard discovery={discovery} />
         </div>
       )}
 
@@ -405,13 +411,6 @@ export default async function HomePage() {
           </div>
         </Card>
       </div>
-
-      {/* LA PRIMERA SEMANA (it30): una sola cosa nueva al día, descartable */}
-      {discovery && (
-        <div className="mb-4">
-          <DiscoveryCard discovery={discovery} />
-        </div>
-      )}
 
       {/* Cuidaros y quereros, a un toque (compacto) */}
       {partner && (

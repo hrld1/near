@@ -129,6 +129,14 @@ Catorce mejoras para que la app "se sienta" más cerca, en cuatro niveles:
 - **Español correcto y accesibilidad**: barrido de tildes/ñ/¿¡ por toda la interfaz, respeto de `prefers-reduced-motion` (sin confeti ni latidos para quien pide menos movimiento) y textos mínimos más legibles.
 - **Adaptadores de despliegue**: almacenamiento **S3** y bus **Redis** por entorno (ver *Despliegue*), dormidos por defecto.
 
+### Iteración 30: "El primer día" — donde el sector pierde a la segunda persona
+La auditoría nº 4 (comparativa 2026: Paired, Flamme, Agape, Pine, Cupla) señaló el punto débil de toda la industria: la segunda persona casi nunca termina el onboarding. Near ya vinculaba bien; ahora también **enamora al llegar**.
+- **«Vuestro primer día»**: para parejas con menos de 7 días, una lista de 4 pasos arriba de Hoy — di qué haces ahora, responde la pregunta, comparte el momento, marcad vuestra primera fecha — con **el progreso de los dos** («Tú 1/4 · Leo 0/4», su ✓ aparece en vivo) y celebración al completar tu parte. Sin esquema nuevo: cada check se deriva de registros que ya existen, y las queries extra solo corren esa semana. La edad se cuenta por claves de día en la zona de la pareja (`lib/first-days.ts`, 12 tests): vincularse a las 23:50 no os roba el primer día.
+- **La primera semana**: del día 2 al 7, el mismo hueco sugiere **una sola cosa al día** — carta lenta → reto del día → Coincidir → mazos de Cerca → Estar juntos → vuestro libro. Discreta, descartable (localStorage) y nunca un tour modal. Solo aparece cuando la lista ya está completa.
+- **Vacíos que enseñan**: la auditoría suponía vacíos mudos y la mayoría ya enseñaban (honestidad ante todo); quedó el pulido real — tildes del vacío del chat y el buzón de cartas vacío ahora cuenta qué pasará (llega mañana a las 08:00, su hora) y descubre la cápsula.
+- **Flujo E2E nuevo (9/9)**: una pareja recién vinculada ve la lista a 0/4, Ana completa un paso y Leo ve «Ana ✓» en vivo; el día 1 no hay descubrimiento. Endurecido el spec de vincular con `exact` (los pasos nuevos comparten subcadenas con el ritual).
+- Verificación: 123 tests (12 nuevos), 9/9 E2E, build y capturas reales del día 1 (escritorio y móvil) y del día 3 (pareja avanzada en BD para fabricar el estado).
+
 ### Iteración 29: "La piel, parte 2" — de bonita a inductiva
 La it27 arregló la estética; esta arregla lo que aún había que *saberse*: auditoría con capturas reales y ojos de usuario nuevo.
 - **Los hubs cobran vida**: `HubCard` gana una **señal viva** (punto que late + una línea con lo que pasa ahí ahora): en Juntos, el aprecio reciente de tu pareja, la próxima ventana en común, **su cielo y su hora** ("Allí atardece · son las 20:04"), lo que suena en la sala y el reto del día; en Recuerdos, momentos guardados, cartas en camino y la próxima fecha. Un hub sin contexto es un menú; con él, es producto.
