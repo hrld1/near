@@ -1,0 +1,74 @@
+name: Uptime
+
+# Vigilancia gratuita: pinga /api/health cada 10 min. Si la instancia no
+# responde OK, abre (o reutiliza) un issue para avisar. No sustituye a un
+# monitor serio, pero para un piloto es suficiente y no cuesta nada.
+# Requiere la variable HEALTH_URL (Settings → Actions → Variables), p. ej.
+# https://tu-dominio/api/health — sin ella, el workflow se salta.
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comprobar salud
+        id: check
+        env:
+          HEALTH_URL: ${{ vars.HEALTH_URL }}
+        run: |
+          if [ -z "$HEALTH_URL" ]; then
+            echo "Sin HEALTH_URL configurada: se omite."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          code=$(curl -s -o /tmp/body -w "%{http_code}" --max-time 20 "$HEALTH_URL" || echo "000")
+          echo "HTTP $code — $(cat /tmp/body 2>/dev/null | head -c 200)"
+          if [ "$code" = "200" ] && grep -q '"ok":true' /tmp/body; then
+            echo "healthy=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "healthy=false" >> "$GITHUB_OUTPUT"
+            echo "detail=HTTP $code" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Avisar si está caída
+        if: steps.check.outputs.skip != 'true' && steps.check.outputs.healthy == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const marker = "<!-- uptime-alert -->";
+            const { owner, repo } = context.repo;
+            const open = await github.rest.issues.listForRepo({
+              owner, repo, state: "open", labels: "uptime"
+            });
+            const existing = open.data.find((i) => i.body?.includes(marker));
+            const body = `${marker}\nNear no responde OK en /api/health (${{ steps.check.outputs.detail }}).\nComprobado: ${new Date().toISOString()}`;
+            if (existing) {
+              await github.rest.issues.createComment({ owner, repo, issue_number: existing.number, body });
+            } else {
+              await github.rest.issues.create({
+                owner, repo, title: "⚠️ Near parece caída", labels: ["uptime"], body
+              });
+            }
+
+      - name: Cerrar el aviso si ya está sana
+        if: steps.check.outputs.skip != 'true' && steps.check.outputs.healthy == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const marker = "<!-- uptime-alert -->";
+            const { owner, repo } = context.repo;
+            const open = await github.rest.issues.listForRepo({
+              owner, repo, state: "open", labels: "uptime"
+            });
+            for (const issue of open.data.filter((i) => i.body?.includes(marker))) {
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: issue.number, body: `Recuperada: ${new Date().toISOString()}`
+              });
+              await github.rest.issues.update({ owner, repo, issue_number: issue.number, state: "closed" });
+            }
