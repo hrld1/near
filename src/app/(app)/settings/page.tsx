@@ -8,6 +8,7 @@ import { AnniversaryForm } from "@/features/settings/anniversary-form";
 import { SecuritySettings } from "@/features/settings/security-settings";
 import { DangerZone } from "@/features/settings/danger-zone";
 import { FeedbackForm } from "@/features/settings/feedback-form";
+import { StatusCard } from "@/features/settings/status-card";
 
 export const metadata: Metadata = { title: "Ajustes" };
 export const dynamic = "force-dynamic";
@@ -98,6 +99,8 @@ export default async function SettingsPage() {
             <FeedbackForm />
           </div>
         </Card>
+
+        <StatusCard />
 
         <Card>
           <CardTitle>Zona delicada</CardTitle>
