@@ -142,7 +142,8 @@ export function LettersView({
       {/* buzón */}
       {initialLetters.length === 0 ? (
         <p className="py-8 text-center text-sm text-ink-soft">
-          Aún no hay cartas. Escribe la primera.
+          Aún no hay cartas. Escribe la primera arriba: llegará mañana a las 08:00, su hora
+          — o elige una fecha y será una cápsula del tiempo.
         </p>
       ) : (
         <ul className="space-y-3">

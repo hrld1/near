@@ -94,12 +94,12 @@ export function ChatRoom({
             </span>
             <div>
               <p className="font-display text-lg text-ink">
-                {channel === "DATE_ROOM" ? "La sala esta en silencio" : "Empieza la conversacion"}
+                {channel === "DATE_ROOM" ? "La sala está en silencio" : "Empieza la conversación"}
               </p>
               <p className="mt-1 max-w-xs text-sm text-ink-soft">
                 {channel === "DATE_ROOM"
                   ? "Comentad lo que estáis viendo, este chat es solo de la sala."
-                  : "Todo lo que os digais aquí se queda entre vosotros dos."}
+                  : "Todo lo que os digáis aquí se queda entre vosotros dos."}
               </p>
             </div>
             {channel === "MAIN" && partner && (
