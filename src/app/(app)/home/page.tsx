@@ -7,6 +7,7 @@ import { prisma } from "@/lib/db";
 import { requireCouple } from "@/lib/couple";
 import { moodInfo, presenceInfo } from "@/lib/utils";
 import { dayKeyIn, nextAnniversary, shiftDayKey } from "@/lib/dates";
+import { coupleAgeDays, discoveryOfDay, type FirstStepKey } from "@/lib/first-days";
 import { effectivePresence } from "@/lib/presence";
 import { isUserOnline } from "@/lib/realtime";
 import { agoLabel, dateLong, dayInTz, timeInTz } from "@/lib/format";
@@ -32,6 +33,8 @@ import { MomentOfDay } from "@/features/home/moment-of-day";
 import { MoreOfToday } from "@/features/home/more-of-today";
 import { PartnerSky } from "@/features/home/partner-sky";
 import { PartnerClock } from "@/features/home/partner-clock";
+import { FirstDay, type FirstDayProgress } from "@/features/home/first-day";
+import { DiscoveryCard } from "@/features/home/discovery-card";
 
 export const metadata: Metadata = { title: "Inicio" };
 export const dynamic = "force-dynamic";
@@ -185,6 +188,39 @@ export default async function HomePage() {
     );
   const nextOverlap = partner ? overlapIntervals(freeIv(user.id), freeIv(partner.id))[0] ?? null : null;
 
+  // El primer día y la primera semana (it30): solo para parejas recién nacidas.
+  // Los pasos se derivan de "¿existe ALGÚN registro?" — descubrir, no repetir —
+  // y las queries extra solo corren durante esa semana.
+  const ageDays = partner ? coupleAgeDays(couple.createdAt, couple.timezone, now) : 0;
+  let firstDay: { me: FirstDayProgress; partner: FirstDayProgress } | null = null;
+  if (partner && ageDays >= 1 && ageDays <= 7) {
+    const [myMoodEver, partnerMoodEver, myAnswerEver, partnerAnswerEver, myPhotoEver, partnerPhotoEver, eventCount] =
+      await Promise.all([
+        prisma.moodEntry.findFirst({ where: { userId: user.id }, select: { id: true } }),
+        prisma.moodEntry.findFirst({ where: { userId: partner.id }, select: { id: true } }),
+        prisma.promptAnswer.findFirst({ where: { userId: user.id }, select: { id: true } }),
+        prisma.promptAnswer.findFirst({ where: { userId: partner.id }, select: { id: true } }),
+        prisma.dailyPhoto.findFirst({ where: { userId: user.id }, select: { id: true } }),
+        prisma.dailyPhoto.findFirst({ where: { userId: partner.id }, select: { id: true } }),
+        prisma.calendarEvent.count({ where: { coupleId: couple.id } })
+      ]);
+    const me: FirstDayProgress = {
+      estado: user.presence !== "NONE" || !!myMoodEver,
+      pregunta: !!myAnswerEver,
+      momento: !!myPhotoEver,
+      fecha: eventCount > 0
+    };
+    const other: FirstDayProgress = {
+      estado: partner.presence !== "NONE" || !!partnerMoodEver,
+      pregunta: !!partnerAnswerEver,
+      momento: !!partnerPhotoEver,
+      fecha: eventCount > 0
+    };
+    const bothComplete = Object.values(me).every(Boolean) && Object.values(other).every(Boolean);
+    if (!bothComplete) firstDay = { me, partner: other };
+  }
+  const discovery = partner && !firstDay ? discoveryOfDay(ageDays) : null;
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 md:px-8 md:py-8">
       <LiveRefresh types={["presence", "mood", "note", "prompt", "event", "moment", "nudge", "box:opened", "season", "game:score"]} />
@@ -205,6 +241,13 @@ export default async function HomePage() {
           <PresencePicker current={effectivePresence(user.presence, user.presenceUpdatedAt)} />
         </div>
       </header>
+
+      {/* VUESTRO PRIMER DÍA (it30): la guía de la primera semana, arriba del todo */}
+      {partner && firstDay && (
+        <div className="mb-4">
+          <FirstDay partnerName={partner.name} me={firstDay.me} partner={firstDay.partner} />
+        </div>
+      )}
 
       {/* HERO: la otra persona + la próxima fecha */}
       <section className="mb-4 overflow-hidden rounded-3xl border border-rose/15 bg-gradient-to-br from-rose-faint via-paper to-paper shadow-card">
@@ -362,6 +405,13 @@ export default async function HomePage() {
           </div>
         </Card>
       </div>
+
+      {/* LA PRIMERA SEMANA (it30): una sola cosa nueva al día, descartable */}
+      {discovery && (
+        <div className="mb-4">
+          <DiscoveryCard discovery={discovery} />
+        </div>
+      )}
 
       {/* Cuidaros y quereros, a un toque (compacto) */}
       {partner && (
