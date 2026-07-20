@@ -1,8 +1,8 @@
 name: CI y despliegue
 
 # Cada push a main: verificar (lint + tipos + tests) → construir la imagen y
-# publicarla en GHCR → redesplegar en Koyeb (solo si hay token configurado;
-# sin él, el workflow termina en la imagen y no falla).
+# publicarla en GHCR → redesplegar en Northflank (solo si hay credenciales
+# configuradas; sin ellas, el workflow termina en la imagen y no falla).
 on:
   push:
     branches: [main]
@@ -48,20 +48,30 @@ jobs:
   desplegar:
     needs: imagen
     runs-on: ubuntu-latest
-    env:
-      KOYEB_API_TOKEN: ${{ secrets.KOYEB_API_TOKEN }}
-      # formato app/servicio, p. ej. "near/web" — configúralo como variable
-      # del repositorio (Settings → Secrets and variables → Actions → Variables)
-      KOYEB_SERVICE: ${{ vars.KOYEB_SERVICE }}
     steps:
-      - name: Redesplegar en Koyeb
+      # El secreto no se puede consultar en un `if:` de job, así que se mira
+      # aquí: sin credenciales el deploy se salta en vez de fallar (la imagen
+      # ya está publicada y redesplegar es un clic en Northflank).
+      - name: ¿Hay credenciales?
+        id: cfg
+        env:
+          NORTHFLANK_API_KEY: ${{ secrets.NORTHFLANK_API_KEY }}
+          NORTHFLANK_PROJECT: ${{ vars.NORTHFLANK_PROJECT }}
+          NORTHFLANK_SERVICE: ${{ vars.NORTHFLANK_SERVICE }}
         run: |
-          if [ -z "$KOYEB_API_TOKEN" ] || [ -z "$KOYEB_SERVICE" ]; then
-            echo "Sin KOYEB_API_TOKEN o KOYEB_SERVICE: la imagen queda publicada y el deploy se omite."
-            exit 0
+          if [ -z "$NORTHFLANK_API_KEY" ] || [ -z "$NORTHFLANK_PROJECT" ] || [ -z "$NORTHFLANK_SERVICE" ]; then
+            echo "Sin credenciales de Northflank: la imagen queda publicada y el deploy se omite."
+            echo "listo=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "listo=true" >> "$GITHUB_OUTPUT"
           fi
-          curl -fsSL https://raw.githubusercontent.com/koyeb/koyeb-cli/master/install.sh | sh
-          export PATH=$HOME/.koyeb/bin:$PATH
-          koyeb service update "$KOYEB_SERVICE" \
-            --docker "ghcr.io/${{ github.repository }}:${{ github.sha }}" \
-            --token "$KOYEB_API_TOKEN"
+
+      # La imagen de GHCR es pública, así que no hace falta `credentials-id`.
+      - name: Redesplegar en Northflank
+        if: steps.cfg.outputs.listo == 'true'
+        uses: northflank/deploy-to-northflank@v1
+        with:
+          northflank-api-key: ${{ secrets.NORTHFLANK_API_KEY }}
+          project-id: ${{ vars.NORTHFLANK_PROJECT }}
+          service-id: ${{ vars.NORTHFLANK_SERVICE }}
+          image-path: ghcr.io/${{ github.repository }}:${{ github.sha }}

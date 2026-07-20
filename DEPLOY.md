@@ -1,12 +1,22 @@
 # Desplegar Near
 
-Guía para poner Near en internet. La **ruta A (Koyeb + Neon + R2 + Cloudflare)**
-es gratis y la recomendada para el piloto. La **ruta B (VPS)** lo mete todo en
-una máquina tuya y queda documentada como plan B.
+Guía para poner Near en internet. La **ruta A (Northflank + Neon + R2 +
+Cloudflare)** es gratis y la recomendada para el piloto. La **ruta B (VPS)** lo
+mete todo en una máquina tuya y queda documentada como plan B.
 
 > Requisito que manda todo lo demás: el bus de eventos en vivo (SSE, presencia,
 > carreras 1v1) vive **en memoria**. Near necesita **un proceso siempre
 > encendido** — nada de serverless, nada de plataformas que hibernan.
+
+Ese requisito descarta más plataformas de las que parece. Las capas gratuitas de
+Render y de la antigua de Koyeb **bajan a cero tras 15–60 min sin tráfico**: la
+app parece funcionar, pero cada noche se pierden presencia, rachas en vivo y
+partidas en curso, y el primer mensaje de la mañana tarda en llegar. Northflank
+es de las pocas que mantiene el contenedor encendido en su plan gratuito.
+
+> Nota: Koyeb retiró su capa gratuita de cómputo (adquirida por Mistral AI; hoy
+> el plan de entrada son 29 $/mes). Si buscas una alternativa de pago pero muy
+> sólida, Fly.io cuesta ~3 €/mes con `auto_stop_machines = "off"`.
 
 ---
 
@@ -18,7 +28,7 @@ Todas están en `.env.example` con comentarios. Las imprescindibles:
 |---|---|
 | `DATABASE_URL` | Postgres (Neon en producción, con `?sslmode=require`) |
 | `AUTH_SECRET` | secreto de sesión — genera uno **nuevo** con `openssl rand -base64 32` |
-| `AUTH_TRUST_HOST` | `true` detrás de proxy (Koyeb, Caddy) |
+| `AUTH_TRUST_HOST` | `true` detrás de proxy (Northflank, Caddy) |
 
 Opcionales (cada bloque duerme sin sus claves):
 
@@ -30,7 +40,7 @@ Opcionales (cada bloque duerme sin sus claves):
 
 ---
 
-## Ruta A — Koyeb + Neon + R2 + Cloudflare (gratis)
+## Ruta A — Northflank + Neon + R2 + Cloudflare (gratis)
 
 ### 1. Base de datos: Neon
 1. Crea un proyecto en [neon.tech](https://neon.tech).
@@ -57,14 +67,22 @@ npx web-push generate-vapid-keys
 Copia la pública a `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, la privada a
 `VAPID_PRIVATE_KEY`, y pon `VAPID_SUBJECT=mailto:tu-correo`.
 
-### 5. La app: Koyeb
-1. Crea cuenta en [koyeb.com](https://app.koyeb.com) (login con GitHub).
-2. **Create Web Service → Docker image**:
-   `ghcr.io/hrld1/near:latest` (la publica el CI en cada push a `main`; hazlo
-   público en GitHub → Packages, o añade credenciales de registro en Koyeb).
-3. **Instance**: Free. **Port**: `3000`. **Health check**: HTTP `GET /api/health`.
+### 5. La app: Northflank
+1. Crea cuenta en [northflank.com](https://app.northflank.com) (login con GitHub)
+   y un **proyecto** llamado `near` en la región europea.
+2. **Create new → Service → Deployment** (no "Build"; queremos la imagen ya
+   construida), origen **External image**:
+   `ghcr.io/hrld1/near:latest` — la publica el CI en cada push a `main`. Hazla
+   pública en GitHub → Packages y Northflank la detecta sin credenciales.
+3. **Plan**: `nf-compute-10` (el gratuito del Sandbox). **Port**: `3000`, público
+   y HTTP. **Health check**: HTTP `GET /api/health`.
 4. Pega TODAS las variables de entorno de arriba.
 5. Deploy. El arranque corre `prisma migrate deploy` y levanta el servidor.
+
+El plan gratuito (Sandbox: 2 servicios + 1 base de datos) mantiene el contenedor
+**siempre encendido**, que es justo lo que el bus SSE necesita. Northflank
+advierte que el Sandbox no está pensado para producción seria: vale para el
+piloto, y si Near crece se sube de plan sin tocar nada del despliegue.
 
 ### 6. Contenido inicial (una vez)
 La app funciona pero sin preguntas del día ni quiz hasta sembrarlas. Desde tu
@@ -76,10 +94,16 @@ SEED_DEMO=false npm run db:seed
 ### 7. Despliegue continuo (opcional)
 Para que cada push a `main` redespliegue solo, en GitHub → Settings → Secrets
 and variables → Actions:
-- Secreto **`KOYEB_API_TOKEN`** (Koyeb → Account → API).
-- Variable **`KOYEB_SERVICE`** con el formato `app/servicio` (p. ej. `near/web`).
+- Secreto **`NORTHFLANK_API_KEY`** (Northflank → avatar → Account settings →
+  API tokens; basta con el permiso **Update Deployment**).
+- Variable **`NORTHFLANK_PROJECT`** con el ID del proyecto (p. ej. `near`).
+- Variable **`NORTHFLANK_SERVICE`** con el ID del servicio (p. ej. `web`).
 
-Sin ellos, el CI publica la imagen y no falla; redesplegar es un clic en Koyeb.
+Los IDs son los del *slug* de la URL, no el nombre visible:
+`app.northflank.com/s/<equipo>/projects/<PROJECT>/services/<SERVICE>`.
+
+Sin ellos, el CI publica la imagen y no falla; redesplegar es un clic en
+Northflank.
 
 ---
 
@@ -164,7 +188,7 @@ con uno de los dos en datos móviles (fuerza el uso de TURN).
 
 ## Escalar
 
-- **Crece** (decenas–cientos de parejas): sube la instancia de Koyeb a 1 GB y el
-  plan de Neon. Cero cambios de código.
+- **Crece** (decenas–cientos de parejas): sube el plan de cómputo de Northflank
+  (de `nf-compute-10` al siguiente) y el de Neon. Cero cambios de código.
 - **Multi-instancia** (miles): define `REDIS_URL` (Upstash) para repartir el bus
   entre procesos y arranca 2+ instancias. El adaptador ya existe.
