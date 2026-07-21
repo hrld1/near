@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
+import { useServerState } from "@/hooks/use-server-state";
 import { Clapperboard, MonitorPlay, Popcorn } from "lucide-react";
 import { setVideoAction, updatePlaybackAction } from "@/actions/dateroom";
 import { setRoomModeAction } from "@/actions/dateroom";
@@ -63,9 +64,9 @@ export function DateRoom({
   initialTitle: string | null;
   music: { connected: boolean; partnerConnected: boolean } | null;
 }) {
-  const [mode, setMode] = useState<"YOUTUBE" | "COMPANION">(initialMode);
-  const [videoId, setVideoId] = useState(initialState.videoId);
-  const [videoTitle, setVideoTitle] = useState(initialState.videoTitle);
+  const [mode, setMode] = useServerState<"YOUTUBE" | "COMPANION">(initialMode);
+  const [videoId, setVideoId] = useServerState(initialState.videoId);
+  const [videoTitle, setVideoTitle] = useServerState(initialState.videoTitle);
   const [url, setUrl] = useState("");
   const [syncFlash, setSyncFlash] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);

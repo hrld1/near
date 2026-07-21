@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useServerState } from "@/hooks/use-server-state";
 import { Waves } from "lucide-react";
 import { setPulseAction } from "@/actions/pulse";
 import { Button } from "@/components/ui/button";
@@ -22,7 +23,7 @@ export function PulseCard({
   partner: Pulse | null;
   partnerName: string;
 }) {
-  const [mine, setMine] = useState<Pulse | null>(initialMine);
+  const [mine, setMine] = useServerState<Pulse | null>(initialMine);
   const [editing, setEditing] = useState(initialMine === null);
   const [value, setValue] = useState(initialMine?.value ?? 4);
   const [note, setNote] = useState(initialMine?.note ?? "");

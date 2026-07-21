@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useServerState } from "@/hooks/use-server-state";
 import { HeartHandshake, Sparkles } from "lucide-react";
 import { sendAppreciationAction } from "@/actions/appreciation";
 import { useCoupleStream } from "@/hooks/use-stream";
@@ -25,7 +26,7 @@ export function AppreciationBox({
   partnerName: string;
   initial: Appr[];
 }) {
-  const [list, setList] = useState<Appr[]>(initial);
+  const [list, setList] = useServerState<Appr[]>(initial);
   const [body, setBody] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);

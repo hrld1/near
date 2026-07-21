@@ -14,10 +14,13 @@ test("al perder la conexión avisa, y al volver se pone al día", async ({ brows
     await a.goto("/cerca");
     await b.goto("/cerca");
 
-    // A se queda sin red. Tumba la conexión abierta, no solo las futuras, que
-    // es lo que de verdad pasa cuando el servidor se reinicia en un despliegue
-    // o cuando alguien entra en el metro.
-    await a.context().setOffline(true);
+    // El servidor deja de ser alcanzable para A. Ojo: `setOffline` NO vale
+    // aquí — bloquea las peticiones nuevas pero deja fluyendo el stream ya
+    // abierto, así que A seguiría recibiéndolo todo. Bloqueamos la ruta y
+    // recargamos, de modo que la conexión nueva no llega a establecerse: eso
+    // sí es quedarse a ciegas.
+    await a.route("**/api/stream", (route) => route.abort());
+    await a.reload();
     // El aviso tarda 2,5 s a propósito: un parpadeo no merece cartel.
     await expect(a.getByText("Reconectando…")).toBeVisible({ timeout: 30_000 });
 
@@ -29,9 +32,9 @@ test("al perder la conexión avisa, y al volver se pone al día", async ({ brows
     await expect(b.getByText(`“${texto}”`)).toBeVisible();
     await expect(a.getByText(`“${texto}”`)).toBeHidden(); // no lo ha visto
 
-    // Vuelve la red: A reconecta y, al hacerlo, vuelve a pedir los datos. Sin
-    // recargar la página a mano.
-    await a.context().setOffline(false);
+    // Vuelve a ser alcanzable: A reconecta y, al hacerlo, vuelve a pedir los
+    // datos. Sin recargar la página a mano.
+    await a.unroute("**/api/stream");
     await expect(a.getByText("Reconectando…")).toBeHidden({ timeout: 60_000 });
     await expect(a.getByText(`“${texto}”`)).toBeVisible({ timeout: 30_000 });
   } finally {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useServerState } from "@/hooks/use-server-state";
 import { Cloudy, Sun } from "lucide-react";
 import { submitRepairEntryAction } from "@/actions/repair";
 import { REPAIR_FEELINGS } from "@/lib/repair";
@@ -26,9 +27,9 @@ export function AftermathTool({
   initialPartner: Entry | null;
   partnerAnswered: boolean;
 }) {
-  const [repairId, setRepairId] = useState<string | null>(initialRepairId);
-  const [mine, setMine] = useState<Entry | null>(initialMine);
-  const [partner, setPartner] = useState<Entry | null>(initialPartner);
+  const [repairId, setRepairId] = useServerState<string | null>(initialRepairId);
+  const [mine, setMine] = useServerState<Entry | null>(initialMine);
+  const [partner, setPartner] = useServerState<Entry | null>(initialPartner);
   const [theyAnswered, setTheyAnswered] = useState(partnerAnswered);
 
   const [feelings, setFeelings] = useState<string[]>([]);

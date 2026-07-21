@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useServerState } from "@/hooks/use-server-state";
 import { Gift, Sparkles } from "lucide-react";
 import { openDailyBoxAction } from "@/actions/box";
 import { cn } from "@/lib/utils";
@@ -17,7 +18,7 @@ export function DailyBox({
 }: {
   initial: { kind: string; content: string; openedBy: string | null } | null;
 }) {
-  const [box, setBox] = useState(initial);
+  const [box, setBox] = useServerState(initial);
   const [justOpened, setJustOpened] = useState(false);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);

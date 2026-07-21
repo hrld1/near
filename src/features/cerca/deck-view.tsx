@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useServerState } from "@/hooks/use-server-state";
 import Link from "next/link";
 import { ArrowLeft, Lock } from "lucide-react";
 import { answerCardAction } from "@/actions/cards";
@@ -27,7 +28,7 @@ export function DeckView({
   partnerName: string;
   initial: CardState[];
 }) {
-  const [cards, setCards] = useState<CardState[]>(initial);
+  const [cards, setCards] = useServerState<CardState[]>(initial);
   const revealed = cards.filter((c) => c.myAnswer && c.partnerAnswer).length;
   const mineDone = cards.filter((c) => c.myAnswer).length;
 

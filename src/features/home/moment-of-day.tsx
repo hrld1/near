@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useServerState } from "@/hooks/use-server-state";
 import { Camera, Flame, ImagePlus, Lock, Sparkles } from "lucide-react";
 import { setDailyPhotoAction } from "@/actions/photo";
 import { uploadFile } from "@/lib/upload-client";
@@ -32,8 +33,8 @@ export function MomentOfDay({
   initialPartnerPhoto: Photo | null;
   partnerPostedInitial: boolean;
 }) {
-  const [myPhoto, setMyPhoto] = useState<Photo | null>(initialMyPhoto);
-  const [partnerPhoto, setPartnerPhoto] = useState<Photo | null>(initialPartnerPhoto);
+  const [myPhoto, setMyPhoto] = useServerState<Photo | null>(initialMyPhoto);
+  const [partnerPhoto, setPartnerPhoto] = useServerState<Photo | null>(initialPartnerPhoto);
   const [partnerPosted, setPartnerPosted] = useState(partnerPostedInitial || !!initialPartnerPhoto);
   const [caption, setCaption] = useState("");
   const [uploading, setUploading] = useState(false);

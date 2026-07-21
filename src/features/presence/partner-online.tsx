@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useServerState } from "@/hooks/use-server-state";
 import { useCoupleStream } from "@/hooks/use-stream";
 import { cn } from "@/lib/utils";
 
@@ -19,7 +20,7 @@ export function PartnerOnline({
   withLabel?: boolean;
   className?: string;
 }) {
-  const [online, setOnline] = useState(initialOnline);
+  const [online, setOnline] = useServerState(initialOnline);
 
   useCoupleStream((event) => {
     if (event.type !== "online") return;
