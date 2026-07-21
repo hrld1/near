@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { raceSignalAction } from "@/actions/race";
-import { sendQuitBeacon } from "@/lib/quit-beacon";
+import { sendLiveSignal, sendQuitBeacon } from "@/lib/quit-beacon";
 import { useCoupleStream } from "@/hooks/use-stream";
 import type { GameDef } from "@/lib/games";
 
@@ -107,10 +107,15 @@ export function useRace(def: GameDef, myId: string) {
   // salir a mitad = abandonar. Por beacon y no por server action: al
   // desmontarse ya se está navegando, y el navegador cancela las peticiones
   // normales en vuelo (ver src/lib/quit-beacon.ts).
+  // "incoming" cuenta: si te invitan, te vas sin contestar y no avisamos, el
+  // otro se queda esperando en "inviting" para siempre. "over" no, porque ahí
+  // la partida ya terminó y ambos tienen el resultado.
   useEffect(() => {
     return () => {
       const p = phaseRef.current;
-      if (p === "playing" || p === "countdown" || p === "inviting") sendQuitBeacon("race", game);
+      if (p === "playing" || p === "countdown" || p === "inviting" || p === "incoming") {
+        sendQuitBeacon("race", game);
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -128,19 +133,21 @@ export function useRace(def: GameDef, myId: string) {
     resetRound();
     setPhaseAll("lobby");
   }
+  // Marcador y final NO van por server action: son el flujo de alta frecuencia
+  // que encolaba las navegaciones (ver src/lib/quit-beacon.ts).
   function reportProgress(score: number) {
     setMyScore(score);
     const now = Date.now();
     if (now - lastSentRef.current > 200) {
       lastSentRef.current = now;
-      void raceSignalAction({ game, kind: "score", score });
+      sendLiveSignal({ arena: "race", game, kind: "score", score });
     }
   }
   function reportFinish(score: number) {
     setMyScore(score);
     myFinalRef.current = score;
     setMyFinal(score);
-    void raceSignalAction({ game, kind: "done", score });
+    sendLiveSignal({ arena: "race", game, kind: "done", score });
     checkOver();
   }
 
