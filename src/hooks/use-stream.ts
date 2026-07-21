@@ -30,19 +30,88 @@ const reconnectListeners = new Set<() => void>();
 let retryMs = 1000;
 let retryTimer: ReturnType<typeof setTimeout> | null = null;
 
+// `onerror` NO basta para saber que estás desconectado. Medido: con la red
+// cortada, una conexión SSE ya abierta se queda en readyState=1 sin disparar
+// un solo error — el socket no se entera de que no hay red hasta que intenta
+// hablar y agota el tiempo, y eso puede tardar minutos. O sea que detectaba el
+// reinicio del servidor pero no el metro, ni el wifi que se cae, ni el móvil
+// que se duerme.
+//
+// Por eso hay tres señales: el error (cuando llega), los eventos de red del
+// navegador, y sobre todo un vigía sobre el latido del servidor — si lleva
+// demasiado en silencio, la conexión está muerta aunque diga estar viva.
+const LATIDO_MS = 25_000; // el servidor manda "ping" a este ritmo
+const SILENCIO_MAX_MS = LATIDO_MS * 2 + 10_000;
+let lastMessageAt = 0;
+let watchdog: ReturnType<typeof setInterval> | null = null;
+let netListenersReady = false;
+
 function setStatus(next: StreamStatus) {
   if (status === next) return;
   status = next;
   for (const listener of statusListeners) listener(next);
 }
 
+// Cierra lo que haya y vuelve a abrir ya, sin esperar la cuenta atrás.
+function reopen() {
+  if (typeof window === "undefined") return;
+  if (source) {
+    source.close();
+    source = null;
+  }
+  if (retryTimer) {
+    clearTimeout(retryTimer);
+    retryTimer = null;
+  }
+  setStatus("reconnecting");
+  if (listeners.size > 0) ensureSource();
+}
+
+function ensureNetListeners() {
+  if (netListenersReady || typeof window === "undefined") return;
+  netListenersReady = true;
+
+  // La red se fue: no hace falta esperar al vigía para saberlo.
+  window.addEventListener("offline", () => setStatus("reconnecting"));
+  // La red volvió: reabrir en el acto, sin respetar la espera creciente.
+  window.addEventListener("online", () => {
+    retryMs = 1000;
+    if (listeners.size > 0) reopen();
+  });
+  // Volver a la app tras un rato (móvil desbloqueado, pestaña al frente) es el
+  // momento típico en que arrastras una conexión zombi.
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState !== "visible") return;
+    if (listeners.size === 0) return;
+    if (Date.now() - lastMessageAt > SILENCIO_MAX_MS) reopen();
+  });
+}
+
+function startWatchdog() {
+  if (watchdog) return;
+  watchdog = setInterval(() => {
+    if (listeners.size === 0) return;
+    if (typeof navigator !== "undefined" && !navigator.onLine) {
+      setStatus("reconnecting");
+      return;
+    }
+    // Demasiado silencio: el servidor late cada 25 s, así que si no llega nada
+    // en más de un minuto la conexión está muerta por mucho que lo niegue.
+    if (lastMessageAt > 0 && Date.now() - lastMessageAt > SILENCIO_MAX_MS) reopen();
+  }, 5000);
+}
+
 function ensureSource() {
   if (source || typeof window === "undefined") return;
+  ensureNetListeners();
+  startWatchdog();
   const es = new EventSource("/api/stream");
   source = es;
+  lastMessageAt = Date.now(); // margen para el primer latido
 
   es.onopen = () => {
     retryMs = 1000;
+    lastMessageAt = Date.now();
     // Solo es una RE-conexión si ya habíamos estado caídos; la primera vez no
     // hay nada que resincronizar.
     const wasDown = status === "reconnecting";
@@ -51,6 +120,9 @@ function ensureSource() {
   };
 
   es.onmessage = (message) => {
+    // Cualquier cosa que llegue, incluido el latido, prueba que sigue viva.
+    lastMessageAt = Date.now();
+    if (status !== "online") setStatus("online");
     let event: StreamEvent;
     try {
       event = JSON.parse(message.data) as StreamEvent;
@@ -86,12 +158,17 @@ function ensureSource() {
 }
 
 function teardownIfIdle() {
-  if (listeners.size > 0 || !source) return;
-  source.close();
-  source = null;
+  if (listeners.size > 0) return;
+  if (source) {
+    source.close();
+    source = null;
+  }
   if (retryTimer) clearTimeout(retryTimer);
   retryTimer = null;
+  if (watchdog) clearInterval(watchdog);
+  watchdog = null;
   retryMs = 1000;
+  lastMessageAt = 0;
   setStatus("connecting");
 }
 
