@@ -10,7 +10,7 @@ import { presenceInfo, moodInfo } from "@/lib/utils";
 import { heartbeat, sfx } from "@/lib/sound";
 import { sendNudgeAction } from "@/actions/presence";
 import { touchSignalAction } from "@/actions/touch";
-import { togetherHereAction } from "@/actions/together";
+import { sendLiveSignal, sendTogetherLeaveBeacon } from "@/lib/quit-beacon";
 import { useCoupleStream } from "@/hooks/use-stream";
 import { useCall } from "@/features/call/call-context";
 import { PartnerOnline } from "@/features/presence/partner-online";
@@ -107,12 +107,12 @@ export function TogetherWindow({
   // para que quien llega tarde también se entere.
   useEffect(() => {
     if (!partner) return;
-    void togetherHereAction(true);
-    const onHide = () => void togetherHereAction(false);
+    sendLiveSignal({ arena: "together", here: true });
+    const onHide = () => sendTogetherLeaveBeacon();
     window.addEventListener("pagehide", onHide);
     return () => {
       window.removeEventListener("pagehide", onHide);
-      void togetherHereAction(false);
+      sendTogetherLeaveBeacon();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -124,7 +124,7 @@ export function TogetherWindow({
       if (!partnerHereRef.current) {
         partnerHereRef.current = true;
         setPartnerHere(true);
-        void togetherHereAction(true);
+        sendLiveSignal({ arena: "together", here: true });
       }
     } else {
       partnerHereRef.current = false;

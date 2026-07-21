@@ -10,7 +10,7 @@ import {
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Mic, MicOff, Moon, Phone, PhoneOff, Sun } from "lucide-react";
-import { callSignalAction } from "@/actions/call";
+import { sendHangupBeacon, sendLiveSignal } from "@/lib/quit-beacon";
 import { useCoupleStream } from "@/hooks/use-stream";
 import { heartbeat, sfx, vibrate } from "@/lib/sound";
 import { Avatar } from "@/components/ui/avatar";
@@ -154,6 +154,17 @@ export function CallProvider({
 
   useEffect(() => () => cleanup(true), []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Cerrar la pestaña en mitad de una llamada tiene que colgar. Va por beacon
+  // porque en `pagehide` una petición normal ya no llega. Sin esto, el otro se
+  // queda con la llamada abierta y sonando hasta que se rinde.
+  useEffect(() => {
+    const onLeave = () => {
+      if (stateRef.current !== "idle") sendHangupBeacon();
+    };
+    window.addEventListener("pagehide", onLeave);
+    return () => window.removeEventListener("pagehide", onLeave);
+  }, []);
+
   // Pide medios degradando con elegancia: video+audio -> audio -> nada.
   async function ensureMedia(audioOnly = false): Promise<{ stream: MediaStream | null; mode: MediaMode }> {
     if (localStreamRef.current) {
@@ -227,7 +238,7 @@ export function CallProvider({
     };
     pc.onicecandidate = (event) => {
       if (event.candidate) {
-        void callSignalAction({ kind: "ice", data: JSON.stringify(event.candidate.toJSON()) });
+        sendLiveSignal({ arena: "call", kind: "ice", data: JSON.stringify(event.candidate.toJSON()) });
       }
     };
     pc.onconnectionstatechange = () => {
@@ -297,7 +308,7 @@ export function CallProvider({
           setCallState("connecting");
           const offer = await pc.createOffer();
           await pc.setLocalDescription(offer);
-          await callSignalAction({ kind: "offer", data: JSON.stringify(offer) });
+          sendLiveSignal({ arena: "call", kind: "offer", data: JSON.stringify(offer) });
           break;
         }
         case "offer": {
@@ -309,7 +320,7 @@ export function CallProvider({
           await drainIce();
           const answer = await pc.createAnswer();
           await pc.setLocalDescription(answer);
-          await callSignalAction({ kind: "answer", data: JSON.stringify(answer) });
+          sendLiveSignal({ arena: "call", kind: "answer", data: JSON.stringify(answer) });
           break;
         }
         case "answer": {
@@ -397,13 +408,13 @@ export function CallProvider({
       setCallState("outgoing");
       // primer ring con push ("te esta llamando" aunque tenga la app cerrada);
       // los re-rings solo viajan por el bus
-      await callSignalAction({ kind: "ring", initial: true });
+      sendLiveSignal({ arena: "call", kind: "ring", initial: true });
       reRingRef.current = setInterval(() => {
-        if (stateRef.current === "outgoing") void callSignalAction({ kind: "ring" });
+        if (stateRef.current === "outgoing") sendLiveSignal({ arena: "call", kind: "ring" });
       }, 4000);
       noAnswerRef.current = setTimeout(() => {
         if (stateRef.current === "outgoing") {
-          void callSignalAction({ kind: "hangup" });
+          sendLiveSignal({ arena: "call", kind: "hangup" });
           cleanup(false, "No contesta ahora mismo");
         }
       }, 45000);
@@ -421,20 +432,20 @@ export function CallProvider({
       createPeer(stream);
       roleRef.current = "callee";
       setCallState("connecting");
-      await callSignalAction({ kind: "accept" });
+      sendLiveSignal({ arena: "call", kind: "accept" });
     } catch (err) {
-      void callSignalAction({ kind: "decline" });
+      sendLiveSignal({ arena: "call", kind: "decline" });
       cleanup(false, mediaErrorMessage(err));
     }
   }
 
   function declineCall() {
-    void callSignalAction({ kind: "decline" });
+    sendLiveSignal({ arena: "call", kind: "decline" });
     cleanup(true);
   }
 
   function hangup() {
-    void callSignalAction({ kind: "hangup" });
+    sendLiveSignal({ arena: "call", kind: "hangup" });
     cleanup(false, "Llamada terminada");
   }
 
@@ -482,16 +493,16 @@ export function CallProvider({
   function startSleep() {
     if (stateRef.current !== "active") return;
     setSleeping(true);
-    void callSignalAction({ kind: "sleep" });
+    sendLiveSignal({ arena: "call", kind: "sleep" });
   }
 
   function wakeUp() {
     setSleeping(false);
-    void callSignalAction({ kind: "wake" });
+    sendLiveSignal({ arena: "call", kind: "wake" });
   }
 
   function goodnight() {
-    void callSignalAction({ kind: "goodnight" });
+    sendLiveSignal({ arena: "call", kind: "goodnight" });
     heartbeat();
     sfx.goodnight();
     cleanup(false, "Buenas noches 🌙");

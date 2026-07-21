@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Fingerprint, Heart } from "lucide-react";
-import { touchSignalAction } from "@/actions/touch";
+import { sendLiveSignal, sendTouchLeaveBeacon } from "@/lib/quit-beacon";
 import { useCoupleStream } from "@/hooks/use-stream";
 import { heartbeat, sfx } from "@/lib/sound";
 import { cn } from "@/lib/utils";
@@ -39,8 +39,8 @@ export function TouchTogether({ me, partner }: { me: MemberInfo; partner: Member
   // Presencia en la superficie: aviso al entrar y al salir (o al cerrar la
   // pestaña) para que el otro no vea un dedo fantasma.
   useEffect(() => {
-    void touchSignalAction({ kind: "join" });
-    const onHide = () => void touchSignalAction({ kind: "leave" });
+    sendLiveSignal({ arena: "touch", kind: "join" });
+    const onHide = () => sendTouchLeaveBeacon();
     window.addEventListener("pagehide", onHide);
     // Keepalive: mientras el dedo esté apoyado y quieto no hay pointermove,
     // así que reenviamos la posición ~1/s para que al otro no se le borre.
@@ -53,7 +53,7 @@ export function TouchTogether({ me, partner }: { me: MemberInfo; partner: Member
       window.removeEventListener("pagehide", onHide);
       clearInterval(keepalive);
       if (staleRef.current) clearTimeout(staleRef.current);
-      void touchSignalAction({ kind: "leave" });
+      sendTouchLeaveBeacon();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -64,7 +64,7 @@ export function TouchTogether({ me, partner }: { me: MemberInfo; partner: Member
     if (partnerHereRef.current) return;
     partnerHereRef.current = true;
     setPartnerHere(true);
-    void touchSignalAction({ kind: "join" });
+    sendLiveSignal({ arena: "touch", kind: "join" });
   }
 
   useCoupleStream((event) => {
@@ -100,7 +100,7 @@ export function TouchTogether({ me, partner }: { me: MemberInfo; partner: Member
     if (!force && now - lastSentRef.current < 90 && moved < 0.008) return;
     lastSentRef.current = now;
     lastPosRef.current = { x, y };
-    void touchSignalAction({ kind: "move", x, y, pressing });
+    sendLiveSignal({ arena: "touch", kind: "move", x, y, pressing });
   }
 
   function normalize(e: React.PointerEvent) {

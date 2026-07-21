@@ -10,27 +10,8 @@ import { getCurrentPlayback, playTrack, spotifyEnabled } from "@/lib/spotify";
 // El "lider" comparte lo que suena en su Spotify: el servidor lo consulta con
 // su token y lo publica por el bus (music:sync). No exponemos el token al
 // cliente en ningun momento.
-export const broadcastPlaybackAction = coupleAction<[], { playing: boolean; trackName: string | null }>(
-  async ({ user, coupleId }) => {
-    if (!spotifyEnabled()) return { ok: false, error: "Spotify no esta configurado" };
-    const pb = await getCurrentPlayback(user.id);
-    if (!pb) return { ok: false, error: "Conecta tu Spotify para compartir lo que suena" };
-    publish(coupleId, {
-      type: "music:sync",
-      payload: {
-        byId: user.id,
-        trackUri: pb.trackUri,
-        trackName: pb.trackName,
-        artists: pb.artists,
-        albumArt: pb.albumArt,
-        positionMs: pb.positionMs,
-        playing: pb.playing,
-        at: Date.now()
-      }
-    });
-    return { ok: true, data: { playing: pb.playing, trackName: pb.trackName } };
-  }
-);
+// broadcastPlaybackAction vivia aqui: paso a POST /api/live {arena:"music"}
+// porque se llamaba cada 4 s y encolaba las navegaciones.
 
 const followSchema = z.object({
   trackUri: z.string().startsWith("spotify:track:").max(120),

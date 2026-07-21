@@ -2,11 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Music, Radio, Link2, Loader2 } from "lucide-react";
-import {
-  broadcastPlaybackAction,
-  followPlaybackAction,
-  disconnectSpotifyAction
-} from "@/actions/spotify";
+import { followPlaybackAction, disconnectSpotifyAction } from "@/actions/spotify";
 import { useCoupleStream } from "@/hooks/use-stream";
 import { cn } from "@/lib/utils";
 import type { StreamEvent } from "@/types";
@@ -40,11 +36,18 @@ export function MusicTogether({
   useEffect(() => {
     if (!leading) return;
     let alive = true;
+    // Por fetch y no por server action: es periódico y encolaría las
+    // navegaciones (ver src/lib/quit-beacon.ts).
     const tick = async () => {
-      const res = await broadcastPlaybackAction();
+      const res = await fetch("/api/live", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ arena: "music" })
+      }).catch(() => null);
       if (!alive) return;
-      if (!res.ok) {
-        setNote(res.error);
+      if (!res?.ok) {
+        const error = await res?.json().catch(() => null);
+        setNote(error?.error ?? "No se pudo compartir lo que suena");
         setLeading(false);
       }
     };

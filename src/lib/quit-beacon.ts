@@ -12,21 +12,49 @@
 //    el navegador navega a otra parte, y ahí cancela las peticiones en vuelo.
 //    `sendBeacon` encola la petición en el navegador y la entrega aunque la
 //    página ya no exista.
+export type CallSignalKind =
+  | "ring"
+  | "accept"
+  | "decline"
+  | "offer"
+  | "answer"
+  | "ice"
+  | "hangup"
+  | "sleep"
+  | "wake"
+  | "goodnight";
+
 type LiveSignal =
   | { arena: "race"; game: string; kind: "score" | "done"; score: number }
   | { arena: "race"; game: string; kind: "quit" }
-  | { arena: "duel"; game: string; kind: "quit" };
+  | { arena: "duel"; game: string; kind: "quit" }
+  | { arena: "call"; kind: CallSignalKind; data?: string; initial?: boolean }
+  | { arena: "touch"; kind: "join" | "leave" | "move"; x?: number; y?: number; pressing?: boolean }
+  | { arena: "together"; here: boolean };
 
 // El marcador es un flujo continuo: si una petición sigue en vuelo no tiene
 // sentido apilar la siguiente — el valor nuevo ya sustituye al viejo. Así el
 // canal se autolimita si la red se pone lenta, en vez de acumular retraso.
-let inFlight = false;
+// Por arena, no global: que el marcador de un duelo esté en vuelo no debe
+// silenciar el dedo en la superficie de tacto.
+const inFlight = new Set<string>();
+
+// ¿Es un flujo continuo del que solo importa el último valor? El marcador de
+// un duelo y la posición del dedo lo son; todo lo demás (empezar, terminar,
+// colgar) tiene que llegar sí o sí.
+function isStream(signal: LiveSignal) {
+  return (
+    (signal.arena === "race" && signal.kind === "score") ||
+    (signal.arena === "touch" && signal.kind === "move")
+  );
+}
 
 export function sendLiveSignal(signal: LiveSignal) {
   if (typeof fetch === "undefined") return;
-  if (signal.kind === "score") {
-    if (inFlight) return;
-    inFlight = true;
+  const stream = isStream(signal);
+  if (stream) {
+    if (inFlight.has(signal.arena)) return;
+    inFlight.add(signal.arena);
   }
   void fetch("/api/live", {
     method: "POST",
@@ -35,14 +63,34 @@ export function sendLiveSignal(signal: LiveSignal) {
   })
     .catch(() => {})
     .finally(() => {
-      if (signal.kind === "score") inFlight = false;
+      if (stream) inFlight.delete(signal.arena);
     });
 }
 
 // Abandono: la página se está muriendo, así que va por beacon.
 export function sendQuitBeacon(arena: "race" | "duel", game: string) {
+  sendBeaconJson({ arena, game, kind: "quit" });
+}
+
+// Colgar al cerrar la pestaña en mitad de una llamada: mismo problema, misma
+// solución. Sin esto, el otro se queda con la llamada abierta y sonando.
+export function sendHangupBeacon() {
+  sendBeaconJson({ arena: "call", kind: "hangup" });
+}
+
+// "Me voy" del tacto compartido y de Estar juntos. Sin beacon, el otro se
+// queda viendo un dedo fantasma o creyendo que sigues mirando el mismo cielo.
+export function sendTouchLeaveBeacon() {
+  sendBeaconJson({ arena: "touch", kind: "leave" });
+}
+
+export function sendTogetherLeaveBeacon() {
+  sendBeaconJson({ arena: "together", here: false });
+}
+
+function sendBeaconJson(payload: Record<string, unknown>) {
   if (typeof navigator === "undefined") return;
-  const body = JSON.stringify({ arena, game, kind: "quit" });
+  const body = JSON.stringify(payload);
 
   if (typeof navigator.sendBeacon === "function") {
     // El tipo importa: con Blob se manda tal cual y el servidor lo lee como
