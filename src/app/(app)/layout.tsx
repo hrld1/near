@@ -2,6 +2,7 @@ import { requireUser } from "@/lib/couple";
 import { prisma } from "@/lib/db";
 import { CallProvider } from "@/features/call/call-context";
 import { LiveRefresh } from "@/components/live-refresh";
+import { LiveConnection } from "@/components/live-connection";
 import { Sidebar } from "@/components/layout/sidebar";
 import { NudgeToast } from "@/components/layout/nudge-toast";
 import { RepairToast } from "@/components/layout/repair-toast";
@@ -48,6 +49,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       {user.coupleId && <RepairToast myId={user.id} />}
       {user.coupleId && <TouchInvite myId={user.id} />}
       {user.coupleId && <LiveRefresh types={["message:new"]} />}
+      {user.coupleId && <LiveConnection />}
       <TimezoneSync current={user.timezone} />
     </div>
   );
