@@ -25,27 +25,17 @@ jobs:
           fi
 
       # pg_dump puede volcar su versión y anteriores, pero NO un servidor más
-      # nuevo que él. Neon corre 18, así que hace falta el cliente 18.
-      # La AWS CLI v2 ya viene en el runner (y `awscli` dejó de existir en apt
-      # a partir de Ubuntu 24.04, que es lo que rompía antes).
-      - name: Instalar pg_dump 18 (compatible con Neon)
-        run: |
-          sudo sh -c 'echo "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
-          curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/pgdg.gpg
-          sudo apt-get update -qq
-          sudo apt-get install -y postgresql-client-18
-          # El runner trae su propio pg_dump 16 en /usr/bin que tapa al de
-          # pgdg: instalar no basta, hay que anteponerlo en el PATH. Se coge
-          # la versión más alta instalada para que esto siga valiendo cuando
-          # Neon suba de versión otra vez.
-          ls -d /usr/lib/postgresql/*/bin | sort -V | tail -1 >> "$GITHUB_PATH"
-
-      # En un paso aparte: GITHUB_PATH solo aplica a los pasos siguientes, así
-      # que aquí ya se ve el pg_dump que de verdad va a correr el volcado.
+      # nuevo que él, y Neon corre 18. Instalarlo por apt no funciona: el
+      # runner ya trae postgresql-client-16 de pgdg y su wrapper en /usr/bin
+      # gana al binario nuevo, así que el volcado seguía saliendo en 16.14.
+      # Con la imagen oficial la versión queda fijada y no depende de lo que
+      # el runner tenga instalado. La AWS CLI v2 ya viene preinstalada.
       - name: Comprobar versiones
         run: |
-          pg_dump --version
+          docker run --rm "$PG_IMAGE" pg_dump --version
           aws --version
+        env:
+          PG_IMAGE: postgres:18-alpine
 
       - name: Volcar, cifrar y subir a R2
         env:
@@ -56,14 +46,25 @@ jobs:
           AWS_DEFAULT_REGION: auto
           S3_BUCKET: ${{ secrets.S3_BUCKET }}
           S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
+          PG_IMAGE: postgres:18-alpine
         run: |
           set -euo pipefail
           STAMP=$(date -u +%Y-%m-%d)
           FILE="near-${STAMP}.dump.gpg"
-          # formato custom (-Fc): comprimido y restaurable con pg_restore
-          pg_dump "$DATABASE_URL" -Fc \
+          # La URL entra al contenedor como variable, no como argumento, para
+          # que no quede en la línea de comandos. Formato custom (-Fc):
+          # comprimido y restaurable con pg_restore.
+          docker run --rm -e PGURL="$DATABASE_URL" "$PG_IMAGE" \
+              sh -c 'pg_dump "$PGURL" -Fc' \
             | gpg --batch --yes --symmetric --cipher-algo AES256 \
                   --passphrase "$BACKUP_PASSPHRASE" -o "$FILE"
+          # Un backup vacío que "termina bien" es peor que uno que falla: se
+          # descubriría el día que haga falta restaurar.
+          SIZE=$(stat -c%s "$FILE")
+          if [ "$SIZE" -lt 1024 ]; then
+            echo "El volcado ocupa $SIZE bytes: algo ha ido mal."
+            exit 1
+          fi
           aws s3 cp "$FILE" "s3://${S3_BUCKET}/backups/${FILE}" \
             --endpoint-url "$S3_ENDPOINT"
           echo "Backup subido: backups/${FILE} ($(du -h "$FILE" | cut -f1))"

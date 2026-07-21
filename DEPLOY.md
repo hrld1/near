@@ -172,7 +172,10 @@ Restaurar:
 ```bash
 aws s3 cp s3://near/backups/near-AAAA-MM-DD.dump.gpg . --endpoint-url "$S3_ENDPOINT"
 gpg -d near-AAAA-MM-DD.dump.gpg > near.dump
-pg_restore --clean --if-exists -d "$DATABASE_URL" near.dump
+# Por Docker para no depender de la versión de pg_restore que tengas: debe ser
+# igual o mayor que la del servidor (Neon corre 18), o se niega a restaurar.
+docker run --rm -i -e PGURL="$DATABASE_URL" -v "$PWD:/w" -w /w postgres:18-alpine \
+  sh -c 'pg_restore --clean --if-exists -d "$PGURL" near.dump'
 ```
 
 ---
