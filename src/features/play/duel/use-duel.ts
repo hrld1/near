@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { duelSignalAction } from "@/actions/duel";
+import { sendQuitBeacon } from "@/lib/quit-beacon";
 import { useCoupleStream } from "@/hooks/use-stream";
 
 // Arnés reutilizable de los duelos 1v1 EN VIVO. Encapsula TODO el ciclo de
@@ -100,10 +101,12 @@ export function useDuel<S extends DuelBaseState, M>(spec: DuelSpec<S, M>, myId: 
     }
   });
 
-  // salir de la página en mitad de partida = abandonar
+  // salir de la página en mitad de partida = abandonar. Por beacon y no por
+  // server action: al desmontarse ya se está navegando, y el navegador cancela
+  // las peticiones normales en vuelo (ver src/lib/quit-beacon.ts).
   useEffect(() => {
     return () => {
-      if (phaseRef.current === "playing") void duelSignalAction({ game: specRef.current.key, kind: "quit" });
+      if (phaseRef.current === "playing") sendQuitBeacon("duel", specRef.current.key);
     };
   }, []);
 

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { raceSignalAction } from "@/actions/race";
+import { sendQuitBeacon } from "@/lib/quit-beacon";
 import { useCoupleStream } from "@/hooks/use-stream";
 import type { GameDef } from "@/lib/games";
 
@@ -103,11 +104,13 @@ export function useRace(def: GameDef, myId: string) {
     }
   });
 
-  // salir a mitad = abandonar
+  // salir a mitad = abandonar. Por beacon y no por server action: al
+  // desmontarse ya se está navegando, y el navegador cancela las peticiones
+  // normales en vuelo (ver src/lib/quit-beacon.ts).
   useEffect(() => {
     return () => {
       const p = phaseRef.current;
-      if (p === "playing" || p === "countdown" || p === "inviting") void raceSignalAction({ game, kind: "quit" });
+      if (p === "playing" || p === "countdown" || p === "inviting") sendQuitBeacon("race", game);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
