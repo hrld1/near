@@ -24,16 +24,26 @@ jobs:
             exit 1
           fi
 
-      # pg_dump 17: puede volcar servidores 17 y anteriores, pero NO uno más
-      # nuevo que él. Neon crea los proyectos nuevos en 17, así que la 16 se
-      # quedaba corta. La AWS CLI v2 ya viene en el runner (y `awscli` dejó de
-      # existir en apt a partir de Ubuntu 24.04, que es lo que rompía aquí).
-      - name: Instalar pg_dump 17 (compatible con Neon)
+      # pg_dump puede volcar su versión y anteriores, pero NO un servidor más
+      # nuevo que él. Neon corre 18, así que hace falta el cliente 18.
+      # La AWS CLI v2 ya viene en el runner (y `awscli` dejó de existir en apt
+      # a partir de Ubuntu 24.04, que es lo que rompía antes).
+      - name: Instalar pg_dump 18 (compatible con Neon)
         run: |
           sudo sh -c 'echo "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
           curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/pgdg.gpg
           sudo apt-get update -qq
-          sudo apt-get install -y postgresql-client-17
+          sudo apt-get install -y postgresql-client-18
+          # El runner trae su propio pg_dump 16 en /usr/bin que tapa al de
+          # pgdg: instalar no basta, hay que anteponerlo en el PATH. Se coge
+          # la versión más alta instalada para que esto siga valiendo cuando
+          # Neon suba de versión otra vez.
+          ls -d /usr/lib/postgresql/*/bin | sort -V | tail -1 >> "$GITHUB_PATH"
+
+      # En un paso aparte: GITHUB_PATH solo aplica a los pasos siguientes, así
+      # que aquí ya se ve el pg_dump que de verdad va a correr el volcado.
+      - name: Comprobar versiones
+        run: |
           pg_dump --version
           aws --version
 
