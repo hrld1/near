@@ -34,6 +34,18 @@ jobs:
           else
             echo "healthy=false" >> "$GITHUB_OUTPUT"
             echo "detail=HTTP $code" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Un despliegue que falla NO se ve aquí: la app sigue sana sirviendo
+          # la versión anterior, el monitor da verde y nadie se entera. Pasó de
+          # verdad (la imagen de 4a47cc9 no se construyó y estuvimos una hora
+          # creyendo que estaba desplegada). Así que además de "¿responde?",
+          # preguntamos "¿responde lo que acabamos de subir?".
+          desplegada=$(sed -n 's/.*"version":"\([^"]*\)".*/\1/p' /tmp/body)
+          echo "desplegada=$desplegada · main=$GITHUB_SHA"
+          if [ -n "$desplegada" ] && [ "$desplegada" != "dev" ] && [ "$desplegada" != "$GITHUB_SHA" ]; then
+            echo "stale=true" >> "$GITHUB_OUTPUT"
+            echo "stale_detail=sirviendo ${desplegada:0:7}, main va por ${GITHUB_SHA:0:7}" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Avisar si está caída
@@ -56,6 +68,30 @@ jobs:
               });
             }
 
+      # Aviso aparte del de "está caída": son problemas distintos y se
+      # resuelven distinto. Este no cierra solo — hay que mirar por qué el
+      # despliegue no llegó.
+      - name: Avisar si el despliegue se quedó atrás
+        if: steps.check.outputs.skip != 'true' && steps.check.outputs.stale == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const marker = "<!-- deploy-stale -->";
+            const { owner, repo } = context.repo;
+            const open = await github.rest.issues.listForRepo({
+              owner, repo, state: "open", labels: "uptime"
+            });
+            if (open.data.some((i) => i.body?.includes(marker))) return;
+            await github.rest.issues.create({
+              owner, repo,
+              title: "⚠️ El despliegue no está al día",
+              labels: ["uptime"],
+              body: `${marker}\nNear responde bien, pero con una versión vieja: ${{ steps.check.outputs.stale_detail }}.\nProbablemente falló la construcción de la imagen o el redespliegue.\nComprobado: ${new Date().toISOString()}`
+            });
+
+      # Solo mira `healthy`: si estaba caída y ha vuelto, la caída terminó
+      # aunque sirva una versión vieja. Son dos avisos independientes y este
+      # paso solo cierra los de caída (los busca por su propia marca).
       - name: Cerrar el aviso si ya está sana
         if: steps.check.outputs.skip != 'true' && steps.check.outputs.healthy == 'true'
         uses: actions/github-script@v7
