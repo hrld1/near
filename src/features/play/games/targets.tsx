@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Target } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const DURATION = 30;
 const TARGET_LIFE = 1500;
@@ -90,18 +91,33 @@ export function TargetsGame({ onFinish, onProgress }: { onFinish: (score: number
       <div
         className="relative h-[340px] w-full touch-none select-none overflow-hidden rounded-xl"
         style={{
+          // Galería de tiro en penumbra: antes era un lavanda pálido plano,
+          // desentonaba junto al resto de la arcade (todo oscuro y con
+          // atmósfera desde Meteoros). Un foco radial + viñeta + trama de
+          // puntos en vez de rayas — mismo espíritu que el cielo estrellado
+          // de Meteoros, sin tocar la lógica del juego.
           background:
-            "radial-gradient(ellipse at 50% 30%, rgb(var(--c-plum) / 0.16), rgb(var(--c-plum) / 0.05) 65%), repeating-linear-gradient(45deg, rgb(var(--c-plum) / 0.04) 0 14px, transparent 14px 28px)"
+            "radial-gradient(ellipse 70% 55% at 50% 38%, rgb(var(--c-plum) / 0.55), transparent 70%), " +
+            "radial-gradient(ellipse 120% 90% at 50% 100%, rgba(0,0,0,0.45), transparent 60%), " +
+            "radial-gradient(circle at 2px 2px, rgb(var(--c-plum) / 0.35) 1px, transparent 0) 0 0 / 22px 22px, " +
+            "#100a1c"
         }}
       >
         {targets.map((target) => {
           const age = (Date.now() - target.bornAt) / TARGET_LIFE;
           const size = Math.max(24, 58 * (1 - age * 0.7));
+          // se acerca a desaparecer (y a valer el doble): el halo se aviva
+          // en vez de solo encoger, para que la urgencia se VEA, no solo se
+          // intuya por el tamaño.
+          const urgent = age > 0.55;
           return (
             <button
               key={target.id}
               onPointerDown={(e) => hit(target, e)}
-              className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full shadow-lift transition-transform active:scale-90"
+              className={cn(
+                "absolute -translate-x-1/2 -translate-y-1/2 rounded-full transition-transform active:scale-90",
+                urgent && "motion-safe:animate-pulse"
+              )}
               style={{
                 left: `${target.x}%`,
                 top: `${target.y}%`,
@@ -110,7 +126,9 @@ export function TargetsGame({ onFinish, onProgress }: { onFinish: (score: number
                 // diana real: anillos concentricos blanco/rojo
                 background:
                   "radial-gradient(circle, #ef4444 0 19%, #ffffff 19% 40%, #ef4444 40% 61%, #ffffff 61% 80%, #dc2626 80% 100%)",
-                boxShadow: "0 3px 10px rgba(0,0,0,0.25), inset 0 -2px 4px rgba(0,0,0,0.15)"
+                boxShadow: urgent
+                  ? "0 3px 10px rgba(0,0,0,0.4), 0 0 18px 4px rgba(251,191,36,0.55), inset 0 -2px 4px rgba(0,0,0,0.15)"
+                  : "0 3px 10px rgba(0,0,0,0.4), 0 0 14px 2px rgba(239,68,68,0.35), inset 0 -2px 4px rgba(0,0,0,0.15)"
               }}
             />
           );
@@ -125,8 +143,8 @@ export function TargetsGame({ onFinish, onProgress }: { onFinish: (score: number
         {pops.map((pop) => (
           <span
             key={pop.id}
-            className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 animate-pop-in text-sm font-bold text-rose-deep"
-            style={{ left: `${pop.x}%`, top: `${pop.y}%` }}
+            className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 animate-pop-in text-base font-bold text-white"
+            style={{ left: `${pop.x}%`, top: `${pop.y}%`, textShadow: "0 0 10px rgba(251,191,36,0.9), 0 1px 3px rgba(0,0,0,0.6)" }}
           >
             +{pop.value}
           </span>
