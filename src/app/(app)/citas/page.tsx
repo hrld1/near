@@ -80,7 +80,7 @@ export default async function CitasPage() {
         </p>
       </header>
 
-      <CitasChat partnerName={partnerName} />
+      <CitasChat partnerName={partnerName} myCity={user.city} partnerCity={partner?.city ?? null} />
 
       <section className="mt-7">
         <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-ink-soft">Vuestras citas planeadas</h2>

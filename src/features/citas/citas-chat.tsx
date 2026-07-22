@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowUp, Shield, Sparkles } from "lucide-react";
+import { ArrowUp, Shield } from "lucide-react";
 import type { DatePlanData } from "@/lib/citas";
 import { planSchema } from "@/lib/citas";
 import { cn } from "@/lib/utils";
 import { ItineraryCard } from "./itinerary-card";
+import { CitasBriefing } from "./citas-briefing";
 
 // El chat con la planificadora. La conversación vive en el cliente (no se
 // persiste); el servidor la recibe entera en cada turno y responde en
@@ -13,21 +14,24 @@ import { ItineraryCard } from "./itinerary-card";
 
 type ChatMsg = { role: "user" | "assistant"; content: string; plan?: DatePlanData };
 
-const SUGGESTIONS = [
-  "Sorpréndeme con una cita en su ciudad ✨",
-  "Planea nuestra cita de reencuentro 💫",
-  "Un viernes a distancia sin salir de casa 🛋️",
-  "Cita barata y bonita para este finde"
-];
-
 const PRIVACY_KEY = "near:citas-privacy-ok";
 
-export function CitasChat({ partnerName }: { partnerName: string }) {
+export function CitasChat({
+  partnerName,
+  myCity,
+  partnerCity
+}: {
+  partnerName: string;
+  myCity: string | null;
+  partnerCity: string | null;
+}) {
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [privacyOk, setPrivacyOk] = useState(true);
+  // El briefing es la puerta de entrada; se puede saltar para escribir a mano.
+  const [briefingOff, setBriefingOff] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -139,29 +143,42 @@ export function CitasChat({ partnerName }: { partnerName: string }) {
     );
   }
 
+  // Con el briefing en pantalla NO se limita la altura: si no, el botón de
+  // "Planear la cita" cae fuera del recorte y hay que hacer scroll dentro de
+  // un scroll para encontrarlo. Lo vi en la captura, no razonándolo.
+  const briefingVisible = messages.length === 0 && !briefingOff;
+
   return (
     <div className="flex flex-col overflow-hidden rounded-2xl border border-sand-deep bg-paper shadow-card">
-      <div className="max-h-[60vh] min-h-[340px] flex-1 space-y-3 overflow-y-auto p-4">
-        {messages.length === 0 && (
-          <div className="flex h-full min-h-[300px] flex-col items-center justify-center gap-4 text-center">
-            <span className="flex h-16 w-16 items-center justify-center rounded-3xl bg-rose/12 text-rose-deep">
-              <Sparkles className="h-8 w-8" />
-            </span>
+      <div
+        className={cn(
+          "flex-1 space-y-3 p-4",
+          briefingVisible ? "" : "max-h-[60vh] min-h-[340px] overflow-y-auto"
+        )}
+      >
+        {briefingVisible && (
+          <CitasBriefing
+            partnerName={partnerName}
+            myCity={myCity}
+            partnerCity={partnerCity}
+            onSubmit={(mensaje) => void send(mensaje)}
+            onSkip={() => setBriefingOff(true)}
+          />
+        )}
+
+        {messages.length === 0 && briefingOff && (
+          <div className="flex h-full min-h-[300px] flex-col items-center justify-center gap-3 text-center">
             <p className="max-w-sm text-sm text-ink-soft">
               Cuéntame qué cita os apetece — juntos en una ciudad o a distancia — y os la dejo planeada y lista
               para proponer.
             </p>
-            <div className="flex max-w-md flex-wrap justify-center gap-2">
-              {SUGGESTIONS.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => send(s)}
-                  className="rounded-full border border-rose/30 bg-rose-faint px-3.5 py-1.5 text-sm text-ink transition hover:border-rose hover:bg-rose/10"
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
+            <button
+              type="button"
+              onClick={() => setBriefingOff(false)}
+              className="text-xs text-ink-soft underline decoration-dotted underline-offset-4 transition hover:text-ink"
+            >
+              Mejor con las preguntas rápidas
+            </button>
           </div>
         )}
 
@@ -200,12 +217,14 @@ export function CitasChat({ partnerName }: { partnerName: string }) {
         <div ref={endRef} />
       </div>
 
+      {/* Con el briefing delante sobra: tiene su propio botón, y dos formas de
+          enviar a la vez solo confunden. Vuelve en cuanto hay conversación. */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
           void send(input);
         }}
-        className="flex items-end gap-2 border-t border-sand p-3"
+        className={cn("items-end gap-2 border-t border-sand p-3", briefingVisible ? "hidden" : "flex")}
       >
         <textarea
           value={input}
