@@ -9,6 +9,7 @@ import { agoLabel } from "@/lib/format";
 import { sfx, vibrate } from "@/lib/sound";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/input";
+import { EmptyJarIllustration } from "@/components/illustrations";
 import { cn } from "@/lib/utils";
 
 type Appr = { id: string; fromId: string; fromName: string; body: string; createdAt: string };
@@ -97,9 +98,10 @@ export function AppreciationBox({
           <span className="text-ink-soft/70">· {list.length}</span>
         </p>
         {list.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-sand-deep bg-paper/60 px-4 py-6 text-center text-sm text-ink-soft">
-            El frasco está vacío. El primer aprecio siempre emociona.
-          </p>
+          <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-sand-deep bg-paper/60 px-4 py-6 text-center">
+            <EmptyJarIllustration className="h-16 w-16" />
+            <p className="text-sm text-ink-soft">El frasco está vacío. El primer aprecio siempre emociona.</p>
+          </div>
         ) : (
           <ul className="grid gap-2.5 sm:grid-cols-2">
             {list.map((a) => {

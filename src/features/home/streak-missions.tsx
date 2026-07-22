@@ -6,6 +6,7 @@ import { CalendarCheck, Check, ChevronRight, Flame, Gift } from "lucide-react";
 import { claimMissionBonusAction, claimWeeklyBonusAction } from "@/actions/games";
 import { Button } from "@/components/ui/button";
 import { Confetti } from "@/features/play/confetti";
+import { UnlitStreakIllustration } from "@/components/illustrations";
 import { cn } from "@/lib/utils";
 import type { Mission } from "@/lib/engagement";
 
@@ -79,7 +80,13 @@ export function StreakMissions({
             streak > 0 ? "bg-orange-100 dark:bg-orange-900/30" : "bg-sand"
           )}
         >
-          <Flame className={cn("h-6 w-6", streak > 0 ? "text-orange-500" : "text-ink-soft/50")} />
+          {streak > 0 ? (
+            <Flame className="h-6 w-6 text-orange-500" />
+          ) : (
+            // en cero, la propia llama sin encender — no un icono generico
+            // en gris, para que el primer día se sienta un inicio
+            <UnlitStreakIllustration className="h-8 w-8" />
+          )}
         </span>
         <div>
           <p className="font-display text-2xl leading-none text-ink">
