@@ -107,7 +107,16 @@ done
 echo " listo"
 
 echo "→ Restaurando…"
-docker cp "${TRABAJO}/near.dump" "${CONTENEDOR}:/tmp/near.dump" >/dev/null
+# Ojo con las rutas: la del CONTENEDOR (/tmp/near.dump) tiene que llegar tal
+# cual, pero la del HOST tiene que ir en formato Windows o docker la busca en
+# C:\tmp. Por eso se desactivó la conversión automática arriba y aquí se
+# convierte solo esta a mano. En Linux/macOS no hay cygpath y se usa tal cual.
+if command -v cygpath >/dev/null 2>&1; then
+  HOST_DUMP=$(cygpath -m "${TRABAJO}/near.dump")
+else
+  HOST_DUMP="${TRABAJO}/near.dump"
+fi
+docker cp "$HOST_DUMP" "${CONTENEDOR}:/tmp/near.dump" >/dev/null
 # --clean/--if-exists: la BD está vacía, pero así el ensayo se parece a una
 # restauración real sobre algo existente. Los avisos de "no existe" son
 # normales aquí y no significan fallo.
