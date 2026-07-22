@@ -128,7 +128,13 @@ export async function POST(req: Request) {
         for (let turn = 0; turn < MAX_TURNS; turn++) {
           const msgStream = anthropic.messages.stream({
             model: AI_MODEL,
-            max_tokens: 8192,
+            // Sonnet 5 comparte max_tokens entre pensar y responder: con
+            // pensamiento activo, 8192 se quedaba corto y podía cortar el
+            // plan a medias. display "omitido" (el defecto) porque no se
+            // muestra al usuario — solo interesa el texto y la herramienta.
+            max_tokens: 16000,
+            thinking: { type: "adaptive" },
+            output_config: { effort: "high" },
             system,
             messages: convo,
             tools: [
