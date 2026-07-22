@@ -30,6 +30,7 @@ const PRESUPUESTO = [
   { key: "20", label: "~20 €" },
   { key: "50", label: "~50 €" },
   { key: "100", label: "~100 €" },
+  { key: "otro", label: "Otro…" },
   { key: "libre", label: "Sin límite" }
 ] as const;
 
@@ -100,7 +101,11 @@ export function CitasBriefing({
   const [fecha, setFecha] = useState("");
   const [ciudad, setCiudad] = useState(partnerCity ?? myCity ?? "");
   const [presupuesto, setPresupuesto] = useState<PresupuestoKey>("50");
+  const [presupuestoOtro, setPresupuestoOtro] = useState("");
   const [apetece, setApetece] = useState("");
+
+  const faltaCiudad = modo === "juntos" && !ciudad.trim();
+  const faltaImporte = presupuesto === "otro" && !presupuestoOtro.trim();
 
   function componer() {
     const partes: string[] = [];
@@ -120,10 +125,13 @@ export function CitasBriefing({
       partes.push(`Cuándo: ${texto}.`);
     }
 
+    // El presupuesto es POR PERSONA: hay que decírselo explícito o el modelo
+    // lo interpreta como total y se queda corto de plan.
     const pres = PRESUPUESTO.find((p) => p.key === presupuesto);
     if (presupuesto === "gratis") partes.push("Presupuesto: nada, plan gratis.");
     else if (presupuesto === "libre") partes.push("Presupuesto: sin límite concreto.");
-    else partes.push(`Presupuesto: ${pres?.label} en total.`);
+    else if (presupuesto === "otro") partes.push(`Presupuesto: ${presupuestoOtro.trim()} por persona.`);
+    else partes.push(`Presupuesto: ${pres?.label} por persona.`);
 
     if (apetece.trim()) partes.push(`Nos apetece: ${apetece.trim()}`);
 
@@ -178,7 +186,7 @@ export function CitasBriefing({
         )}
       </Campo>
 
-      <Campo icon={<Wallet className="h-3.5 w-3.5" />} titulo="Presupuesto">
+      <Campo icon={<Wallet className="h-3.5 w-3.5" />} titulo="Presupuesto por persona">
         <div className="flex flex-wrap gap-2">
           {PRESUPUESTO.map((p) => (
             <Chip key={p.key} active={presupuesto === p.key} onClick={() => setPresupuesto(p.key)}>
@@ -186,6 +194,15 @@ export function CitasBriefing({
             </Chip>
           ))}
         </div>
+        {presupuesto === "otro" && (
+          <input
+            value={presupuestoOtro}
+            onChange={(e) => setPresupuestoOtro(e.target.value)}
+            maxLength={40}
+            placeholder="¿Cuánto? p. ej. 35 €"
+            className="mt-2.5 w-full rounded-xl border border-sand-deep bg-paper px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-soft/60 focus:border-rose focus:outline-none focus:ring-2 focus:ring-rose/15"
+          />
+        )}
       </Campo>
 
       <Campo icon={<PencilLine className="h-3.5 w-3.5" />} titulo="Algo que os apetezca (opcional)">
@@ -206,7 +223,7 @@ export function CitasBriefing({
         <button
           type="button"
           onClick={() => onSubmit(componer())}
-          disabled={modo === "juntos" && !ciudad.trim()}
+          disabled={faltaCiudad || faltaImporte}
           className="w-full rounded-xl bg-rose py-3 text-sm font-medium text-white shadow-glow transition hover:bg-rose-deep disabled:opacity-50 disabled:shadow-none"
         >
           Planear la cita 💘
