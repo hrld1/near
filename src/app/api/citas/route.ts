@@ -123,9 +123,15 @@ export async function POST(req: Request) {
           // cliente desconectado
         }
       };
+      let totalIn = 0;
+      let totalOut = 0;
+      let totalCacheRead = 0;
+      let totalCacheWrite = 0;
+      let turnsUsed = 0;
       try {
         const anthropic = getAnthropic();
         for (let turn = 0; turn < MAX_TURNS; turn++) {
+          turnsUsed = turn + 1;
           const msgStream = anthropic.messages.stream({
             model: AI_MODEL,
             // Sonnet 5 comparte max_tokens entre pensar y responder: con
@@ -135,10 +141,20 @@ export async function POST(req: Request) {
             max_tokens: 16000,
             thinking: { type: "adaptive" },
             output_config: { effort: "high" },
+            // El bucle de abajo reenvía TODA la conversación acumulada en cada
+            // vuelta, y los resultados de búsqueda son lo más pesado que lleva.
+            // Con caché, cada vuelta relee lo que escribió la anterior a una
+            // décima parte del precio. Es de lejos el mayor ahorro aquí: el
+            // ida y vuelta de preguntas con la pareja es calderilla al lado
+            // del bucle de búsquedas dentro de una sola petición.
+            cache_control: { type: "ephemeral" },
             system,
             messages: convo,
             tools: [
-              { type: "web_search_20260209", name: "web_search", max_uses: 5 },
+              // 3 en vez de 5: cada búsqueda engorda el contexto de TODAS las
+              // vueltas siguientes, así que el coste de una búsqueda de más no
+              // es lineal. Con 3 hay de sobra para una cita.
+              { type: "web_search_20260209", name: "web_search", max_uses: 3 },
               GUARDAR_CITA_TOOL
             ]
           });
@@ -148,6 +164,16 @@ export async function POST(req: Request) {
             }
           }
           const msg = await msgStream.finalMessage();
+
+          // Consumo real por vuelta, para dejar de estimar el coste a ojo.
+          // `cache_read` a cero vuelta tras vuelta significa que la caché no
+          // está entrando y hay que mirar por qué. Sin datos de la pareja: solo
+          // números.
+          const u = msg.usage;
+          totalIn += u.input_tokens;
+          totalOut += u.output_tokens;
+          totalCacheRead += u.cache_read_input_tokens ?? 0;
+          totalCacheWrite += u.cache_creation_input_tokens ?? 0;
 
           // la búsqueda web (server tool) puede pausar el turno: se reanuda
           if (msg.stop_reason === "pause_turn") {
@@ -196,6 +222,13 @@ export async function POST(req: Request) {
         console.error("[citas] error:", err);
         send({ type: "error", error: "La planificadora se ha atascado. Prueba otra vez en un momento." });
       } finally {
+        // Sonnet 5: 3 $/M entrada, 15 $/M salida; lo leído de caché va a una
+        // décima parte. Precio a mano y no de una tabla porque cambia — sirve
+        // como orden de magnitud, no como factura.
+        const coste = (totalIn * 3 + totalCacheWrite * 3.75 + totalCacheRead * 0.3 + totalOut * 15) / 1_000_000;
+        console.log(
+          `[citas] vueltas=${turnsUsed} entrada=${totalIn} cache_lee=${totalCacheRead} cache_escribe=${totalCacheWrite} salida=${totalOut} ~${coste.toFixed(4)}$`
+        );
         send({ type: "done" });
         try {
           controller.close();
