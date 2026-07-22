@@ -164,6 +164,15 @@ body::after {
   }
 }
 
+/* Juegos en pantalla completa (it33-audit): cada canvas de la arcade limita
+   su alto a 64vh para no desbordar la tarjeta normal, pero dentro de
+   :fullscreen sobra pantalla de sobra — se deja crecer casi al completo.
+   Una regla global en vez de tocar el className de cada uno de los 19
+   juegos: cualquier canvas que entre en pantalla completa se beneficia solo. */
+:fullscreen canvas {
+  max-height: 92vh !important;
+}
+
 /* Ficha del 4 en raya: cae desde arriba con un pequeno rebote. */
 .c4-disc {
   animation: c4-drop 0.45s cubic-bezier(0.55, 0, 0.65, 1.35) both;

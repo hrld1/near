@@ -182,11 +182,20 @@ export function ReactionGame({ onFinish, onProgress }: { onFinish: (score: numbe
       e.preventDefault();
       tap();
     };
+    // Mismo gesto, otra tecla: en un juego de reflejos, la barra espaciadora
+    // es más rápida de repetir que buscar el ratón cada ronda.
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== " " && e.key !== "Enter") return;
+      e.preventDefault();
+      tap();
+    };
     canvas.addEventListener("pointerdown", onPointer);
+    window.addEventListener("keydown", onKey);
     return () => {
       cancelAnimationFrame(raf);
       if (armTimer.current) clearTimeout(armTimer.current);
       canvas.removeEventListener("pointerdown", onPointer);
+      window.removeEventListener("keydown", onKey);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -204,12 +213,12 @@ export function ReactionGame({ onFinish, onProgress }: { onFinish: (score: numbe
       <div className="overflow-hidden rounded-2xl shadow-card">
         <canvas
           ref={canvasRef}
-          className="block w-full touch-none select-none"
+          className="mx-auto block h-auto max-h-[64vh] w-auto touch-none select-none"
           style={{ aspectRatio: `${W} / ${H}`, background: "#140b2e" }}
         />
       </div>
       <p className="mt-2 text-center text-xs text-ink-soft">
-        Toca en cuanto el núcleo se ponga verde. Ni antes… ni tarde.
+        Toca o pulsa espacio en cuanto el núcleo se ponga verde. Ni antes… ni tarde.
       </p>
     </div>
   );

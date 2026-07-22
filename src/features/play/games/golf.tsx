@@ -538,7 +538,11 @@ export function GolfGame({ onFinish, onProgress }: { onFinish: (score: number) =
         </span>
       </div>
       <div className="relative select-none overflow-hidden rounded-xl shadow-card">
-        <canvas ref={canvasRef} className="block w-full touch-none" style={{ aspectRatio: `${W} / ${H}` }} />
+        <canvas
+          ref={canvasRef}
+          className="mx-auto block h-auto max-h-[64vh] w-auto touch-none"
+          style={{ aspectRatio: `${W} / ${H}` }}
+        />
         {banner && (
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
             <span className="animate-pop-in rounded-2xl bg-black/60 px-6 py-3 font-display text-2xl text-white backdrop-blur-sm">

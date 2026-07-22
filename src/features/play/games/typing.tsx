@@ -242,7 +242,7 @@ export function TypingGame({ onFinish, onProgress }: { onFinish: (score: number)
       <div className="overflow-hidden rounded-2xl shadow-card">
         <canvas
           ref={canvasRef}
-          className="block w-full touch-none select-none"
+          className="mx-auto block h-auto max-h-[64vh] w-auto touch-none select-none"
           style={{ aspectRatio: `${W} / ${H}`, background: "#0a1230" }}
           onPointerDown={() => inputRef.current?.focus()}
         />

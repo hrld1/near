@@ -5,6 +5,7 @@ import Link from "next/link";
 import { CalendarCheck, Check, ChevronRight, Flame, Gift } from "lucide-react";
 import { claimMissionBonusAction, claimWeeklyBonusAction } from "@/actions/games";
 import { Button } from "@/components/ui/button";
+import { Confetti } from "@/features/play/confetti";
 import { cn } from "@/lib/utils";
 import type { Mission } from "@/lib/engagement";
 
@@ -41,13 +42,19 @@ export function StreakMissions({
   const [weeklyClaimed, setWeeklyClaimed] = useState(weekly?.claimed ?? false);
   const [weeklyPending, startWeeklyTransition] = useTransition();
   const [weeklyError, setWeeklyError] = useState<string | null>(null);
+  // Distinto de `claimed`/`weeklyClaimed`: esos arrancan en true si ya se
+  // reclamó antes de cargar la página, y no queremos confeti en cada visita.
+  // Este solo se enciende con el clic de AHORA.
+  const [celebrate, setCelebrate] = useState(false);
 
   function claim() {
     setError(null);
     startTransition(async () => {
       const result = await claimMissionBonusAction();
-      if (result.ok) setClaimed(true);
-      else setError(result.error);
+      if (result.ok) {
+        setClaimed(true);
+        setCelebrate(true);
+      } else setError(result.error);
     });
   }
 
@@ -55,13 +62,16 @@ export function StreakMissions({
     setWeeklyError(null);
     startWeeklyTransition(async () => {
       const result = await claimWeeklyBonusAction();
-      if (result.ok) setWeeklyClaimed(true);
-      else setWeeklyError(result.error);
+      if (result.ok) {
+        setWeeklyClaimed(true);
+        setCelebrate(true);
+      } else setWeeklyError(result.error);
     });
   }
 
   return (
-    <div>
+    <div className="relative">
+      {celebrate && <Confetti />}
       <div className="flex items-center gap-3">
         <span
           className={cn(

@@ -347,12 +347,16 @@ export function PinballGame({ onFinish, onProgress }: { onFinish: (score: number
     }
     raf = requestAnimationFrame(frame);
 
-    // control: cada dedo activa el flipper de su lado (multitáctil)
+    // control: cada dedo activa el flipper de su lado (multitáctil), y en
+    // teclado las flechas ← → (o Z / M, como en los pinballs de siempre)
+    // hacen lo mismo — un flipper puede quedar activo por dedo o por tecla
+    // a la vez, así que se combinan con OR, no se sustituyen.
     const pointers = new Map<number, 0 | 1>();
+    const keysDown = new Set<0 | 1>();
     function refreshFlippers() {
       const sides = new Set(pointers.values());
-      st.flippers[0].active = sides.has(0);
-      st.flippers[1].active = sides.has(1);
+      st.flippers[0].active = sides.has(0) || keysDown.has(0);
+      st.flippers[1].active = sides.has(1) || keysDown.has(1);
     }
     const down = (e: PointerEvent) => {
       e.preventDefault();
@@ -364,15 +368,37 @@ export function PinballGame({ onFinish, onProgress }: { onFinish: (score: number
       pointers.delete(e.pointerId);
       refreshFlippers();
     };
+    const keyToSide = (key: string): 0 | 1 | null => {
+      if (key === "ArrowLeft" || key === "z" || key === "Z") return 0;
+      if (key === "ArrowRight" || key === "m" || key === "M") return 1;
+      return null;
+    };
+    const keyDown = (e: KeyboardEvent) => {
+      const side = keyToSide(e.key);
+      if (side === null) return;
+      e.preventDefault();
+      keysDown.add(side);
+      refreshFlippers();
+    };
+    const keyUp = (e: KeyboardEvent) => {
+      const side = keyToSide(e.key);
+      if (side === null) return;
+      keysDown.delete(side);
+      refreshFlippers();
+    };
     canvas.addEventListener("pointerdown", down);
     canvas.addEventListener("pointerup", up);
     canvas.addEventListener("pointercancel", up);
     canvas.addEventListener("pointerleave", up);
+    window.addEventListener("keydown", keyDown);
+    window.addEventListener("keyup", keyUp);
     return () => {
       cancelAnimationFrame(raf);
       canvas.removeEventListener("pointerdown", down);
       canvas.removeEventListener("pointerup", up);
       canvas.removeEventListener("pointercancel", up);
+      window.removeEventListener("keydown", keyDown);
+      window.removeEventListener("keyup", keyUp);
       canvas.removeEventListener("pointerleave", up);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -402,7 +428,7 @@ export function PinballGame({ onFinish, onProgress }: { onFinish: (score: number
         />
       </div>
       <p className="mt-2 text-center text-xs text-ink-soft">
-        Toca a la izquierda o a la derecha para cada flipper. No dejes que la bola escape por el centro.
+        Toca a los lados o usa ← → (también Z / M) para cada flipper. No dejes que la bola escape por el centro.
       </p>
     </div>
   );

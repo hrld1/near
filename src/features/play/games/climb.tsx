@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Cloud } from "lucide-react";
 import { clamp, pointerPos, setupHiDpi, spawnBurst, stepParticles, type Particle } from "./engine";
+import { steerAxis, useSteerKeys } from "./keyboard";
 
 // A las nubes: saltador infinito (estilo doodle jump). El personaje rebota solo
 // en las plataformas; mueves el dedo para dirigirlo. La cámara sube contigo y
@@ -33,6 +34,7 @@ function pickType(heightM: number): PType {
 
 export function ClimbGame({ onFinish, onProgress }: { onFinish: (score: number) => void; onProgress?: (score: number) => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const heldKeys = useSteerKeys();
   const [score, setScore] = useState(0);
   const onFinishRef = useRef(onFinish);
   onFinishRef.current = onFinish;
@@ -185,6 +187,9 @@ export function ClimbGame({ onFinish, onProgress }: { onFinish: (score: number) 
       const c = st.char;
 
       if (st.running) {
+        const axis = steerAxis(heldKeys.current);
+        if (axis.x) st.targetX = clamp(st.targetX + axis.x * 7, R, W - R);
+
         c.vy += GRAV;
         c.y += c.vy;
         c.x += (st.targetX - c.x) * 0.2;
@@ -314,7 +319,7 @@ export function ClimbGame({ onFinish, onProgress }: { onFinish: (score: number) 
           <Cloud className="h-4 w-4 text-sky-500" />
           <span className="font-display text-xl">{score}</span> m
         </span>
-        <span className="text-ink-soft">mueve el dedo para dirigir el salto</span>
+        <span className="text-ink-soft">dedo o flechas para dirigir el salto</span>
       </div>
       <div className="overflow-hidden rounded-2xl shadow-card">
         <canvas

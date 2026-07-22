@@ -304,7 +304,7 @@ export function CapsGame({ onFinish, onProgress }: { onFinish: (score: number) =
       <div className="select-none overflow-hidden rounded-xl shadow-card">
         <canvas
           ref={canvasRef}
-          className="block w-full touch-none"
+          className="mx-auto block h-auto max-h-[64vh] w-auto touch-none"
           style={{ aspectRatio: `${W} / ${H}` }}
         />
       </div>

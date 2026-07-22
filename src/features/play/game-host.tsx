@@ -11,6 +11,7 @@ import { Confetti } from "@/features/play/confetti";
 import { gameVisual } from "@/components/product-icons";
 import { cn } from "@/lib/utils";
 import { ArcadeGameView } from "@/features/play/games/arcade-view";
+import { FullscreenStage } from "@/features/play/games/fullscreen-stage";
 
 export type GameHostProps = {
   gameKey: string;
@@ -147,13 +148,13 @@ export function GameHost(props: GameHostProps) {
           )}
 
           {phase === "playing" && (
-            <div key={attempt}>
+            <FullscreenStage key={attempt}>
               <ArcadeGameView
                 gameKey={props.gameKey}
                 onFinish={handleFinish}
                 anagramWords={props.anagramWords}
               />
-            </div>
+            </FullscreenStage>
           )}
 
           {phase === "done" && (

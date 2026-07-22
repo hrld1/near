@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Confetti } from "@/features/play/confetti";
 import { ArcadeGameView } from "@/features/play/games/arcade-view";
+import { FullscreenStage } from "@/features/play/games/fullscreen-stage";
 import { cn } from "@/lib/utils";
 import { useRace } from "./use-race";
 
@@ -126,7 +127,7 @@ export function RaceRoom({
               </div>
 
               {phase === "playing" && (
-                <div className="relative">
+                <FullscreenStage>
                   <ArcadeGameView
                     key={race.round}
                     gameKey={def.key}
@@ -139,7 +140,7 @@ export function RaceRoom({
                       Has terminado con <b className="text-ink">{def.format(race.myFinal!)}</b>. Esperando a {partnerName}...
                     </div>
                   )}
-                </div>
+                </FullscreenStage>
               )}
 
               {phase === "over" && (

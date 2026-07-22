@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Blocks, Heart } from "lucide-react";
 import { clamp, pointerPos, setupHiDpi, spawnBurst, stepParticles, type Particle } from "./engine";
+import { steerAxis, useSteerKeys } from "./keyboard";
 
 // Rompemuros (Breakout) en canvas: pala que sigue el dedo, bola con rebotes y
 // ladrillos por MAPAS (incluido uno con forma de corazón). Al romper un
@@ -57,6 +58,7 @@ function buildBricks(layout: string[]): Brick[] {
 
 export function BricksGame({ onFinish, onProgress }: { onFinish: (score: number) => void; onProgress?: (score: number) => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const heldKeys = useSteerKeys();
   const [score, setScore] = useState(0);
   const [level, setLevel] = useState(1);
   const [lives, setLives] = useState(3);
@@ -209,6 +211,13 @@ export function BricksGame({ onFinish, onProgress }: { onFinish: (score: number)
       const slow = now < st.slowUntil ? 0.55 : 1;
 
       if (!st.done) {
+        // Teclado: la pala no tiene suavizado propio (sigue al dedo al
+        // instante), así que aquí se mueve igual de directa.
+        const axis = steerAxis(heldKeys.current);
+        if (axis.x) {
+          const pw = paddleW();
+          st.paddle.cx = clamp(st.paddle.cx + axis.x * 7, MARGIN + pw / 2, W - MARGIN - pw / 2);
+        }
         if (!st.launched) {
           for (const b of st.balls) {
             b.x = st.paddle.cx;
@@ -361,12 +370,19 @@ export function BricksGame({ onFinish, onProgress }: { onFinish: (score: number)
       move(e);
       launch();
     };
+    // Sin esto, quien solo usa teclado dirige la pala pero nunca puede
+    // soltar la bola: launch() antes solo colgaba del primer toque.
+    const key = (e: KeyboardEvent) => {
+      if (e.key === " " || e.key === "Enter") launch();
+    };
     canvas.addEventListener("pointerdown", down);
     canvas.addEventListener("pointermove", move);
+    window.addEventListener("keydown", key);
     return () => {
       cancelAnimationFrame(raf);
       canvas.removeEventListener("pointerdown", down);
       canvas.removeEventListener("pointermove", move);
+      window.removeEventListener("keydown", key);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -395,7 +411,7 @@ export function BricksGame({ onFinish, onProgress }: { onFinish: (score: number)
         />
       </div>
       <p className="mt-2 text-center text-xs text-ink-soft">
-        Mueve el dedo para la pala. Rompe todos los ladrillos y no dejes caer la bola.
+        Mueve el dedo o las flechas para la pala, espacio para lanzar. Rompe todos los ladrillos y no dejes caer la bola.
       </p>
     </div>
   );

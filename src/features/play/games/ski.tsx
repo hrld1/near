@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Snowflake } from "lucide-react";
 import { clamp, pointerPos, setupHiDpi, spawnBurst, stepParticles, type Particle } from "./engine";
+import { steerAxis, useSteerKeys } from "./keyboard";
 
 // Esquí / esquiva: bajada infinita en canvas. El esquiador va abajo y sigue el
 // dedo en horizontal; árboles y rocas suben hacia él (el mundo baja). Cada
@@ -20,6 +21,7 @@ type Flake = { x: number; y: number; r: number; sp: number };
 
 export function SkiGame({ onFinish, onProgress }: { onFinish: (score: number) => void; onProgress?: (score: number) => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const heldKeys = useSteerKeys();
   const [score, setScore] = useState(0);
   const [combo, setCombo] = useState(0);
   const onFinishRef = useRef(onFinish);
@@ -156,6 +158,10 @@ export function SkiGame({ onFinish, onProgress }: { onFinish: (score: number) =>
       if (st.running) {
         st.speed = clamp(3.4 + st.dist / 900, 3.4, 9.5);
         st.dist += st.speed * 0.12;
+
+        // Teclado: empuja el mismo objetivo que el dedo, no un modo aparte.
+        const axis = steerAxis(heldKeys.current);
+        if (axis.x) st.targetX = clamp(st.targetX + axis.x * 7, 24, W - 24);
 
         // seguir el dedo (suave) + inclinación
         const dx = st.targetX - st.skierX;
@@ -355,7 +361,7 @@ export function SkiGame({ onFinish, onProgress }: { onFinish: (score: number) =>
           <span className="font-display text-xl">{score}</span> m
         </span>
         <span className="text-ink-soft">
-          {combo >= 2 ? <b className="text-sky-500">combo x{combo}</b> : "mueve el dedo para esquivar"}
+          {combo >= 2 ? <b className="text-sky-500">combo x{combo}</b> : "dedo o flechas para esquivar"}
         </span>
       </div>
       <div className="overflow-hidden rounded-2xl shadow-card">

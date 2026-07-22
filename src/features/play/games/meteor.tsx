@@ -10,6 +10,7 @@ import {
   clamp,
   type Particle
 } from "./engine";
+import { steerAxis, useSteerKeys } from "./keyboard";
 
 // Meteoros: arcade espacial. Pilotas una nave (sigue tu dedo), esquivas
 // asteroides y recoges orbes para subir el combo. Nebulosa con parallax de
@@ -26,6 +27,7 @@ type Orb = { x: number; y: number; r: number; vy: number; hue: number; born: num
 
 export function MeteorGame({ onFinish, onProgress }: { onFinish: (score: number) => void; onProgress?: (score: number) => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const heldKeys = useSteerKeys();
   const [combo, setCombo] = useState(1);
   const stateRef = useRef({
     ship: { x: W / 2, y: H - 90, tx: W / 2, ty: H - 90 },
@@ -165,6 +167,15 @@ export function MeteorGame({ onFinish, onProgress }: { onFinish: (score: number)
 
       // --- update ---
       if (s.alive) {
+        // Teclado: empuja el mismo objetivo que ya mueve el puntero, a una
+        // velocidad fija por fotograma. Igual de "real" que el dedo — no un
+        // modo aparte.
+        const axis = steerAxis(heldKeys.current);
+        if (axis.x || axis.y) {
+          const KEY_SPEED = 6.5;
+          s.ship.tx = clamp(s.ship.tx + axis.x * KEY_SPEED * dt, SHIP_R, W - SHIP_R);
+          s.ship.ty = clamp(s.ship.ty + axis.y * KEY_SPEED * dt, SHIP_R, H - SHIP_R);
+        }
         s.ship.x += (s.ship.tx - s.ship.x) * 0.25;
         s.ship.y += (s.ship.ty - s.ship.y) * 0.25;
         s.score += dt * 0.9 * s.combo * 0.5; // renta por sobrevivir
@@ -310,12 +321,12 @@ export function MeteorGame({ onFinish, onProgress }: { onFinish: (score: number)
       <div className="overflow-hidden rounded-2xl shadow-card">
         <canvas
           ref={canvasRef}
-          className="block w-full touch-none select-none"
+          className="mx-auto block h-auto max-h-[64vh] w-auto touch-none select-none"
           style={{ aspectRatio: `${W} / ${H}`, background: "#080513" }}
         />
       </div>
       <p className="mt-2 text-center text-xs text-ink-soft">
-        Mueve el dedo para pilotar. Esquiva las rocas y recoge orbes para subir el combo.
+        Mueve el dedo o las flechas para pilotar. Esquiva las rocas y recoge orbes para subir el combo.
       </p>
     </div>
   );
