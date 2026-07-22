@@ -22,7 +22,8 @@ export type CallSignalKind =
   | "hangup"
   | "sleep"
   | "wake"
-  | "goodnight";
+  | "goodnight"
+  | "screen";
 
 type LiveSignal =
   | { arena: "race"; game: string; kind: "score" | "done"; score: number }

@@ -51,7 +51,8 @@ const schema = z.discriminatedUnion("arena", [
       "hangup",
       "sleep",
       "wake",
-      "goodnight"
+      "goodnight",
+      "screen"
     ]),
     data: z.string().max(50_000).optional(),
     initial: z.boolean().optional()

@@ -36,7 +36,11 @@ export type CallSignalKind =
   // "goodnight" cierra la llamada con un latido en ambos lados
   | "sleep"
   | "wake"
-  | "goodnight";
+  | "goodnight"
+  // compartir pantalla (it33-audit): "on"/"off" va en `data` como JSON
+  // {on: boolean} — solo avisa al otro para que muestre el aviso, la propia
+  // imagen ya llega por el track de vídeo sustituido en la conexión.
+  | "screen";
 
 // Trazo del lienzo compartido: puntos normalizados 0..1 intercalados x,y.
 export type CanvasStroke = {

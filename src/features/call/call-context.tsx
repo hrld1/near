@@ -45,12 +45,15 @@ type CallContextValue = {
   partner: MemberInfo | null;
   localStream: MediaStream | null;
   remoteStream: MediaStream | null;
+  screenStream: MediaStream | null;
+  partnerSharingScreen: boolean;
   startCall: (opts?: { audioOnly?: boolean }) => Promise<void>;
   acceptCall: () => Promise<void>;
   declineCall: () => void;
   hangup: () => void;
   toggleMute: () => void;
   toggleCamera: () => void;
+  toggleScreenShare: () => Promise<void>;
   startSleep: () => void;
   wakeUp: () => void;
   goodnight: () => void;
@@ -101,6 +104,8 @@ export function CallProvider({
   const [sleeping, setSleeping] = useState(false);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
+  const [screenStream, setScreenStream] = useState<MediaStream | null>(null);
+  const [partnerSharingScreen, setPartnerSharingScreen] = useState(false);
 
   const stateRef = useRef<CallState>("idle");
   const roleRef = useRef<"caller" | "callee" | null>(null);
@@ -109,6 +114,7 @@ export function CallProvider({
   // trae nada (instancia sin claves, fallo de red), vale el fallback estático.
   const iceRef = useRef<RTCIceServer[] | null>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
+  const screenStreamRef = useRef<MediaStream | null>(null);
   const mediaModeRef = useRef<MediaMode>("full");
   const pendingIceRef = useRef<RTCIceCandidateInit[]>([]);
   const graceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -363,6 +369,12 @@ export function CallProvider({
             cleanup(false, "Buenas noches 🌙");
           }
           break;
+        case "screen": {
+          if (!signal.data) break;
+          const payload = JSON.parse(signal.data) as { on: boolean };
+          setPartnerSharingScreen(payload.on);
+          break;
+        }
         default:
           break;
       }
@@ -463,6 +475,10 @@ export function CallProvider({
     pcRef.current = null;
     localStreamRef.current?.getTracks().forEach((t) => t.stop());
     localStreamRef.current = null;
+    screenStreamRef.current?.getTracks().forEach((t) => t.stop());
+    screenStreamRef.current = null;
+    setScreenStream(null);
+    setPartnerSharingScreen(false);
     mediaModeRef.current = "full";
     setMediaMode("full");
     setLocalStream(null);
@@ -487,6 +503,55 @@ export function CallProvider({
     const next = !cameraOff;
     localStreamRef.current?.getVideoTracks().forEach((t) => (t.enabled = !next));
     setCameraOff(next);
+  }
+
+  // --- compartir pantalla (it33-audit) ---
+  //
+  // Como Discord: no es "sincronizar Netflix", es retransmitir la pantalla
+  // por la MISMA videollamada que ya existe. `replaceTrack` cambia el track
+  // de vídeo que sale de la nave sin volver a negociar la conexión — el
+  // resto del código de señalización (ofertas, ICE, reconexión) no se
+  // entera de nada. Deliberadamente NO cubre el caso de una llamada que
+  // empezó solo con audio: ahí no hay hueco de vídeo donde meter la pantalla
+  // sin renegociar, y esa conexión ya tiene bastantes guardas delicadas como
+  // para arriesgarlas por un caso de borde.
+  function findVideoSender(): RTCRtpSender | null {
+    return pcRef.current?.getSenders().find((s) => s.track?.kind === "video") ?? null;
+  }
+
+  function stopScreenShare(notifyPartner: boolean) {
+    if (!screenStreamRef.current) return;
+    screenStreamRef.current.getTracks().forEach((t) => t.stop());
+    screenStreamRef.current = null;
+    setScreenStream(null);
+    const camTrack = localStreamRef.current?.getVideoTracks()[0] ?? null;
+    if (camTrack) void findVideoSender()?.replaceTrack(camTrack);
+    if (notifyPartner) {
+      sendLiveSignal({ arena: "call", kind: "screen", data: JSON.stringify({ on: false }) });
+    }
+  }
+
+  async function toggleScreenShare() {
+    if (screenStreamRef.current) {
+      stopScreenShare(true);
+      return;
+    }
+    if (mediaModeRef.current !== "full" || stateRef.current !== "active") return;
+    const sender = findVideoSender();
+    if (!sender) return;
+    try {
+      const display = await navigator.mediaDevices.getDisplayMedia({ video: true });
+      const screenTrack = display.getVideoTracks()[0];
+      await sender.replaceTrack(screenTrack);
+      screenStreamRef.current = display;
+      setScreenStream(display);
+      sendLiveSignal({ arena: "call", kind: "screen", data: JSON.stringify({ on: true }) });
+      // el botón nativo "dejar de compartir" del propio navegador también
+      // tiene que volver a la cámara, no solo el botón de Near
+      screenTrack.onended = () => stopScreenShare(true);
+    } catch {
+      // permiso denegado o ventana de selección cancelada: no pasa nada
+    }
   }
 
   // --- modo dormir juntos ---
@@ -519,12 +584,15 @@ export function CallProvider({
     partner,
     localStream,
     remoteStream,
+    screenStream,
+    partnerSharingScreen,
     startCall,
     acceptCall,
     declineCall,
     hangup,
     toggleMute,
     toggleCamera,
+    toggleScreenShare,
     startSleep,
     wakeUp,
     goodnight,
