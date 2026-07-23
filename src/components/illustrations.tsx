@@ -119,6 +119,92 @@ export function AlbumIllustration({ className }: { className?: string }) {
   );
 }
 
+// Chat vacío, antes del primer mensaje: dos burbujas que se solapan —una de
+// cada uno— con un corazón dentro. "Empieza la conversación" como algo que se
+// hace entre dos, no un icono de mensaje suelto.
+export function ChatIllustration({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 120 120" fill="none" className={className} aria-hidden="true">
+      <defs>
+        <linearGradient id="chat-fill" x1="44" y1="50" x2="90" y2="84" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="rgb(var(--c-rose))" stopOpacity="0.22" />
+          <stop offset="1" stopColor="rgb(var(--c-rose-deep))" stopOpacity="0.16" />
+        </linearGradient>
+      </defs>
+      {/* burbuja de atrás (ciruela) */}
+      <path
+        d="M30 32 h40 a11 11 0 0 1 11 11 v14 a11 11 0 0 1 -11 11 h-24 l-9 9 v-9 h-7 a11 11 0 0 1 -11 -11 v-14 a11 11 0 0 1 11 -11 z"
+        fill="rgb(var(--c-plum) / 0.12)"
+        stroke="rgb(var(--c-plum))"
+        strokeOpacity="0.45"
+        strokeWidth="2.5"
+        strokeLinejoin="round"
+      />
+      {/* burbuja de delante (rosa) con el corazón */}
+      <path
+        d="M62 54 h24 a10 10 0 0 1 10 10 v12 a10 10 0 0 1 -10 10 h-6 v8 l-9 -8 h-9 a10 10 0 0 1 -10 -10 v-12 a10 10 0 0 1 10 -10 z"
+        fill="url(#chat-fill)"
+        stroke="rgb(var(--c-rose))"
+        strokeOpacity="0.7"
+        strokeWidth="2.5"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M74 78 C 70 74, 65 72, 65 68 C 65 65.5, 67 64, 69.5 64 C 71.5 64, 73 65, 74 66.5 C 75 65, 76.5 64, 78.5 64 C 81 64, 83 65.5, 83 68 C 83 72, 78 74, 74 78 Z"
+        fill="rgb(var(--c-rose))"
+        opacity="0.85"
+      />
+    </svg>
+  );
+}
+
+// Calendario sin fechas por venir: una hoja de calendario con el día señalado
+// por un corazón. Para que "aún no hay fechas" invite a marcar un reencuentro.
+export function CalendarIllustration({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 120 120" fill="none" className={className} aria-hidden="true">
+      <defs>
+        <linearGradient id="cal-head" x1="30" y1="30" x2="90" y2="48" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="rgb(var(--c-rose))" />
+          <stop offset="1" stopColor="rgb(var(--c-plum))" />
+        </linearGradient>
+      </defs>
+      {/* anillas */}
+      <rect x="43" y="24" width="4" height="14" rx="2" fill="rgb(var(--c-plum))" opacity="0.6" />
+      <rect x="73" y="24" width="4" height="14" rx="2" fill="rgb(var(--c-plum))" opacity="0.6" />
+      {/* cuerpo */}
+      <rect
+        x="28"
+        y="32"
+        width="64"
+        height="58"
+        rx="9"
+        fill="rgb(var(--c-paper))"
+        stroke="rgb(var(--c-plum))"
+        strokeOpacity="0.4"
+        strokeWidth="2.5"
+      />
+      {/* cabecera de color */}
+      <path d="M28 41 a9 9 0 0 1 9 -9 h46 a9 9 0 0 1 9 9 v4 h-64 z" fill="url(#cal-head)" opacity="0.9" />
+      {/* días */}
+      <g fill="rgb(var(--c-plum))" opacity="0.3">
+        <circle cx="40" cy="56" r="2.4" />
+        <circle cx="52" cy="56" r="2.4" />
+        <circle cx="64" cy="56" r="2.4" />
+        <circle cx="76" cy="56" r="2.4" />
+        <circle cx="40" cy="70" r="2.4" />
+        <circle cx="76" cy="70" r="2.4" />
+      </g>
+      {/* el día marcado */}
+      <path
+        d="M60 78 C 55 73, 50 70.5, 50 66 C 50 63, 52 61, 55 61 C 57.5 61, 59 62.5, 60 64 C 61 62.5, 62.5 61, 65 61 C 68 61, 70 63, 70 66 C 70 70.5, 65 73, 60 78 Z"
+        fill="rgb(var(--c-rose))"
+        opacity="0.9"
+      />
+    </svg>
+  );
+}
+
 // Racha en cero: una llama apagada, dibujada con el mismo trazo que el icono
 // Flame de la cabecera — para que el primer día se sienta como un inicio, no
 // como un hueco vacío.

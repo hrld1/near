@@ -91,6 +91,13 @@ const config: Config = {
           "0%, 100%": { transform: "scale(1)" },
           "30%": { transform: "scale(1.25)" }
         },
+        // latido suave y periódico del logo (it39): dos golpes discretos al
+        // final de cada ciclo, como un corazón en calma. Nada intrusivo.
+        heartbeat: {
+          "0%, 82%, 100%": { transform: "scale(1)" },
+          "88%": { transform: "scale(1.13)" },
+          "94%": { transform: "scale(1.05)" }
+        },
         "pop-in": {
           from: { opacity: "0", transform: "scale(0.85)" },
           to: { opacity: "1", transform: "scale(1)" }
@@ -108,6 +115,7 @@ const config: Config = {
       animation: {
         "fade-up": "fade-up 0.35s ease-out both",
         "pulse-heart": "pulse-heart 0.6s ease-in-out",
+        heartbeat: "heartbeat 3.6s ease-in-out infinite",
         "pop-in": "pop-in 0.25s ease-out both",
         shake: "shake 0.3s ease-in-out",
         confetti: "confetti 1.1s ease-in forwards"

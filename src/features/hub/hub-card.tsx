@@ -48,7 +48,7 @@ export function HubHero({ item }: { item: HubItem }) {
   const Icon = item.icon;
   return (
     <Link href={item.href} className="group block h-full">
-      <Card className="relative flex h-full min-h-[15rem] flex-col justify-between overflow-hidden border-rose/15 bg-gradient-to-br from-rose-faint via-paper to-paper p-6 transition group-hover:-translate-y-0.5 group-hover:shadow-lift md:p-7">
+      <Card className="relative flex h-full min-h-[15rem] flex-col justify-between overflow-hidden border-rose/15 bg-gradient-to-br from-rose-faint via-paper to-paper p-6 transition duration-200 group-hover:-translate-y-0.5 group-hover:shadow-lift group-active:scale-[0.99] md:p-7">
         <Icon
           aria-hidden
           strokeWidth={1.25}
@@ -104,7 +104,7 @@ export function HubCard({ item }: { item: HubItem }) {
   const Icon = item.icon;
   return (
     <Link href={item.href} className="group">
-      <Card className="flex h-full items-center gap-4 transition group-hover:-translate-y-0.5 group-hover:shadow-lift">
+      <Card className="flex h-full items-center gap-4 transition duration-200 group-hover:-translate-y-0.5 group-hover:shadow-lift group-active:scale-[0.985]">
         <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-rose/10 text-rose-deep">
           <Icon className="h-6 w-6" />
         </span>

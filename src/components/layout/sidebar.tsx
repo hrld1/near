@@ -59,7 +59,7 @@ export function Sidebar({ userName, unreadChat = 0 }: { userName: string; unread
         <div className="glass flex w-56 flex-col rounded-3xl px-3 py-5 shadow-card">
           <Link href="/home" className="mb-8 flex items-center gap-2.5 px-2">
             <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-rose to-plum text-white shadow-glow">
-              <Heart className="h-4 w-4 fill-current" />
+              <Heart className="h-4 w-4 fill-current motion-safe:animate-heartbeat" />
             </span>
             <span className="font-display text-2xl font-semibold tracking-tight text-ink">Near</span>
           </Link>

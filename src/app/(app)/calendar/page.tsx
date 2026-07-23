@@ -9,6 +9,7 @@ import { nextAnniversary } from "@/lib/dates";
 import { dateLong, agoLabel } from "@/lib/format";
 import { eventIcon } from "@/components/product-icons";
 import { EmptyState } from "@/components/ui/empty-state";
+import { CalendarIllustration } from "@/components/illustrations";
 import { LiveRefresh } from "@/components/live-refresh";
 import { Countdown } from "@/features/home/countdown";
 import { EventForm } from "@/features/calendar/event-form";
@@ -68,7 +69,7 @@ export default async function CalendarPage() {
 
       {events.length === 0 ? (
         <EmptyState
-          icon={CalendarHeart}
+          illustration={<CalendarIllustration className="h-20 w-20" />}
           title="Sin fechas a la vista"
           description="La distancia pesa menos cuando hay una fecha marcada. Cread vuestro próximo reencuentro, una cita virtual o un aniversario."
         />

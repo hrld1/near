@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Heart, MessagesSquare } from "lucide-react";
+import { Heart } from "lucide-react";
 import { sendNudgeAction } from "@/actions/presence";
 import { Avatar } from "@/components/ui/avatar";
+import { ChatIllustration } from "@/components/illustrations";
 import { useChat } from "@/features/chat/use-chat";
 import { Composer } from "@/features/chat/composer";
 import { MessageBubble } from "@/features/chat/message-bubble";
@@ -89,9 +90,7 @@ export function ChatRoom({
 
         {chat.messages.length === 0 && (
           <div className="flex h-full min-h-[280px] flex-col items-center justify-center gap-3 text-center">
-            <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-faint">
-              <MessagesSquare className="h-7 w-7 text-rose" />
-            </span>
+            <ChatIllustration className="h-20 w-20" />
             <div>
               <p className="font-display text-lg text-ink">
                 {channel === "DATE_ROOM" ? "La sala está en silencio" : "Empieza la conversación"}
