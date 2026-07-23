@@ -104,7 +104,7 @@ export function StreakMissions({
 
       {graceDay && (
         <p className="mt-2 rounded-xl bg-amber-500/10 px-3 py-2 text-xs font-medium text-amber-700 dark:text-amber-400">
-          Un día flojo no os la quitó: os guardamos la racha 💛 (un perdón cada 30 días)
+          Un día flojo no os la quitó: os guardamos la racha (un perdón cada 30 días)
         </p>
       )}
 

@@ -103,11 +103,11 @@ export function PlanList({ items, myId, partnerName }: { items: PlanListItemDto[
                       disabled={busy === item.id}
                       className="flex items-center gap-1.5 rounded-full bg-rose px-4 py-2 text-sm font-medium text-white transition hover:bg-rose-deep disabled:opacity-60"
                     >
-                      <HeartHandshake className="h-4 w-4" /> Me apunto 💛
+                      <HeartHandshake className="h-4 w-4" /> Me apunto
                     </button>
                   ) : (
                     <span className="text-xs text-ink-soft">
-                      {item.status === "ACEPTADA" ? "Los dos dentro. Solo queda vivirla 💞" : `Esperando a ${partnerName}…`}
+                      {item.status === "ACEPTADA" ? "Los dos dentro. Solo queda vivirla" : `Esperando a ${partnerName}…`}
                     </span>
                   )}
                   <button

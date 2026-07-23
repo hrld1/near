@@ -533,8 +533,8 @@ export default async function HomePage() {
                 <p className="font-display text-xl leading-tight text-ink">
                   {milestone.daysLeft === 0
                     ? milestone.isAnnual
-                      ? `Hoy cumplís ${milestone.years} ${milestone.years === 1 ? "año" : "años"} 🎉`
-                      : `Hoy cumplís ${milestone.months} meses 🎉`
+                      ? `Hoy cumplís ${milestone.years} ${milestone.years === 1 ? "año" : "años"}`
+                      : `Hoy cumplís ${milestone.months} meses`
                     : milestone.isAnnual
                       ? `${milestone.years} ${milestone.years === 1 ? "año" : "años"} en ${milestone.daysLeft} ${milestone.daysLeft === 1 ? "día" : "días"}`
                       : `${milestone.months} meses en ${milestone.daysLeft} ${milestone.daysLeft === 1 ? "día" : "días"}`}

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Fingerprint, Heart, MapPin, Phone, Sparkles, Sun, SunMoon } from "lucide-react";
 import { skyForHour } from "@/lib/sky";
-import { currentWeather, geocode, weatherText, type Wx } from "@/lib/weather";
+import { currentWeather, geocode, weatherIcon, weatherLabel, type Wx } from "@/lib/weather";
 import { effectivePresence } from "@/lib/presence";
 import { presenceInfo, moodInfo } from "@/lib/utils";
 import { heartbeat, sfx } from "@/lib/sound";
@@ -271,7 +271,15 @@ export function TogetherWindow({
                   {presence.label}
                 </span>
               )}
-              {wx && <span className="text-white/80">{weatherText(wx.code)} {wx.temp}°</span>}
+              {wx && (() => {
+                const WxIcon = weatherIcon(wx.code);
+                return (
+                  <span className="inline-flex items-center gap-1.5 text-white/80">
+                    <WxIcon className="h-4 w-4" />
+                    {weatherLabel(wx.code)} {wx.temp}°
+                  </span>
+                );
+              })()}
             </div>
 
             {mood && (

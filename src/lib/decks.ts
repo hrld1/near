@@ -4,10 +4,13 @@
 // identificada por cardId = "deckKey:index". Reciprocidad por carta: ves la
 // respuesta del otro solo cuando has respondido la tuya.
 
+import type { LucideIcon } from "lucide-react";
+import { Camera, Flame, HeartHandshake, Home, Sparkles } from "lucide-react";
+
 export type Deck = {
   key: string;
   name: string;
-  emoji: string;
+  icon: LucideIcon; // it36: icono de trazo (antes emoji), coherente con la app
   tagline: string;
   accent: string; // gradiente tailwind "from-x to-y"
   soft: string;
@@ -20,7 +23,7 @@ export const DECKS: Deck[] = [
   {
     key: "recuerdos",
     name: "Recuerdos",
-    emoji: "📷",
+    icon: Camera,
     tagline: "Lo que ya habéis vivido, contado de nuevo.",
     accent: "from-amber-400 to-orange-500",
     soft: "bg-amber-500/12",
@@ -39,7 +42,7 @@ export const DECKS: Deck[] = [
   {
     key: "tuyyo",
     name: "Tú y yo",
-    emoji: "💞",
+    icon: HeartHandshake,
     tagline: "Cómo nos queremos, aquí y ahora.",
     accent: "from-rose-400 to-pink-600",
     soft: "bg-rose/12",
@@ -58,7 +61,7 @@ export const DECKS: Deck[] = [
   {
     key: "suenos",
     name: "Sueños",
-    emoji: "✨",
+    icon: Sparkles,
     tagline: "Lo que os ilusiona, dicho en voz alta.",
     accent: "from-violet-400 to-purple-600",
     soft: "bg-violet-500/12",
@@ -77,7 +80,7 @@ export const DECKS: Deck[] = [
   {
     key: "futuro",
     name: "El futuro",
-    emoji: "🏡",
+    icon: Home,
     tagline: "El nosotros que estáis construyendo.",
     accent: "from-emerald-400 to-teal-600",
     soft: "bg-emerald-500/12",
@@ -96,7 +99,7 @@ export const DECKS: Deck[] = [
   {
     key: "intimidad",
     name: "Intimidad",
-    emoji: "🔥",
+    icon: Flame,
     tagline: "Más cerca, con confianza. Se abre con permiso.",
     accent: "from-red-400 to-rose-600",
     soft: "bg-red-500/12",

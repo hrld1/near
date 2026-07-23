@@ -46,7 +46,7 @@ export function FeedbackForm() {
       <div className="mt-2 flex items-center justify-between">
         {sent ? (
           <span className="flex items-center gap-1.5 text-sm font-medium text-emerald-700 dark:text-emerald-400">
-            <Check className="h-4 w-4" /> Recibido. Gracias de corazón 💛
+            <Check className="h-4 w-4" /> Recibido. Gracias de corazón
           </span>
         ) : (
           <span className="text-xs text-ink-soft">{error ?? ""}</span>

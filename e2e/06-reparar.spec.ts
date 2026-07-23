@@ -18,7 +18,7 @@ test("tender la mano + aftermath recíproco", async ({ browser }) => {
     // B ve el aviso global y acepta
     await expect(b.getByText("Ana te tiende la mano")).toBeVisible();
     await b.getByRole("button", { name: /Acepto/ }).click();
-    await expect(a.getByText("Leo ha aceptado tu mano 💛")).toBeVisible();
+    await expect(a.getByText("Leo ha aceptado tu mano")).toBeVisible();
 
     // Después de la tormenta: A comparte su reflexión
     await a.getByRole("button", { name: "Dolido/a" }).click();

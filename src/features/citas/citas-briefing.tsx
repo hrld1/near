@@ -226,7 +226,7 @@ export function CitasBriefing({
           disabled={faltaCiudad || faltaImporte}
           className="w-full rounded-xl bg-rose py-3 text-sm font-medium text-white shadow-glow transition hover:bg-rose-deep disabled:opacity-50 disabled:shadow-none"
         >
-          Planear la cita 💘
+          Planear la cita
         </button>
         <button
           type="button"

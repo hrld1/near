@@ -66,8 +66,8 @@ export function DuelFrame({
         <div className="p-5">
           {phase === "lobby" && (
             <div className="flex min-h-[320px] flex-col items-center justify-center gap-4 text-center">
-              <span className={cn("flex h-20 w-20 items-center justify-center rounded-3xl text-3xl", meta.soft)}>
-                {meta.emoji}
+              <span className={cn("flex h-20 w-20 items-center justify-center rounded-3xl", meta.soft, meta.text)}>
+                <Icon className="h-9 w-9" />
               </span>
               <p className="max-w-xs text-sm text-ink-soft">{meta.blurb}</p>
               {notice && <p className="text-sm font-medium text-rose-deep">{notice}</p>}
@@ -82,8 +82,8 @@ export function DuelFrame({
 
           {phase === "inviting" && (
             <div className="flex min-h-[320px] flex-col items-center justify-center gap-4 text-center">
-              <span className={cn("flex h-16 w-16 animate-pulse items-center justify-center rounded-3xl text-2xl", meta.soft)}>
-                {meta.emoji}
+              <span className={cn("flex h-16 w-16 animate-pulse items-center justify-center rounded-3xl", meta.soft, meta.text)}>
+                <Icon className="h-7 w-7" />
               </span>
               <p className="text-sm font-medium text-ink">Esperando a {partnerName}...</p>
               <Button variant="secondary" size="sm" onClick={onCancel}>
@@ -94,8 +94,8 @@ export function DuelFrame({
 
           {phase === "incoming" && (
             <div className="flex min-h-[320px] flex-col items-center justify-center gap-4 text-center">
-              <span className={cn("flex h-16 w-16 animate-pulse-heart items-center justify-center rounded-3xl text-2xl", meta.soft)}>
-                {meta.emoji}
+              <span className={cn("flex h-16 w-16 animate-pulse-heart items-center justify-center rounded-3xl", meta.soft, meta.text)}>
+                <Icon className="h-7 w-7" />
               </span>
               <p className="font-display text-xl text-ink">
                 {partnerName} te reta a {meta.name}

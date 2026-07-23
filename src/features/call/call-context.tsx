@@ -366,7 +366,7 @@ export function CallProvider({
           if (stateRef.current !== "idle") {
             heartbeat();
             sfx.goodnight();
-            cleanup(false, "Buenas noches 🌙");
+            cleanup(false, "Buenas noches");
           }
           break;
         case "screen": {
@@ -570,7 +570,7 @@ export function CallProvider({
     sendLiveSignal({ arena: "call", kind: "goodnight" });
     heartbeat();
     sfx.goodnight();
-    cleanup(false, "Buenas noches 🌙");
+    cleanup(false, "Buenas noches");
   }
 
   const value: CallContextValue = {

@@ -83,7 +83,7 @@ export function AppreciationBox({
         />
         <div className="mt-2 flex items-center justify-between">
           <p className={cn("text-xs transition", justSent ? "font-medium text-rose-deep" : "text-ink-soft")}>
-            {justSent ? "Guardado en el frasco 💞" : "Se guarda para siempre en vuestro frasco."}
+            {justSent ? "Guardado en el frasco" : "Se guarda para siempre en vuestro frasco."}
           </p>
           <Button size="sm" onClick={send} loading={sending} disabled={!body.trim()}>
             Meter en el frasco

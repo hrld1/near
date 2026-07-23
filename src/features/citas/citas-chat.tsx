@@ -137,7 +137,7 @@ export function CitasChat({
           onClick={acceptPrivacy}
           className="mt-4 rounded-full bg-rose px-5 py-2.5 text-sm font-medium text-white transition hover:bg-rose-deep"
         >
-          Entendido, a planear 💘
+          Entendido, a planear
         </button>
       </div>
     );

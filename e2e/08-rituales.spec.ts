@@ -49,7 +49,7 @@ test("pregunta y momento del día: revelación recíproca", async ({ browser }) 
       buffer: TINY_PNG
     });
     await expect(b.locator('img[alt="El momento de Ana"]')).toBeVisible({ timeout: 20_000 });
-    await expect(b.getByText("El momento de hoy, hecho por los dos 💞")).toBeVisible();
+    await expect(b.getByText("El momento de hoy, hecho por los dos")).toBeVisible();
   } finally {
     await couple.dispose();
   }

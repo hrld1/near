@@ -176,7 +176,7 @@ export function DrawGuess({
       <div className="flex items-center justify-between rounded-2xl border border-sand bg-paper px-4 py-2.5 shadow-card">
         {phase === "won" ? (
           <p className="text-sm font-medium text-ink">
-            {winner === "Tú" ? "¡Has acertado! 🎉" : `¡${winner} lo ha adivinado! 🎉`}
+            {winner === "Tú" ? "¡Has acertado!" : `¡${winner} lo ha adivinado!`}
             <span className="ml-2 text-ink-soft">era “{word}”</span>
           </p>
         ) : isDrawer ? (

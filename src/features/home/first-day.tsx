@@ -36,7 +36,7 @@ export function FirstDay({
       <div className="p-5">
         <p className="font-display text-xl leading-snug text-ink">
           {mineComplete
-            ? `Tu parte está hecha 💛 Cuando ${partnerName} termine la suya, esta lista se despide sola.`
+            ? `Tu parte está hecha. Cuando ${partnerName} termine la suya, esta lista se despide sola.`
             : "Cuatro pasos y Near empieza a contar vuestra historia."}
         </p>
 

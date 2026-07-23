@@ -1,10 +1,11 @@
 import Link from "next/link";
+import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type DeckProgress = {
   key: string;
   name: string;
-  emoji: string;
+  icon: LucideIcon;
   tagline: string;
   accent: string;
   soft: string;
@@ -20,15 +21,16 @@ export function DeckGrid({ items }: { items: DeckProgress[] }) {
     <div className="grid gap-3 sm:grid-cols-2">
       {items.map((d) => {
         const pct = d.total > 0 ? Math.round((d.revealed / d.total) * 100) : 0;
+        const Icon = d.icon;
         return (
           <Link key={d.key} href={`/cerca/${d.key}`} className="group">
             <div className="h-full rounded-2xl border border-sand-deep bg-paper p-4 shadow-card transition group-hover:-translate-y-0.5 group-hover:shadow-lift">
               <div className="flex items-start justify-between">
-                <span className={cn("flex h-11 w-11 items-center justify-center rounded-xl text-xl", d.soft)}>
-                  {d.emoji}
+                <span className={cn("flex h-11 w-11 items-center justify-center rounded-xl", d.soft, d.text)}>
+                  <Icon className="h-5 w-5" />
                 </span>
                 {d.intimate && (
-                  <span className="rounded-full bg-red-500/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-red-600 dark:text-red-400">
+                  <span className="rounded-full bg-red-500/10 px-2 py-0.5 text-2xs font-bold uppercase tracking-wide text-red-600 dark:text-red-400">
                     Íntimo
                   </span>
                 )}

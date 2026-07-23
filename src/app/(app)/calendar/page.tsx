@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { CalendarHeart, History } from "lucide-react";
+import { CalendarHeart, Heart, History } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { requireCouple } from "@/lib/couple";
 import { EVENT_KINDS } from "@/lib/utils";
@@ -48,8 +48,8 @@ export default async function CalendarPage() {
             Lo que os espera y lo que ya habéis vivido.
           </p>
           {milestone && (
-            <p className="mt-1.5 text-xs font-medium text-rose-deep">
-              💗{" "}
+            <p className="mt-1.5 inline-flex items-center gap-1.5 text-xs font-medium text-rose-deep">
+              <Heart className="h-3.5 w-3.5 fill-current" />
               {milestone.daysLeft === 0
                 ? milestone.isAnnual
                   ? `Hoy cumplís ${milestone.years} ${milestone.years === 1 ? "año" : "años"}`

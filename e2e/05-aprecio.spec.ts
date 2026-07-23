@@ -14,7 +14,7 @@ test("un aprecio cae en el frasco de los dos, en vivo", async ({ browser }) => {
     await a.getByPlaceholder(/Algo que valoras/).fill(texto);
     await a.getByRole("button", { name: "Meter en el frasco" }).click();
 
-    await expect(a.getByText("Guardado en el frasco 💞")).toBeVisible();
+    await expect(a.getByText("Guardado en el frasco")).toBeVisible();
     await expect(a.getByText(`“${texto}”`)).toBeVisible(); // en mi frasco
     await expect(b.getByText(`“${texto}”`)).toBeVisible(); // en vivo en el suyo
   } finally {

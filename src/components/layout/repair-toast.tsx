@@ -42,11 +42,11 @@ export function RepairToast({ myId }: { myId: string }) {
   const title = {
     pause: `${toast.name} necesita un respiro`,
     reach: `${toast.name} te tiende la mano`,
-    accept: `${toast.name} ha aceptado tu mano 💛`,
+    accept: `${toast.name} ha aceptado tu mano`,
     aftermath: `${toast.name} ha compartido cómo se sintió`
   }[toast.kind];
   const sub = {
-    pause: "Volverá — no es que se vaya 🕊️",
+    pause: "Volverá — no es que se vaya",
     reach: toast.message ?? "Quiere acercarse",
     accept: "Estáis más cerca",
     aftermath: "Ábrelo en Reparar cuando estés listo/a"
@@ -68,7 +68,7 @@ export function RepairToast({ myId }: { myId: string }) {
             disabled={accepting}
             className="shrink-0 rounded-full bg-rose px-3.5 py-1.5 text-sm font-medium text-white transition hover:bg-rose-deep disabled:opacity-60"
           >
-            Acepto 💛
+            Acepto
           </button>
         )}
         {toast.kind === "aftermath" && (

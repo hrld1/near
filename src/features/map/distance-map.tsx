@@ -4,21 +4,23 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { MapPin } from "lucide-react";
 import { setCityAction } from "@/actions/presence";
+import { weatherIcon, weatherLabel } from "@/lib/weather";
 
 type Geo = { lat: number; lon: number; label: string };
 type Wx = { temp: number; code: number };
 
-// Descripción WMO compacta (Open-Meteo). Sin assets: emoji.
-function weatherText(code: number): string {
-  if (code === 0) return "☀️ Despejado";
-  if (code <= 2) return "🌤️ Poco nuboso";
-  if (code === 3) return "☁️ Nublado";
-  if (code <= 48) return "🌫️ Niebla";
-  if (code <= 67) return "🌧️ Lluvia";
-  if (code <= 77) return "🌨️ Nieve";
-  if (code <= 82) return "🌦️ Chubascos";
-  if (code <= 99) return "⛈️ Tormenta";
-  return "🌡️";
+// Clima compacto de una ciudad: icono de trazo + etiqueta + temperatura.
+function WeatherLine({ wx }: { wx: Wx | null }) {
+  if (!wx) return <span className="text-ink-soft">—</span>;
+  const Icon = weatherIcon(wx.code);
+  const label = weatherLabel(wx.code);
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <Icon className="h-4 w-4 text-ink-soft" />
+      {label && <span>{label}</span>}
+      <span className="tabular-nums">{wx.temp}°</span>
+    </span>
+  );
 }
 
 async function geocode(city: string): Promise<Geo | null> {
@@ -154,11 +156,11 @@ export function DistanceMap({
         <div className="grid grid-cols-2 gap-px bg-sand/50">
           <div className="bg-paper p-3 text-center">
             <p className="text-xs font-medium text-ink-soft">{mine?.label ?? myName}</p>
-            <p className="mt-0.5 text-sm text-ink">{myWx ? `${weatherText(myWx.code)} ${myWx.temp}°` : "—"}</p>
+            <p className="mt-0.5 text-sm text-ink"><WeatherLine wx={myWx} /></p>
           </div>
           <div className="bg-paper p-3 text-center">
             <p className="text-xs font-medium text-ink-soft">{theirs?.label ?? partnerName}</p>
-            <p className="mt-0.5 text-sm text-ink">{theirWx ? `${weatherText(theirWx.code)} ${theirWx.temp}°` : "—"}</p>
+            <p className="mt-0.5 text-sm text-ink"><WeatherLine wx={theirWx} /></p>
           </div>
         </div>
       </div>
@@ -167,7 +169,7 @@ export function DistanceMap({
         <p className="text-center text-sm text-ink-soft">
           {daysToMeeting !== null
             ? daysToMeeting === 0
-              ? `Hoy os veis: ${nextMeeting?.title} 💞`
+              ? `Hoy os veis: ${nextMeeting?.title}`
               : `${nextMeeting?.title} en ${daysToMeeting} ${daysToMeeting === 1 ? "día" : "días"} — cada día, un poco más cerca.`
             : "Marcad una fecha para veros y la distancia pesará menos."}
         </p>

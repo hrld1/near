@@ -45,7 +45,7 @@ export default async function CercaPage() {
     return {
       key: deck.key,
       name: deck.name,
-      emoji: deck.emoji,
+      icon: deck.icon,
       tagline: deck.tagline,
       accent: deck.accent,
       soft: deck.soft,

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Clock } from "lucide-react";
 
 // Reloj local de tu pareja: usa su User.timezone (IANA).
 export function PartnerClock({ timezone, name }: { timezone: string; name: string }) {
@@ -35,8 +36,11 @@ export function PartnerClock({ timezone, name }: { timezone: string; name: strin
 
   if (!time) return null;
   return (
-    <span className="text-xs text-ink-soft" title={`Zona horaria de ${name}: ${timezone}`}>
-      🕐 Allí son las {time}
+    <span
+      className="inline-flex items-center gap-1 text-xs text-ink-soft"
+      title={`Zona horaria de ${name}: ${timezone}`}
+    >
+      <Clock className="h-3 w-3" /> Allí son las {time}
       {dayDiff}
     </span>
   );

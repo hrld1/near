@@ -202,7 +202,7 @@ export function MomentOfDay({
 
         {bothDone && (
           <p className="mt-3 text-center text-sm font-medium text-rose-deep">
-            El momento de hoy, hecho por los dos 💞
+            El momento de hoy, hecho por los dos
           </p>
         )}
         {error && <p className="mt-2 text-center text-xs text-red-700 dark:text-red-400">{error}</p>}

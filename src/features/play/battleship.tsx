@@ -221,7 +221,7 @@ export function Battleship({ myId, partnerName }: { myId: string; partnerName: s
         <div className="mb-3 flex items-center justify-between">
           {phase === "over" ? (
             <p className="font-display text-lg text-ink">
-              {won ? "¡Flota rival hundida! 🎉" : `${partnerName} ha hundido tu flota…`}
+              {won ? "¡Flota rival hundida!" : `${partnerName} ha hundido tu flota…`}
             </p>
           ) : (
             <p className={cn("text-sm font-medium", myTurn ? "text-rose-deep" : "text-ink-soft")}>

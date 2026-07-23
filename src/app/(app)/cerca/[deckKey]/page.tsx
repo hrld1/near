@@ -43,7 +43,7 @@ export default async function DeckPage({ params }: { params: { deckKey: string }
   return (
     <div className="mx-auto max-w-2xl px-4 py-6 md:py-10">
       <DeckView
-        deck={{ name: deck.name, emoji: deck.emoji, accent: deck.accent, tagline: deck.tagline, intimate: deck.intimate }}
+        deck={{ deckKey: deck.key, name: deck.name, accent: deck.accent, tagline: deck.tagline, intimate: deck.intimate }}
         partnerName={partner?.name ?? "tu pareja"}
         initial={initial}
       />

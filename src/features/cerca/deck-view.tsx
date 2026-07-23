@@ -5,6 +5,7 @@ import { useServerState } from "@/hooks/use-server-state";
 import Link from "next/link";
 import { ArrowLeft, ChevronLeft, ChevronRight, Lock } from "lucide-react";
 import { answerCardAction } from "@/actions/cards";
+import { deckByKey } from "@/lib/decks";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/input";
 import { QuestionStage, Reveal } from "@/features/questions/question-stage";
@@ -18,7 +19,9 @@ type CardState = {
   partnerAnswer: string | null;
 };
 
-type DeckMeta = { name: string; emoji: string; accent: string; tagline: string; intimate?: boolean };
+// El icono no puede cruzar la frontera servidor→cliente (una función no es
+// serializable): se pasa la key y se resuelve aquí, en el cliente.
+type DeckMeta = { deckKey: string; name: string; accent: string; tagline: string; intimate?: boolean };
 
 export function DeckView({
   deck,
@@ -35,6 +38,7 @@ export function DeckView({
   const revealed = cards.filter((c) => c.myAnswer && c.partnerAnswer).length;
   const mineDone = cards.filter((c) => c.myAnswer).length;
   const current = cards[idx];
+  const DeckIcon = deckByKey(deck.deckKey)?.icon;
 
   function onAnswered(cardId: string, myAnswer: string, partnerAnswer: string | null) {
     setCards((cs) => cs.map((c) => (c.cardId === cardId ? { ...c, myAnswer, partnerAnswer } : c)));
@@ -52,8 +56,8 @@ export function DeckView({
       </Link>
 
       <header className={cn("overflow-hidden rounded-3xl bg-gradient-to-br p-6 text-white shadow-lift", deck.accent)}>
-        <p className="text-3xl">{deck.emoji}</p>
-        <h1 className="mt-1 font-display text-3xl">{deck.name}</h1>
+        {DeckIcon && <DeckIcon className="h-8 w-8" />}
+        <h1 className="mt-2 font-display text-3xl">{deck.name}</h1>
         <p className="mt-1 max-w-md text-sm text-white/85">{deck.tagline}</p>
         <div className="mt-4 flex flex-wrap items-center gap-2 text-xs font-medium">
           <span className="rounded-full bg-black/20 px-3 py-1 backdrop-blur-sm">
@@ -133,7 +137,7 @@ export function DeckView({
 
       {mineDone === cards.length && (
         <p className="mt-5 text-center text-sm font-medium text-rose-deep">
-          Habéis abierto todo este mazo. Probad otro cuando queráis 💞
+          Habéis abierto todo este mazo. Probad otro cuando queráis
         </p>
       )}
     </div>
