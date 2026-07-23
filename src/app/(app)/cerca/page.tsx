@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { HeartHandshake } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { requireCouple } from "@/lib/couple";
 import { dayKeyIn, mondayOfWeek } from "@/lib/dates";
@@ -70,8 +71,13 @@ export default async function CercaPage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-6 md:py-10">
       <header className="mb-5">
-        <h1 className="font-display text-3xl text-ink">Cerca</h1>
-        <p className="mt-1 text-sm text-ink-soft">
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-rose/12 text-rose-deep">
+            <HeartHandshake className="h-5 w-5" />
+          </span>
+          <h1 className="font-display text-3xl text-ink">Cerca</h1>
+        </div>
+        <p className="mt-2 text-sm text-ink-soft">
           Un rincón para quereros y conoceros más — no para pasar el rato.
         </p>
       </header>
