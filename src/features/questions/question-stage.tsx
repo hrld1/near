@@ -60,12 +60,12 @@ export function Reveal({
     <div className="space-y-2.5">
       <div className="rounded-2xl bg-sand px-4 py-3">
         <p className="text-2xs font-semibold uppercase tracking-wider text-ink-soft">Tú</p>
-        <p className="mt-0.5 whitespace-pre-wrap text-sm leading-relaxed text-ink">{myAnswer}</p>
+        <p className="mt-1 whitespace-pre-wrap text-read text-ink">{myAnswer}</p>
       </div>
       {partnerAnswer ? (
         <div className="rounded-2xl bg-rose-faint px-4 py-3">
           <p className="text-2xs font-semibold uppercase tracking-wider text-rose-deep">{name}</p>
-          <p className="mt-0.5 whitespace-pre-wrap text-sm leading-relaxed text-ink">{partnerAnswer}</p>
+          <p className="mt-1 whitespace-pre-wrap text-read text-ink">{partnerAnswer}</p>
         </div>
       ) : (
         <p className={cn("rounded-2xl border border-dashed border-sand-deep px-4 py-3 text-sm text-ink-soft")}>

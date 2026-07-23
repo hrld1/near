@@ -37,6 +37,51 @@ export function EmptyJarIllustration({ className }: { className?: string }) {
   );
 }
 
+// Buzón vacío, antes de la primera carta: un sobre cerrado con un corazón
+// saliendo, para que "aún no hay cartas" se sienta como una invitación a
+// escribir, no como un vacío. Mismo trazo y degradado que las demás.
+export function LetterIllustration({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 120 120" fill="none" className={className} aria-hidden="true">
+      <defs>
+        <linearGradient id="env-fill" x1="30" y1="46" x2="90" y2="96" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="rgb(var(--c-rose))" stopOpacity="0.16" />
+          <stop offset="1" stopColor="rgb(var(--c-plum))" stopOpacity="0.1" />
+        </linearGradient>
+      </defs>
+      {/* cuerpo del sobre */}
+      <rect
+        x="26"
+        y="50"
+        width="68"
+        height="44"
+        rx="7"
+        fill="url(#env-fill)"
+        stroke="rgb(var(--c-plum))"
+        strokeOpacity="0.5"
+        strokeWidth="2.5"
+      />
+      {/* la solapa */}
+      <path
+        d="M28 53 L60 76 L92 53"
+        fill="none"
+        stroke="rgb(var(--c-plum))"
+        strokeOpacity="0.5"
+        strokeWidth="2.5"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+      />
+      {/* el corazón que sale: lo que la carta lleva dentro */}
+      <circle cx="60" cy="34" r="14" fill="rgb(var(--c-rose))" opacity="0.14" />
+      <path
+        d="M60 48 C 54 41, 45 37, 45 30 C 45 25.5, 48.5 23, 52.5 23 C 56 23, 58.5 25.5, 60 28 C 61.5 25.5, 64 23, 67.5 23 C 71.5 23, 75 25.5, 75 30 C 75 37, 66 41, 60 48 Z"
+        fill="rgb(var(--c-rose))"
+        opacity="0.85"
+      />
+    </svg>
+  );
+}
+
 // Racha en cero: una llama apagada, dibujada con el mismo trazo que el icono
 // Flame de la cabecera — para que el primer día se sienta como un inicio, no
 // como un hueco vacío.

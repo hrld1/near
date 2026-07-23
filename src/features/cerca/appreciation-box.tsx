@@ -116,7 +116,7 @@ export function AppreciationBox({
                       : "border-rose/20 bg-rose-faint"
                   )}
                 >
-                  <p className="text-sm leading-relaxed text-ink">“{a.body}”</p>
+                  <p className="text-read text-ink">“{a.body}”</p>
                   <p className="mt-1.5 text-2xs text-ink-soft">
                     <span className={cn("font-semibold", mine ? "text-ink" : "text-rose-deep")}>
                       {mine ? "Tú" : a.fromName}

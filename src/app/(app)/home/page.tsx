@@ -303,7 +303,7 @@ export default async function HomePage() {
                       <p className="text-2xs font-semibold uppercase tracking-wider text-rose-deep">
                         Nota de {partner.name}
                       </p>
-                      <p className="mt-0.5 text-sm leading-relaxed text-ink">{partnerNote.body}</p>
+                      <p className="mt-0.5 text-read text-ink">{partnerNote.body}</p>
                     </div>
                   </div>
                 )}

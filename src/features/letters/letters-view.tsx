@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { Clock, Hourglass, Lock, Mail, MailOpen, Send } from "lucide-react";
 import { openLetterAction, writeLetterAction } from "@/actions/letters";
 import { useCoupleStream } from "@/hooks/use-stream";
+import { EmptyState } from "@/components/ui/empty-state";
+import { LetterIllustration } from "@/components/illustrations";
 import { sfx } from "@/lib/sound";
 import { cn } from "@/lib/utils";
 
@@ -141,10 +143,11 @@ export function LettersView({
 
       {/* buzón */}
       {initialLetters.length === 0 ? (
-        <p className="py-8 text-center text-sm text-ink-soft">
-          Aún no hay cartas. Escribe la primera arriba: llegará mañana a las 08:00, su hora
-          — o elige una fecha y será una cápsula del tiempo.
-        </p>
+        <EmptyState
+          illustration={<LetterIllustration className="h-20 w-20" />}
+          title="El buzón está esperando"
+          description="Escribe la primera arriba: llegará mañana a las 08:00, su hora — o elige una fecha y será una cápsula del tiempo."
+        />
       ) : (
         <ul className="space-y-3">
           {initialLetters.map((l) => (
