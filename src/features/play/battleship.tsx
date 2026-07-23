@@ -170,7 +170,7 @@ export function Battleship({ myId, partnerName }: { myId: string; partnerName: s
     return (
       <Shell>
         <div className="flex min-h-[340px] flex-col items-center justify-center gap-4 p-8 text-center">
-          <span className="flex h-16 w-16 items-center justify-center rounded-3xl bg-sky-500/12 text-sky-600 dark:text-sky-400">
+          <span className="flex h-16 w-16 items-center justify-center rounded-3xl bg-rose/12 text-rose-deep">
             <Anchor className="h-8 w-8" />
           </span>
           {phase === "lobby" && (

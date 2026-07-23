@@ -22,15 +22,17 @@ export type DuelMeta = {
   icon: LucideIcon;
 };
 
+// Color de marca de Near (it36, Fase 3): un solo sistema. Cada duelo se
+// distingue por su icono, no por un color aleatorio.
+const BRAND = { accent: "from-rose to-plum", soft: "bg-rose/12", text: "text-rose-deep" } as const;
+
 export const DUELS: DuelMeta[] = [
   {
     key: "gomoku",
     name: "5 en raya",
     tagline: "Alinea cinco fichas antes que tu pareja.",
     blurb: "Por turnos, colocáis fichas en el tablero. Gana quien logre cinco en línea —horizontal, vertical o diagonal.",
-    accent: "from-teal-400 to-emerald-600",
-    soft: "bg-teal-500/12",
-    text: "text-teal-600 dark:text-teal-400",
+    ...BRAND,
     emoji: "⚫",
     icon: Grid3x3
   },
@@ -39,9 +41,7 @@ export const DUELS: DuelMeta[] = [
     name: "Reversi",
     tagline: "Atrapa sus fichas y voltéalas a tu color.",
     blurb: "Encierra las fichas rivales entre dos tuyas para voltearlas. Cuando no caben más, gana quien tenga más fichas de su color.",
-    accent: "from-violet-400 to-purple-700",
-    soft: "bg-violet-500/12",
-    text: "text-violet-600 dark:text-violet-400",
+    ...BRAND,
     emoji: "⚪",
     icon: Disc3
   },
@@ -50,9 +50,7 @@ export const DUELS: DuelMeta[] = [
     name: "Puntos y cajas",
     tagline: "Cierra cajas y roba turnos. El clásico del papel.",
     blurb: "Por turnos trazáis una línea entre dos puntos. Quien cierra una caja la gana y vuelve a jugar. Gana quien tenga más cajas.",
-    accent: "from-amber-400 to-orange-600",
-    soft: "bg-amber-500/12",
-    text: "text-amber-600 dark:text-amber-400",
+    ...BRAND,
     emoji: "🔲",
     icon: Grip
   }

@@ -196,7 +196,7 @@ export function Connect4({ myId, partnerName }: { myId: string; partnerName: str
       </div>
 
       <Card className="overflow-hidden p-0">
-        <div className="relative overflow-hidden bg-gradient-to-br from-indigo-500 to-violet-700 px-5 py-4 text-white">
+        <div className="relative overflow-hidden bg-gradient-to-br from-rose to-plum px-5 py-4 text-white">
           <Swords className="absolute -right-3 -top-3 h-20 w-20 opacity-15" />
           <h1 className="font-display text-2xl">4 en raya</h1>
           <p className="mt-1 max-w-md text-sm text-white/85">
@@ -207,7 +207,7 @@ export function Connect4({ myId, partnerName }: { myId: string; partnerName: str
         <div className="p-5">
           {phase === "lobby" && (
             <div className="flex min-h-[320px] flex-col items-center justify-center gap-4 text-center">
-              <span className="flex h-20 w-20 items-center justify-center rounded-3xl bg-indigo-500/12 text-indigo-600 dark:text-indigo-400">
+              <span className="flex h-20 w-20 items-center justify-center rounded-3xl bg-rose/12 text-rose-deep">
                 <Swords className="h-10 w-10" />
               </span>
               {notice && <p className="text-sm text-ink-soft">{notice}</p>}
@@ -222,7 +222,7 @@ export function Connect4({ myId, partnerName }: { myId: string; partnerName: str
 
           {phase === "inviting" && (
             <div className="flex min-h-[320px] flex-col items-center justify-center gap-4 text-center">
-              <span className="flex h-16 w-16 animate-pulse items-center justify-center rounded-3xl bg-indigo-500/12 text-indigo-600 dark:text-indigo-400">
+              <span className="flex h-16 w-16 animate-pulse items-center justify-center rounded-3xl bg-rose/12 text-rose-deep">
                 <Swords className="h-8 w-8" />
               </span>
               <p className="text-sm font-medium text-ink">Esperando a {partnerName}...</p>
@@ -234,7 +234,7 @@ export function Connect4({ myId, partnerName }: { myId: string; partnerName: str
 
           {phase === "incoming" && (
             <div className="flex min-h-[320px] flex-col items-center justify-center gap-4 text-center">
-              <span className="flex h-16 w-16 animate-pulse-heart items-center justify-center rounded-3xl bg-indigo-500/12 text-indigo-600 dark:text-indigo-400">
+              <span className="flex h-16 w-16 animate-pulse-heart items-center justify-center rounded-3xl bg-rose/12 text-rose-deep">
                 <Swords className="h-8 w-8" />
               </span>
               <p className="font-display text-xl text-ink">{partnerName} te reta al 4 en raya</p>

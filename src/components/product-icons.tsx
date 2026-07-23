@@ -36,106 +36,41 @@ import {
   type LucideIcon
 } from "lucide-react";
 
-// ---- Juegos: icono + acento propio (identidad por juego) ----
-export const GAME_VISUALS: Record<
-  string,
-  { icon: LucideIcon; accent: string; accentSoft: string; accentText: string }
-> = {
-  reaction: {
-    icon: Zap,
-    accent: "from-amber-400 to-orange-500",
-    accentSoft: "bg-amber-500/12",
-    accentText: "text-amber-600 dark:text-amber-400"
-  },
-  memory: {
-    icon: Layers,
-    accent: "from-violet-400 to-purple-600",
-    accentSoft: "bg-violet-500/12",
-    accentText: "text-violet-600 dark:text-violet-400"
-  },
-  targets: {
-    icon: Target,
-    accent: "from-rose to-rose-deep",
-    accentSoft: "bg-rose/12",
-    accentText: "text-rose-deep"
-  },
-  echo: {
-    icon: AudioLines,
-    accent: "from-sky-400 to-blue-600",
-    accentSoft: "bg-sky-500/12",
-    accentText: "text-sky-600 dark:text-sky-400"
-  },
-  anagram: {
-    icon: Type,
-    accent: "from-emerald-400 to-teal-600",
-    accentSoft: "bg-emerald-500/12",
-    accentText: "text-emerald-600 dark:text-emerald-400"
-  },
-  sprint: {
-    icon: Calculator,
-    accent: "from-fuchsia-400 to-pink-600",
-    accentSoft: "bg-fuchsia-500/12",
-    accentText: "text-fuchsia-600 dark:text-fuchsia-400"
-  },
-  typing: {
-    icon: Keyboard,
-    accent: "from-cyan-400 to-indigo-500",
-    accentSoft: "bg-cyan-500/12",
-    accentText: "text-cyan-600 dark:text-cyan-400"
-  },
-  golf: {
-    icon: LandPlot,
-    accent: "from-lime-400 to-green-600",
-    accentSoft: "bg-lime-500/12",
-    accentText: "text-lime-700 dark:text-lime-400"
-  },
-  caps: {
-    icon: Disc,
-    accent: "from-orange-400 to-red-500",
-    accentSoft: "bg-orange-500/12",
-    accentText: "text-orange-600 dark:text-orange-400"
-  },
-  meteor: {
-    icon: Rocket,
-    accent: "from-indigo-500 to-fuchsia-600",
-    accentSoft: "bg-indigo-500/12",
-    accentText: "text-indigo-600 dark:text-indigo-400"
-  },
-  ski: {
-    icon: Snowflake,
-    accent: "from-sky-300 to-blue-500",
-    accentSoft: "bg-sky-500/12",
-    accentText: "text-sky-600 dark:text-sky-400"
-  },
-  bricks: {
-    icon: Blocks,
-    accent: "from-rose-400 to-orange-500",
-    accentSoft: "bg-rose-500/12",
-    accentText: "text-rose-600 dark:text-rose-400"
-  },
-  climb: {
-    icon: Cloud,
-    accent: "from-emerald-400 to-sky-500",
-    accentSoft: "bg-emerald-500/12",
-    accentText: "text-emerald-600 dark:text-emerald-400"
-  },
-  pinball: {
-    icon: CircleDot,
-    accent: "from-purple-500 to-indigo-700",
-    accentSoft: "bg-purple-500/12",
-    accentText: "text-purple-600 dark:text-purple-400"
-  }
+// El acento de marca de Near: el ÚNICO degradado del producto (it36, Fase 3).
+// Antes cada juego, mazo y duelo traía su propio color —lime, cyan, indigo,
+// fuchsia…— y la app parecía un arcoíris que competía con su propia identidad
+// rosa/ciruela. Ahora la identidad la carga el ICONO de cada cosa; el color es
+// uno solo, el de Near. Un degradado reservado para los hero: no se reparte
+// por cada tarjeta (las rejillas ya son planas desde it35).
+export const BRAND_ACCENT = "from-rose to-plum";
+export const BRAND_SOFT = "bg-rose/12";
+export const BRAND_TEXT = "text-rose-deep";
+
+// ---- Juegos: cada juego se distingue por su icono (el color es el de Near) ----
+export const GAME_VISUALS: Record<string, { icon: LucideIcon }> = {
+  reaction: { icon: Zap },
+  memory: { icon: Layers },
+  targets: { icon: Target },
+  echo: { icon: AudioLines },
+  anagram: { icon: Type },
+  sprint: { icon: Calculator },
+  typing: { icon: Keyboard },
+  golf: { icon: LandPlot },
+  caps: { icon: Disc },
+  meteor: { icon: Rocket },
+  ski: { icon: Snowflake },
+  bricks: { icon: Blocks },
+  climb: { icon: Cloud },
+  pinball: { icon: CircleDot }
 };
 
 export function gameVisual(key: string) {
-  return (
-    GAME_VISUALS[key] ?? {
-      icon: Gamepad2,
-      accent: "from-rose to-plum",
-      accentSoft: "bg-rose/12",
-      accentText: "text-rose-deep"
-    }
-  );
+  return {
+    icon: GAME_VISUALS[key]?.icon ?? Gamepad2,
+    accent: BRAND_ACCENT,
+    accentSoft: BRAND_SOFT,
+    accentText: BRAND_TEXT
+  };
 }
 
 // ---- Tipos de evento ----
