@@ -121,27 +121,18 @@ export default async function PlayPage() {
       key: "connect4",
       name: "4 en raya",
       tagline: "Cuatro fichas en línea antes que tu pareja.",
-      accent: "from-indigo-400 to-violet-600",
-      soft: "bg-indigo-500/12",
-      text: "text-indigo-600 dark:text-indigo-400",
       Icon: Swords
     },
     {
       key: "battleship",
       name: "Hundir la flota",
       tagline: "Encuentra su flota antes que ella la tuya.",
-      accent: "from-sky-400 to-blue-600",
-      soft: "bg-sky-500/12",
-      text: "text-sky-600 dark:text-sky-400",
       Icon: Anchor
     },
     ...DUELS.map((d) => ({
       key: d.key,
       name: d.name,
       tagline: d.tagline,
-      accent: d.accent,
-      soft: d.soft,
-      text: d.text,
       Icon: d.icon
     }))
   ];
@@ -327,10 +318,9 @@ export default async function PlayPage() {
         <div className="grid gap-3 sm:grid-cols-2">
           {liveDuels.map((duel) => (
             <Link key={duel.key} href={`/play/${duel.key}`} className="group">
-              <Card className="relative h-full overflow-hidden transition group-hover:-translate-y-0.5 group-hover:shadow-lift">
-                <div className={cn("absolute inset-x-0 top-0 h-1 bg-gradient-to-r opacity-80", duel.accent)} />
+              <Card className="h-full transition group-hover:-translate-y-0.5 group-hover:shadow-lift">
                 <div className="flex items-start justify-between">
-                  <span className={cn("flex h-11 w-11 items-center justify-center rounded-xl", duel.soft, duel.text)}>
+                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-rose/10 text-rose-deep">
                     <duel.Icon className="h-5 w-5" />
                   </span>
                   <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
@@ -345,76 +335,51 @@ export default async function PlayPage() {
         </div>
       </section>
 
-      {/* Sala de juegos */}
+      {/* Sala de juegos: it35-audit — 15 tarjetas descriptivas (icono + título +
+          descripción + marcador) hacían de esta sección un muro larguísimo de
+          scroll, cada una con su propio color de arcoíris. Es la lista de
+          "explorar todo", no el reto de hoy (eso ya vive arriba, grande) — así
+          que aquí gana la densidad: mosaico compacto, un color consistente y
+          solo la marca de HOY cuando hay una. La descripción de cada juego
+          sigue estando a un toque, en su propia página. */}
       <section className="mt-7">
         <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-ink-soft">
           Sala de juegos
         </h2>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {perGame.map(({ def, myBest, partnerBest, myAttempts }) => {
+        <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4 md:grid-cols-5">
+          {perGame.map(({ def, myBest, myAttempts }) => {
             const visual = gameVisual(def.key);
             const Icon = visual.icon;
+            const isDaily = def.key === daily.key;
             const attemptsLeft = def.maxAttemptsPerDay - myAttempts;
             return (
-              <Link key={def.key} href={`/play/${def.key}`} className="group">
-                <Card className="relative h-full overflow-hidden transition group-hover:-translate-y-0.5 group-hover:shadow-lift">
-                  <div
-                    className={cn(
-                      "absolute inset-x-0 top-0 h-1 bg-gradient-to-r opacity-80",
-                      visual.accent
-                    )}
-                  />
-                  <div className="flex items-start justify-between">
-                    <span
-                      className={cn(
-                        "flex h-11 w-11 items-center justify-center rounded-xl",
-                        visual.accentSoft,
-                        visual.accentText
-                      )}
-                    >
-                      <Icon className="h-5 w-5" />
+              <Link key={def.key} href={`/play/${def.key}`} className="group" title={def.tagline}>
+                <Card className="relative flex h-full flex-col items-center gap-1.5 p-3 text-center transition group-hover:-translate-y-0.5 group-hover:shadow-lift">
+                  {isDaily ? (
+                    <span className="absolute -right-1.5 -top-1.5 rounded-full bg-rose-deep px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white shadow-card">
+                      Hoy
                     </span>
-                    {def.key === daily.key ? (
-                      <span className="rounded-full bg-rose-faint px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-rose-deep">
-                        Reto de hoy
-                      </span>
-                    ) : attemptsLeft === 0 ? (
-                      <span className="flex items-center gap-1 rounded-full bg-sand px-2 py-0.5 text-[11px] font-semibold text-ink-soft">
-                        <Lock className="h-2.5 w-2.5" /> mañana
-                      </span>
-                    ) : null}
-                  </div>
-                  <h3 className="mt-2.5 font-display text-lg text-ink">{def.name}</h3>
-                  <p className="mt-0.5 text-xs leading-relaxed text-ink-soft">{def.tagline}</p>
-                  <p className="mt-2.5 text-xs text-ink-soft">
-                    {myBest !== null ? (
-                      <>
-                        Tu hoy: <b className="text-ink">{def.format(myBest)}</b>
-                      </>
-                    ) : (
-                      "Sin jugar hoy"
-                    )}
-                    {partnerBest !== null && (
-                      <>
-                        {" · "}
-                        {partner?.name}: <b className="text-ink">{def.format(partnerBest)}</b>
-                      </>
-                    )}
+                  ) : attemptsLeft === 0 ? (
+                    <Lock className="absolute right-2.5 top-2.5 h-3 w-3 text-ink-soft/50" />
+                  ) : null}
+                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose/10 text-rose-deep">
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <h3 className="font-display text-sm leading-tight text-ink">{def.name}</h3>
+                  <p className="text-[11px] text-ink-soft">
+                    {myBest !== null ? <b className="text-ink">{def.format(myBest)}</b> : "—"}
                   </p>
                 </Card>
               </Link>
             );
           })}
-          <Link href="/play/quiz" className="group">
-            <Card className="relative h-full overflow-hidden transition group-hover:-translate-y-0.5 group-hover:shadow-lift">
-              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-rose to-plum opacity-80" />
-              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-rose/12 text-rose-deep">
+          <Link href="/play/quiz" className="group" title="Cooperativo, sin cronómetro">
+            <Card className="flex h-full flex-col items-center gap-1.5 p-3 text-center transition group-hover:-translate-y-0.5 group-hover:shadow-lift">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose/10 text-rose-deep">
                 <HeartHandshake className="h-5 w-5" />
               </span>
-              <h3 className="mt-2.5 font-display text-lg text-ink">Nos conocemos?</h3>
-              <p className="mt-0.5 text-xs leading-relaxed text-ink-soft">
-                Responde y apuesta por lo que dira tu pareja. Cooperativo, sin cronometro.
-              </p>
+              <h3 className="font-display text-sm leading-tight text-ink">¿Nos conocemos?</h3>
+              <p className="text-[11px] text-ink-soft">Cooperativo</p>
             </Card>
           </Link>
         </div>

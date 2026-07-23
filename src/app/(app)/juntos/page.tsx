@@ -67,10 +67,7 @@ export default async function JuntosPage() {
             href: "/citas",
             title: "Planear una cita",
             description: "Cuéntale la cita que os apetece y os la deja lista: sitios reales o una cita a distancia.",
-            icon: WandSparkles,
-            accent: "from-rose to-plum",
-            accentSoft: "bg-rose/12",
-            accentText: "text-rose-deep"
+            icon: WandSparkles
           } satisfies HubItem
         ]
       : []),
@@ -79,9 +76,6 @@ export default async function JuntosPage() {
       title: "Cerca de verdad",
       description: "Aprecio, preguntas para conoceros más y el pulso de la semana.",
       icon: HeartHandshake,
-      accent: "from-rose to-plum",
-      accentSoft: "bg-rose/12",
-      accentText: "text-rose-deep",
       live: lastAppreciation
         ? `Aprecio de ${partnerName} ${agoLabel(lastAppreciation.createdAt)}`
         : undefined
@@ -91,9 +85,6 @@ export default async function JuntosPage() {
       title: "Coincidir",
       description: "Marcad cuándo estáis libres y encontrad un hueco para hablar, en las dos horas.",
       icon: CalendarClock,
-      accent: "from-emerald-400 to-teal-600",
-      accentSoft: "bg-emerald-500/12",
-      accentText: "text-emerald-600 dark:text-emerald-400",
       live: nextOverlap
         ? `Próxima ventana: ${dayInTz(new Date(nextOverlap.start), user.timezone)} · ${timeInTz(new Date(nextOverlap.start), user.timezone)} tu hora`
         : undefined
@@ -103,9 +94,6 @@ export default async function JuntosPage() {
       title: "Estar juntos",
       description: "Su cielo, su hora y cómo está ahora mismo. Para dejarla abierta.",
       icon: Moon,
-      accent: "from-indigo-400 to-violet-700",
-      accentSoft: "bg-indigo-500/12",
-      accentText: "text-indigo-600 dark:text-indigo-400",
       live:
         partner && partnerSky
           ? `Allí ${partnerSky.label} · son las ${timeInTz(now, partner.timezone)}`
@@ -116,28 +104,19 @@ export default async function JuntosPage() {
       title: "Ver juntos",
       description: "Un vídeo o una peli sincronizados, con videollamada y chat propio.",
       icon: MonitorPlay,
-      accent: "from-rose to-plum",
-      accentSoft: "bg-rose/12",
-      accentText: "text-rose-deep",
       live: roomState?.videoTitle ? `En la sala: ${roomState.videoTitle}` : undefined
     },
     {
       href: "/canvas",
       title: "Lienzo",
       description: "Dibujáis a la vez sobre el mismo papel. Se guarda en el álbum.",
-      icon: Paintbrush,
-      accent: "from-sky-400 to-blue-600",
-      accentSoft: "bg-sky-500/12",
-      accentText: "text-sky-600 dark:text-sky-400"
+      icon: Paintbrush
     },
     {
       href: "/play",
       title: "Jugar",
       description: "Arcade con retos diarios y duelos en vivo, cara a cara.",
       icon: Gamepad2,
-      accent: "from-amber-400 to-orange-500",
-      accentSoft: "bg-amber-500/12",
-      accentText: "text-amber-600 dark:text-amber-400",
       live: `Reto de hoy: ${dailyGame.name}`
     }
   ];

@@ -22,8 +22,7 @@ export function DeckGrid({ items }: { items: DeckProgress[] }) {
         const pct = d.total > 0 ? Math.round((d.revealed / d.total) * 100) : 0;
         return (
           <Link key={d.key} href={`/cerca/${d.key}`} className="group">
-            <div className="relative h-full overflow-hidden rounded-2xl border border-sand-deep bg-paper p-4 shadow-card transition group-hover:-translate-y-0.5 group-hover:shadow-lift">
-              <div className={cn("absolute inset-x-0 top-0 h-1 bg-gradient-to-r opacity-80", d.accent)} />
+            <div className="h-full rounded-2xl border border-sand-deep bg-paper p-4 shadow-card transition group-hover:-translate-y-0.5 group-hover:shadow-lift">
               <div className="flex items-start justify-between">
                 <span className={cn("flex h-11 w-11 items-center justify-center rounded-xl text-xl", d.soft)}>
                   {d.emoji}
