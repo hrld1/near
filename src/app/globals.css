@@ -17,10 +17,6 @@
   --c-rose-faint: 253 241 243;
   --c-plum: 126 92 146;
   --c-shadow: 95 55 75;
-  /* la aurora ambiental (solo la usa el fondo del body) */
-  --aurora-a: 236 140 155;
-  --aurora-b: 150 116 178;
-  --aurora-c: 240 190 130;
 }
 
 .dark {
@@ -36,9 +32,6 @@
   --c-rose-faint: 56 38 48;
   --c-plum: 192 164 216;
   --c-shadow: 0 0 0;
-  --aurora-a: 190 90 120;
-  --aurora-b: 110 80 160;
-  --aurora-c: 170 120 80;
 }
 
 @layer base {
@@ -61,36 +54,85 @@
 }
 
 /* ---------------------------------------------------------------------------
-   La AURORA: el fondo vivo de Near (it27). Dos velos de luz rosa/ciruela/ámbar
-   que respiran muy despacio detrás de todo, más un grano finísimo de papel.
-   Fijos, sin bloquear clics, y quietos si el sistema pide menos movimiento.
+   El FONDO LÍQUIDO de Near (it38). Cuatro manchas de gradiente suave en el
+   rosa→rojo de la marca (con una de ciruela para dar profundidad) que derivan
+   CADA UNA POR SU CUENTA, muy despacio y con duraciones distintas para que
+   nunca se sincronicen: al solaparse y separarse, el color respira y se mezcla
+   como un fluido lento. Evolución de la antigua "aurora", que se movía como un
+   bloque rígido; esto se mueve como agua.
+
+   Rinde bien: solo se anima `transform` sobre una capa de compositor propia
+   (will-change), así que el desenfoque se calcula una vez y luego la GPU solo
+   la desplaza. Fijo detrás de todo, sin bloquear clics. La regla global de
+   prefers-reduced-motion lo congela en su posición inicial.
 --------------------------------------------------------------------------- */
-body::before {
-  content: "";
+.liquid-bg {
   position: fixed;
-  inset: -25%;
+  inset: 0;
   z-index: -1;
+  overflow: hidden;
   pointer-events: none;
-  background:
-    radial-gradient(38% 32% at 18% 22%, rgb(var(--aurora-a) / 0.16), transparent 70%),
-    radial-gradient(42% 36% at 82% 12%, rgb(var(--aurora-b) / 0.13), transparent 70%),
-    radial-gradient(36% 30% at 70% 85%, rgb(var(--aurora-c) / 0.11), transparent 70%),
-    radial-gradient(30% 26% at 8% 78%, rgb(var(--aurora-a) / 0.09), transparent 70%);
-  animation: aurora 46s ease-in-out infinite alternate;
 }
-.dark body::before {
-  opacity: 0.8;
+.liquid-bg span {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(56px);
+  will-change: transform;
 }
-@keyframes aurora {
-  0% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-  50% {
-    transform: translate3d(2.5%, -1.5%, 0) scale(1.06);
-  }
-  100% {
-    transform: translate3d(-2%, 2%, 0) scale(1.02);
-  }
+.liquid-bg .b1 {
+  width: 48vw;
+  height: 48vw;
+  left: -8vw;
+  top: -12vh;
+  background: radial-gradient(circle, rgb(var(--c-rose) / 0.5), transparent 60%);
+  animation: liquid1 26s ease-in-out infinite alternate;
+}
+.liquid-bg .b2 {
+  width: 42vw;
+  height: 42vw;
+  right: -6vw;
+  top: 6vh;
+  background: radial-gradient(circle, rgb(var(--c-rose-deep) / 0.44), transparent 60%);
+  animation: liquid2 33s ease-in-out infinite alternate;
+}
+.liquid-bg .b3 {
+  width: 50vw;
+  height: 50vw;
+  left: 10vw;
+  bottom: -20vh;
+  background: radial-gradient(circle, rgb(var(--c-plum) / 0.36), transparent 62%);
+  animation: liquid3 40s ease-in-out infinite alternate;
+}
+.liquid-bg .b4 {
+  width: 36vw;
+  height: 36vw;
+  right: 12vw;
+  bottom: 0;
+  background: radial-gradient(circle, rgb(var(--c-rose) / 0.4), transparent 60%);
+  animation: liquid4 30s ease-in-out infinite alternate;
+}
+.dark .liquid-bg {
+  opacity: 0.55;
+}
+@keyframes liquid1 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(12vw, 10vh) scale(1.12); }
+  100% { transform: translate(-4vw, 14vh) scale(1.04); }
+}
+@keyframes liquid2 {
+  0% { transform: translate(0, 0) scale(1.06); }
+  50% { transform: translate(-14vw, 8vh) scale(1); }
+  100% { transform: translate(-6vw, -8vh) scale(1.16); }
+}
+@keyframes liquid3 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(10vw, -10vh) scale(1.1); }
+  100% { transform: translate(16vw, -4vh) scale(1.02); }
+}
+@keyframes liquid4 {
+  0% { transform: translate(0, 0) scale(1.1); }
+  50% { transform: translate(-10vw, -12vh) scale(1); }
+  100% { transform: translate(-16vw, -2vh) scale(1.12); }
 }
 /* grano de papel: textura casi imperceptible que quita lo "plano" */
 body::after {
@@ -145,7 +187,8 @@ body::after {
 --------------------------------------------------------------------------- */
 @media print {
   body::before,
-  body::after {
+  body::after,
+  .liquid-bg {
     display: none !important;
   }
   aside,

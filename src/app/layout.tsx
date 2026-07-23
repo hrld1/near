@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Figtree, Fraunces } from "next/font/google";
+import { LiquidBackground } from "@/components/liquid-background";
 import { PwaRegister } from "@/components/pwa-register";
 import "./globals.css";
 
@@ -39,6 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="min-h-dvh">
+        <LiquidBackground />
         {children}
         <PwaRegister />
       </body>
