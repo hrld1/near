@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { useServerState } from "@/hooks/use-server-state";
 import Link from "next/link";
-import { ArrowLeft, Lock } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Lock } from "lucide-react";
 import { answerCardAction } from "@/actions/cards";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/input";
+import { QuestionStage, Reveal } from "@/features/questions/question-stage";
 import { cn } from "@/lib/utils";
 
 type CardState = {
@@ -29,14 +30,17 @@ export function DeckView({
   initial: CardState[];
 }) {
   const [cards, setCards] = useServerState<CardState[]>(initial);
+  // Carta a carta (it33): una sola pregunta en grande, se avanza a mano.
+  const [idx, setIdx] = useState(0);
   const revealed = cards.filter((c) => c.myAnswer && c.partnerAnswer).length;
   const mineDone = cards.filter((c) => c.myAnswer).length;
+  const current = cards[idx];
 
   function onAnswered(cardId: string, myAnswer: string, partnerAnswer: string | null) {
-    setCards((cs) =>
-      cs.map((c) => (c.cardId === cardId ? { ...c, myAnswer, partnerAnswer } : c))
-    );
+    setCards((cs) => cs.map((c) => (c.cardId === cardId ? { ...c, myAnswer, partnerAnswer } : c)));
   }
+
+  const go = (delta: number) => setIdx((i) => Math.min(cards.length - 1, Math.max(0, i + delta)));
 
   return (
     <div>
@@ -65,11 +69,67 @@ export function DeckView({
         Respondéis a ciegas: verás la respuesta de {partnerName} en cuanto compartas la tuya.
       </p>
 
-      <div className="grid gap-3">
-        {cards.map((card, i) => (
-          <CardItem key={card.cardId} card={card} index={i + 1} partnerName={partnerName} onAnswered={onAnswered} />
-        ))}
-      </div>
+      {current && (
+        <QuestionStage
+          eyebrow={deck.name}
+          counter={`${idx + 1} / ${cards.length}`}
+          question={current.text}
+          nav={
+            <div className="flex items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => go(-1)}
+                disabled={idx === 0}
+                aria-label="Pregunta anterior"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-sand-deep text-ink transition hover:bg-sand disabled:opacity-30"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+
+              {/* puntos: relleno = revelada, aro = respondida por ti, hueco = pendiente */}
+              <div className="flex flex-wrap items-center justify-center gap-1.5">
+                {cards.map((c, i) => {
+                  const done = !!(c.myAnswer && c.partnerAnswer);
+                  const mine = !!c.myAnswer;
+                  return (
+                    <button
+                      key={c.cardId}
+                      type="button"
+                      onClick={() => setIdx(i)}
+                      aria-label={`Ir a la pregunta ${i + 1}`}
+                      className={cn(
+                        "h-2 w-2 rounded-full transition",
+                        i === idx && "ring-2 ring-rose ring-offset-1 ring-offset-paper",
+                        done ? "bg-rose" : mine ? "border border-rose bg-transparent" : "bg-sand-deep"
+                      )}
+                    />
+                  );
+                })}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => go(1)}
+                disabled={idx === cards.length - 1}
+                aria-label="Pregunta siguiente"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-sand-deep text-ink transition hover:bg-sand disabled:opacity-30"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+          }
+        >
+          {/* key = reinicia el estado del formulario al cambiar de carta */}
+          <CardBody
+            key={current.cardId}
+            card={current}
+            partnerName={partnerName}
+            hasNext={idx < cards.length - 1}
+            onAnswered={onAnswered}
+            onNext={() => go(1)}
+          />
+        </QuestionStage>
+      )}
 
       {mineDone === cards.length && (
         <p className="mt-5 text-center text-sm font-medium text-rose-deep">
@@ -80,16 +140,18 @@ export function DeckView({
   );
 }
 
-function CardItem({
+function CardBody({
   card,
-  index,
   partnerName,
-  onAnswered
+  hasNext,
+  onAnswered,
+  onNext
 }: {
   card: CardState;
-  index: number;
   partnerName: string;
+  hasNext: boolean;
   onAnswered: (cardId: string, myAnswer: string, partnerAnswer: string | null) => void;
+  onNext: () => void;
 }) {
   const [answer, setAnswer] = useState("");
   const [saving, setSaving] = useState(false);
@@ -110,53 +172,43 @@ function CardItem({
     setSaving(false);
   }
 
-  return (
-    <div className="rounded-2xl border border-sand-deep bg-paper p-4 shadow-card">
-      <p className="flex gap-2 font-display text-lg leading-snug text-ink">
-        <span className="text-ink-soft/50">{index}.</span>
-        {card.text}
-      </p>
-
-      {card.myAnswer ? (
-        <div className="mt-3 space-y-2.5">
-          <div className="rounded-xl bg-sand px-4 py-3">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-soft">Tú</p>
-            <p className="mt-0.5 whitespace-pre-wrap text-sm text-ink">{card.myAnswer}</p>
-          </div>
-          {card.partnerAnswer ? (
-            <div className="rounded-xl bg-rose-faint px-4 py-3">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-rose-deep">{partnerName}</p>
-              <p className="mt-0.5 whitespace-pre-wrap text-sm text-ink">{card.partnerAnswer}</p>
-            </div>
-          ) : (
-            <p className="text-xs text-ink-soft">
-              {partnerName} aún no ha respondido. Su respuesta aparecerá aquí.
-            </p>
-          )}
-        </div>
-      ) : (
-        <div className="mt-3 space-y-2.5">
-          <Textarea
-            value={answer}
-            onChange={(e) => setAnswer(e.target.value)}
-            rows={2}
-            maxLength={600}
-            placeholder="Tu respuesta…"
-          />
-          <div className="flex items-center justify-between gap-3">
-            <p className="flex items-center gap-1.5 text-xs text-ink-soft">
-              <Lock className="h-3.5 w-3.5" />
-              {card.partnerAnswered
-                ? `${partnerName} ya respondió: responde para verla`
-                : "La respuesta del otro se revela al responder"}
-            </p>
-            <Button size="sm" onClick={submit} loading={saving} disabled={!answer.trim()}>
-              Responder
+  if (card.myAnswer) {
+    return (
+      <div className="space-y-3">
+        <Reveal myAnswer={card.myAnswer} partnerAnswer={card.partnerAnswer} partnerName={partnerName} />
+        {hasNext && (
+          <div className="flex justify-end">
+            <Button size="sm" variant="secondary" onClick={onNext}>
+              Siguiente pregunta
+              <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
-          {error && <p className="text-xs text-red-700 dark:text-red-400">{error}</p>}
-        </div>
-      )}
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      <Textarea
+        value={answer}
+        onChange={(e) => setAnswer(e.target.value)}
+        rows={3}
+        maxLength={600}
+        placeholder="Tu respuesta…"
+      />
+      <div className="flex items-center justify-between gap-3">
+        <p className="flex items-center gap-1.5 text-xs text-ink-soft">
+          <Lock className="h-3.5 w-3.5" />
+          {card.partnerAnswered
+            ? `${partnerName} ya respondió: responde para verla`
+            : "La respuesta del otro se revela al responder"}
+        </p>
+        <Button onClick={submit} loading={saving} disabled={!answer.trim()}>
+          Responder
+        </Button>
+      </div>
+      {error && <p className="text-xs text-red-700 dark:text-red-400">{error}</p>}
     </div>
   );
 }

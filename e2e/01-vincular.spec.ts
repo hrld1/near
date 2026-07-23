@@ -9,10 +9,11 @@ test("dos personas se registran y quedan vinculadas", async ({ browser }) => {
     // cada uno ve el nombre del otro en su Hoy
     await expect(couple.a.getByText("Leo").first()).toBeVisible();
     await expect(couple.b.getByText("Ana").first()).toBeVisible();
-    // y el ritual del día está arriba (exact/rol: getByText por subcadena
-    // casaría también con la misión y con los pasos del primer día)
+    // y el ritual del día está arriba. "Pregunta de hoy" (el rótulo de la
+    // pregunta protagonista, it33) es único: NO colisiona con la misión
+    // "Responde la pregunta del día" — por eso vale exact por texto.
     await expect(couple.a.getByText("El momento de hoy", { exact: true })).toBeVisible();
-    await expect(couple.b.getByRole("heading", { name: "Pregunta del día" })).toBeVisible();
+    await expect(couple.b.getByText("Pregunta de hoy", { exact: true })).toBeVisible();
   } finally {
     await couple.dispose();
   }

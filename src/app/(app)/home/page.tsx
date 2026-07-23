@@ -384,26 +384,27 @@ export default async function HomePage() {
         </div>
       )}
 
-      {/* RITUAL, parte 2: la pregunta del día y tu ánimo, sin scroll */}
-      <div className="mb-4 grid gap-4 md:grid-cols-2">
-        <Card>
+      {/* RITUAL, parte 2: la pregunta del día como protagonista (una sola
+          pregunta en grande), y tu ánimo debajo. */}
+      {prompt ? (
+        <div className="mb-4">
+          <PromptCard
+            promptId={prompt.id}
+            question={prompt.text}
+            myAnswer={myPromptAnswer?.answer ?? null}
+            partnerAnswer={partnerPromptAnswer?.answer ?? null}
+            partnerName={partner?.name ?? null}
+          />
+        </div>
+      ) : (
+        <Card className="mb-4">
           <CardTitle>Pregunta del día</CardTitle>
-          <div className="mt-3">
-            {prompt ? (
-              <PromptCard
-                promptId={prompt.id}
-                question={prompt.text}
-                myAnswer={myPromptAnswer?.answer ?? null}
-                partnerAnswer={partnerPromptAnswer?.answer ?? null}
-                partnerName={partner?.name ?? null}
-              />
-            ) : (
-              <p className="text-sm text-ink-soft">
-                No hay preguntas cargadas. Ejecuta el seed: npm run db:seed
-              </p>
-            )}
-          </div>
+          <p className="mt-3 text-sm text-ink-soft">
+            No hay preguntas cargadas. Ejecuta el seed: npm run db:seed
+          </p>
         </Card>
+      )}
+      <div className="mb-4">
         <Card>
           <CardTitle>¿Cómo estás hoy?</CardTitle>
           <div className="mt-3">

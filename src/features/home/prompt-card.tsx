@@ -1,20 +1,22 @@
 "use client";
 
 import { useFormState, useFormStatus } from "react-dom";
-import { Sparkles } from "lucide-react";
 import { answerPromptAction } from "@/actions/presence";
 import { Button } from "@/components/ui/button";
 import { Textarea, FieldError } from "@/components/ui/input";
+import { QuestionStage, Reveal } from "@/features/questions/question-stage";
 
 function SendButton() {
   const { pending } = useFormStatus();
   return (
-    <Button size="sm" type="submit" loading={pending}>
+    <Button type="submit" loading={pending}>
       Responder
     </Button>
   );
 }
 
+// La pregunta del día, ahora protagonista del Home (it33): una sola pregunta
+// en grande, con el mismo lenguaje visual que las cartas de los mazos.
 export function PromptCard({
   promptId,
   question,
@@ -29,41 +31,20 @@ export function PromptCard({
   partnerName: string | null;
 }) {
   const [state, action] = useFormState(answerPromptAction, {});
+  const name = partnerName ?? "tu pareja";
 
   return (
-    <div>
-      <p className="flex items-start gap-2 font-display text-lg leading-snug text-ink">
-        <Sparkles className="mt-1 h-4 w-4 shrink-0 text-rose" />
-        {question}
-      </p>
-
+    <QuestionStage eyebrow="Pregunta de hoy" question={question}>
       {myAnswer ? (
-        <div className="mt-4 space-y-3">
-          <div className="rounded-xl bg-sand px-4 py-3">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-soft">Tu</p>
-            <p className="mt-0.5 text-sm text-ink">{myAnswer}</p>
-          </div>
-          {partnerAnswer ? (
-            <div className="rounded-xl bg-rose-faint px-4 py-3">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-rose-deep">
-                {partnerName}
-              </p>
-              <p className="mt-0.5 text-sm text-ink">{partnerAnswer}</p>
-            </div>
-          ) : (
-            <p className="text-xs text-ink-soft">
-              {partnerName} aún no ha respondido. Su respuesta aparecerá aquí.
-            </p>
-          )}
-        </div>
+        <Reveal myAnswer={myAnswer} partnerAnswer={partnerAnswer} partnerName={partnerName} />
       ) : (
-        <form action={action} className="mt-4 space-y-2.5">
+        <form action={action} className="space-y-3">
           <input type="hidden" name="promptId" value={promptId} />
-          <Textarea name="answer" rows={2} maxLength={500} placeholder="Tu respuesta..." required />
-          <div className="flex items-center justify-between">
+          <Textarea name="answer" rows={3} maxLength={500} placeholder="Tu respuesta…" required />
+          <div className="flex items-center justify-between gap-3">
             <p className="text-xs text-ink-soft">
               {partnerAnswer !== null
-                ? `${partnerName} ya respondio: responde para verlo`
+                ? `${name} ya respondió: responde para verlo`
                 : "La respuesta del otro se revela al responder"}
             </p>
             <SendButton />
@@ -71,6 +52,6 @@ export function PromptCard({
           <FieldError>{state.error}</FieldError>
         </form>
       )}
-    </div>
+    </QuestionStage>
   );
 }

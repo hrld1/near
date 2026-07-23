@@ -24,7 +24,7 @@ test("pregunta y momento del día: revelación recíproca", async ({ browser }) 
 
     // B: sabe que Ana respondió, pero NO ve el texto hasta responder
     await b.goto("/home");
-    await expect(b.getByText(/ya respondio: responde para verlo/)).toBeVisible({ timeout: 20_000 });
+    await expect(b.getByText(/ya respondió: responde para verlo/)).toBeVisible({ timeout: 20_000 });
     await expect(b.getByText(respuestaA)).toHaveCount(0);
     await b.locator('textarea[name="answer"]').fill("Yo también");
     await b.getByRole("button", { name: "Responder", exact: true }).click();
