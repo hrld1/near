@@ -62,7 +62,7 @@ export default async function JoinPage({ params }: { params: { code: string } })
       {/* lo que han preparado mientras esperaban */}
       {valid && prep && (prep.anniversary || prep.note || prep.welcomeLetter) && (
         <div className="mt-6 space-y-2 rounded-2xl border border-rose/15 bg-rose-faint/60 p-4">
-          <p className="text-[11px] font-bold uppercase tracking-widest text-rose-deep">
+          <p className="text-2xs font-bold uppercase tracking-widest text-rose-deep">
             {inviterName} ya ha ido preparando cosas
           </p>
           {prep.anniversary && (

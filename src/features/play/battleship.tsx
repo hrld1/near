@@ -243,7 +243,7 @@ export function Battleship({ myId, partnerName }: { myId: string; partnerName: s
             return (
               <div
                 className={cn(
-                  "flex h-full w-full items-center justify-center rounded-[3px] text-[11px] transition-colors",
+                  "flex h-full w-full items-center justify-center rounded-[3px] text-2xs transition-colors",
                   !st && "bg-sky-400/15 hover:bg-sky-400/35",
                   st === "miss" && "bg-sky-400/10",
                   st === "hit" && "bg-red-500/80",
@@ -271,7 +271,7 @@ export function Battleship({ myId, partnerName }: { myId: string; partnerName: s
             return (
               <div
                 className={cn(
-                  "flex h-full w-full items-center justify-center rounded-[3px] bg-gradient-to-br text-[11px]",
+                  "flex h-full w-full items-center justify-center rounded-[3px] bg-gradient-to-br text-2xs",
                   !isShip && "from-sky-400/10 to-sky-500/10",
                   isShip && !shot && "from-slate-300 to-slate-500 shadow-inner",
                   isShip && shot === "hit" && "from-red-500 to-red-700"

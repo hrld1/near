@@ -70,7 +70,7 @@ export function ItineraryCard({
   return (
     <div className="overflow-hidden rounded-2xl border border-rose/25 bg-paper shadow-card">
       <div className="border-b border-rose/10 bg-gradient-to-br from-rose-faint via-paper to-paper px-4 py-3">
-        <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-rose-deep">
+        <p className="flex items-center gap-1.5 text-2xs font-bold uppercase tracking-widest text-rose-deep">
           {plan.mode === "distancia" ? <Video className="h-3.5 w-3.5" /> : <MapPin className="h-3.5 w-3.5" />}
           {plan.mode === "distancia" ? "Cita a distancia" : "Cita juntos"}
         </p>

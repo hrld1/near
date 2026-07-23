@@ -37,7 +37,7 @@ export function MessageBubble({
     <div className={cn("relative max-w-[78%]", compact && "max-w-[90%]", hasReactions && "mb-3")}>
       <div
         className={cn(
-          "px-3.5 py-2 text-[15px] leading-relaxed shadow-card transition",
+          "px-3.5 py-2 text-read leading-relaxed shadow-card transition",
           own ? "bg-rose text-white" : "border border-sand bg-paper text-ink",
           own
             ? lastOfGroup
@@ -86,7 +86,7 @@ export function MessageBubble({
         {lastOfGroup && (
           <span
             className={cn(
-              "mt-0.5 flex items-center justify-end gap-1 text-[11px] tabular-nums",
+              "mt-0.5 flex items-center justify-end gap-1 text-2xs tabular-nums",
               own ? "text-white/70" : "text-ink-soft/70"
             )}
           >
@@ -105,7 +105,7 @@ export function MessageBubble({
               className="rounded-full border border-sand bg-paper px-1.5 py-0.5 text-xs shadow-card transition hover:scale-110"
             >
               {emoji}
-              {count > 1 && <span className="ml-0.5 text-[11px] text-ink-soft">{count}</span>}
+              {count > 1 && <span className="ml-0.5 text-2xs text-ink-soft">{count}</span>}
             </button>
           ))}
         </div>

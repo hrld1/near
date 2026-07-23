@@ -58,7 +58,7 @@ export function DailyBox({
 
   return (
     <div className={cn("rounded-xl bg-rose-faint px-4 py-4", justOpened && "animate-pop-in")}>
-      <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-rose-deep">
+      <p className="flex items-center gap-1.5 text-2xs font-bold uppercase tracking-widest text-rose-deep">
         <Sparkles className="h-3.5 w-3.5" /> {KIND_LABEL[box.kind] ?? "Sorpresa"}
       </p>
       <p className="mt-2 font-display text-lg leading-snug text-ink">{box.content}</p>

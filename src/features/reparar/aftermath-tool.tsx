@@ -74,7 +74,7 @@ export function AftermathTool({
 
   return (
     <div className="rounded-2xl border border-sand-deep bg-paper p-4 shadow-card">
-      <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
+      <p className="flex items-center gap-2 text-2xs font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
         <Cloudy className="h-4 w-4" /> Después de la tormenta
       </p>
 
@@ -163,13 +163,13 @@ export function AftermathTool({
 function EntryCard({ entry, label, tone }: { entry: Entry; label: string; tone: "me" | "them" }) {
   return (
     <div className={cn("rounded-xl px-4 py-3", tone === "me" ? "bg-sand" : "bg-emerald-500/8 dark:bg-emerald-500/10")}>
-      <p className={cn("text-[11px] font-semibold uppercase tracking-wider", tone === "me" ? "text-ink-soft" : "text-emerald-700 dark:text-emerald-400")}>
+      <p className={cn("text-2xs font-semibold uppercase tracking-wider", tone === "me" ? "text-ink-soft" : "text-emerald-700 dark:text-emerald-400")}>
         {label}
       </p>
       {entry.feelings.length > 0 && (
         <div className="mt-1.5 flex flex-wrap gap-1.5">
           {entry.feelings.map((f) => (
-            <span key={f} className="rounded-full bg-black/5 px-2 py-0.5 text-[11px] text-ink dark:bg-white/10">
+            <span key={f} className="rounded-full bg-black/5 px-2 py-0.5 text-2xs text-ink dark:bg-white/10">
               {f}
             </span>
           ))}

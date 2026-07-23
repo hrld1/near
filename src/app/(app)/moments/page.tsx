@@ -145,7 +145,7 @@ export default async function MomentsPage({
                       <div className="flex items-start justify-between gap-2">
                         <div>
                           {moment.featured && (
-                            <span className="mb-1 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+                            <span className="mb-1 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-2xs font-bold uppercase tracking-wide text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
                               <Star className="h-2.5 w-2.5 fill-current" /> Momento especial
                             </span>
                           )}

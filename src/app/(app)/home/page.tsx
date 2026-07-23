@@ -235,7 +235,7 @@ export default async function HomePage() {
           </h1>
         </div>
         <div className="flex flex-col items-start gap-1.5 sm:items-end">
-          <p className="text-[11px] font-medium uppercase tracking-wider text-ink-soft">
+          <p className="text-2xs font-medium uppercase tracking-wider text-ink-soft">
             ¿Qué haces ahora? · lo ve {partner?.name ?? "tu pareja"}
           </p>
           <PresencePicker current={effectivePresence(user.presence, user.presenceUpdatedAt)} />
@@ -300,7 +300,7 @@ export default async function HomePage() {
                   <div className="mt-4 flex items-start gap-2.5 rounded-2xl bg-paper/80 px-4 py-3 shadow-card">
                     <StickyNote className="mt-0.5 h-4 w-4 shrink-0 text-rose" />
                     <div>
-                      <p className="text-[11px] font-semibold uppercase tracking-wider text-rose-deep">
+                      <p className="text-2xs font-semibold uppercase tracking-wider text-rose-deep">
                         Nota de {partner.name}
                       </p>
                       <p className="mt-0.5 text-sm leading-relaxed text-ink">{partnerNote.body}</p>
@@ -331,7 +331,7 @@ export default async function HomePage() {
           <div className="relative border-t border-rose/10 bg-paper/60 p-6 md:border-l md:border-t-0 md:p-7">
             {countdownEvent && CountdownIcon ? (
               <>
-                <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-rose-deep">
+                <p className="flex items-center gap-2 text-2xs font-bold uppercase tracking-widest text-rose-deep">
                   <CountdownIcon className="h-4 w-4" />
                   {countdownEvent.title}
                 </p>
@@ -350,7 +350,7 @@ export default async function HomePage() {
               </>
             ) : (
               <div className="flex h-full flex-col justify-center">
-                <p className="text-[11px] font-bold uppercase tracking-widest text-ink-soft">
+                <p className="text-2xs font-bold uppercase tracking-widest text-ink-soft">
                   Próxima fecha
                 </p>
                 <p className="mt-2 font-display text-xl text-ink">Nada en el horizonte</p>
@@ -398,9 +398,9 @@ export default async function HomePage() {
         </div>
       ) : (
         <Card className="mb-4">
-          <CardTitle>Pregunta del día</CardTitle>
+          <CardTitle>Pregunta de hoy</CardTitle>
           <p className="mt-3 text-sm text-ink-soft">
-            No hay preguntas cargadas. Ejecuta el seed: npm run db:seed
+            Hoy no hay pregunta que compartir. Mañana habrá una nueva.
           </p>
         </Card>
       )}
@@ -491,7 +491,7 @@ export default async function HomePage() {
             <div className="mt-3">
               {nextOverlap ? (
                 <Link href="/coincidir" className="group block">
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
+                  <p className="text-2xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
                     Próxima ventana en común
                   </p>
                   <p className="mt-1 font-display text-xl text-ink">
@@ -563,7 +563,7 @@ export default async function HomePage() {
                 </div>
               )}
               <div className="p-4">
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-soft">
+                <p className="text-2xs font-semibold uppercase tracking-wider text-ink-soft">
                   Último momento
                 </p>
                 {latestMoment.title && (

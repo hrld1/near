@@ -36,7 +36,7 @@ export function DeckGrid({ items }: { items: DeckProgress[] }) {
               <h3 className="mt-2.5 font-display text-lg text-ink">{d.name}</h3>
               <p className="mt-0.5 text-xs leading-relaxed text-ink-soft">{d.tagline}</p>
               <div className="mt-3">
-                <div className="flex items-center justify-between text-[11px] text-ink-soft">
+                <div className="flex items-center justify-between text-2xs text-ink-soft">
                   <span>{d.revealed} de {d.total} reveladas</span>
                   <span className={d.text}>{pct}%</span>
                 </div>

@@ -113,7 +113,7 @@ function PartnerRecovery({ partnerName }: { partnerName: string }) {
             <span className="truncate">{link}</span>
             {copied ? <Check className="h-4 w-4 shrink-0" /> : <Copy className="h-4 w-4 shrink-0" />}
           </button>
-          <p className="mt-1.5 text-[11px] text-ink-soft">Válido 1 hora. Un solo uso.</p>
+          <p className="mt-1.5 text-2xs text-ink-soft">Válido 1 hora. Un solo uso.</p>
         </div>
       ) : (
         <Button size="sm" variant="secondary" className="mt-2" loading={pending} onClick={generate}>

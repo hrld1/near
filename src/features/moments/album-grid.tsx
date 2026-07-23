@@ -189,7 +189,7 @@ export function AlbumGrid({ photos, myId }: { photos: AlbumPhoto[]; myId: string
               className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
             />
             <span className="pointer-events-none absolute inset-x-0 bottom-0 translate-y-2 bg-gradient-to-t from-black/65 to-transparent px-2.5 pb-2 pt-8 text-left opacity-0 transition duration-200 group-hover:translate-y-0 group-hover:opacity-100">
-              <span className="block truncate text-[11px] font-medium text-white">
+              <span className="block truncate text-2xs font-medium text-white">
                 {photo.title ?? dateShort(photo.happenedAt)}
               </span>
             </span>
@@ -199,7 +199,7 @@ export function AlbumGrid({ photos, myId }: { photos: AlbumPhoto[]; myId: string
               </span>
             )}
             {(photo.favCount > 0 || photo.comments.length > 0) && (
-              <span className="absolute bottom-1.5 right-1.5 flex items-center gap-1.5 rounded-full bg-black/50 px-2 py-0.5 text-[11px] font-medium text-white backdrop-blur-sm">
+              <span className="absolute bottom-1.5 right-1.5 flex items-center gap-1.5 rounded-full bg-black/50 px-2 py-0.5 text-2xs font-medium text-white backdrop-blur-sm">
                 {photo.favCount > 0 && (
                   <span className="flex items-center gap-0.5">
                     <Heart className="h-2.5 w-2.5 fill-current" /> {photo.favCount}

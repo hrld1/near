@@ -25,7 +25,7 @@ export function RepairMoment({ partnerName }: { partnerName: string }) {
   return (
     <div className="space-y-4">
       <div className="rounded-2xl border border-emerald-500/25 bg-emerald-500/5 p-4">
-        <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
+        <p className="flex items-center gap-2 text-2xs font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
           <Wind className="h-4 w-4" /> Necesito un respiro
         </p>
         <p className="mt-1 text-sm text-ink-soft">
@@ -41,7 +41,7 @@ export function RepairMoment({ partnerName }: { partnerName: string }) {
       </div>
 
       <div className="rounded-2xl border border-sand-deep bg-paper p-4">
-        <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-rose-deep">
+        <p className="flex items-center gap-2 text-2xs font-bold uppercase tracking-widest text-rose-deep">
           <HeartHandshake className="h-4 w-4" /> Tender la mano
         </p>
         <p className="mt-1 text-sm text-ink-soft">

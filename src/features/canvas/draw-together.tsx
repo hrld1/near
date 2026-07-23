@@ -169,7 +169,7 @@ export function DrawTogether({
     return (
       <div className="flex flex-col gap-3">
         <div className="rounded-2xl border border-sand bg-paper p-4 text-center shadow-card">
-          <p className="text-[11px] font-bold uppercase tracking-widest text-rose-deep">La palabra era</p>
+          <p className="text-2xs font-bold uppercase tracking-widest text-rose-deep">La palabra era</p>
           <p className="font-display text-3xl text-ink">{word}</p>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">

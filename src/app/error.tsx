@@ -24,7 +24,7 @@ export default function RootError({
           recarga la página.
         </p>
         {error.digest && (
-          <p className="mt-2 text-[11px] uppercase tracking-wider text-ink-soft/60">
+          <p className="mt-2 text-2xs uppercase tracking-wider text-ink-soft/60">
             ref: {error.digest}
           </p>
         )}

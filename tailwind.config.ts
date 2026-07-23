@@ -28,6 +28,53 @@ const config: Config = {
         sans: ["var(--font-sans)", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
         display: ["var(--font-display)", "Georgia", "serif"]
       },
+      // ESCALA TIPOGRÁFICA (it36). Antes no había ninguna: Tailwind por defecto
+      // y 74 tamaños arbitrarios sueltos (hasta text-[8px]). Sin escala que
+      // respetar, cada componente se afinaba a ojo. Tres registros con papeles
+      // distintos, y el interlineado va emparejado a cada paso para no tener
+      // que recordarlo en cada sitio.
+      //
+      // Los pasos de cromo conservan EXACTAMENTE el interlineado por defecto de
+      // Tailwind: son 550 usos y mover su altura de línea desplazaría media
+      // app. Los pasos nuevos (read/prose) sí nacen con aire, porque cargan
+      // texto largo. Un `leading-*` o `tracking-*` explícito sigue ganando:
+      // esos plugins se emiten después que fontSize.
+      fontSize: {
+        // — Cromo de interfaz: etiquetas, metadatos, sellos —
+        "2xs": ["0.6875rem", { lineHeight: "1rem", letterSpacing: "0.005em" }], // 11px
+        xs: ["0.75rem", { lineHeight: "1rem" }],
+        sm: ["0.875rem", { lineHeight: "1.25rem" }],
+
+        // — Lo que escriben las dos personas (el producto, no el marco) —
+        read: ["0.9375rem", { lineHeight: "1.6" }], // 15px · conversación: chat, respuestas
+        prose: ["1.0625rem", { lineHeight: "1.75" }], // 17px · escritura larga: cartas
+
+        // — Interfaz y titulares —
+        base: ["1rem", { lineHeight: "1.5rem" }],
+        lg: ["1.125rem", { lineHeight: "1.75rem" }],
+        xl: ["1.25rem", { lineHeight: "1.75rem", letterSpacing: "-0.005em" }],
+        "2xl": ["1.5rem", { lineHeight: "2rem", letterSpacing: "-0.01em" }],
+        "3xl": ["1.875rem", { lineHeight: "2.25rem", letterSpacing: "-0.015em" }],
+        "4xl": ["2.25rem", { lineHeight: "2.5rem", letterSpacing: "-0.02em" }],
+        "5xl": ["3rem", { lineHeight: "1", letterSpacing: "-0.025em" }],
+        "6xl": ["3.75rem", { lineHeight: "1", letterSpacing: "-0.03em" }]
+      },
+      // Ritmo vertical con nombre: hoy conviven 12 valores de margen distintos
+      // porque no había ninguno canónico. Aditivo — no rompe las clases que ya
+      // existen; da a dónde converger.
+      spacing: {
+        block: "1.25rem", // entre tarjetas hermanas
+        section: "2.5rem", // entre secciones de una página
+        gutter: "1.5rem" // margen lateral del contenido
+      },
+      // Tres papeles en vez de cinco radios sueltos. Los valores coinciden con
+      // los que ya se usan (card = el rounded-3xl de Card, inset = rounded-2xl),
+      // así que migrar a ellos no cambia nada de sitio.
+      borderRadius: {
+        pill: "9999px",
+        card: "1.5rem",
+        inset: "1rem"
+      },
       boxShadow: {
         // capas suaves con tinte cálido (el --c-shadow ya no es gris)
         card: "0 1px 2px rgb(var(--c-shadow) / 0.05), 0 4px 14px rgb(var(--c-shadow) / 0.06), 0 12px 32px rgb(var(--c-shadow) / 0.04)",

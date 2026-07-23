@@ -145,7 +145,7 @@ export function ChatRoom({
               {showDay && (
                 <div className="my-5 flex items-center gap-3">
                   <span className="h-px flex-1 bg-sand" />
-                  <span className="text-[11px] font-semibold uppercase tracking-widest text-ink-soft/70">
+                  <span className="text-2xs font-semibold uppercase tracking-widest text-ink-soft/70">
                     {day}
                   </span>
                   <span className="h-px flex-1 bg-sand" />
@@ -155,7 +155,7 @@ export function ChatRoom({
                 {!own && !compact && (
                   <span className={cn("w-7 shrink-0", !lastOfGroup && "invisible")}>
                     {partner && (
-                      <Avatar name={partner.name} tone={1} size="sm" className="h-7 w-7 text-[11px]" />
+                      <Avatar name={partner.name} tone={1} size="sm" className="h-7 w-7 text-2xs" />
                     )}
                   </span>
                 )}
@@ -176,7 +176,7 @@ export function ChatRoom({
                 />
               </div>
               {own && message.id === lastOwn?.id && lastOwnSeen && (
-                <p className="mt-1 pr-1 text-right text-[11px] font-medium text-ink-soft">
+                <p className="mt-1 pr-1 text-right text-2xs font-medium text-ink-soft">
                   Visto
                 </p>
               )}
@@ -188,7 +188,7 @@ export function ChatRoom({
           <div className="mt-3.5 flex items-end gap-2">
             {!compact && (
               <span className="w-7 shrink-0">
-                <Avatar name={partner.name} tone={1} size="sm" className="h-7 w-7 text-[11px]" />
+                <Avatar name={partner.name} tone={1} size="sm" className="h-7 w-7 text-2xs" />
               </span>
             )}
             <div className="flex items-center gap-1 rounded-2xl rounded-bl-md bg-sand px-3.5 py-3">

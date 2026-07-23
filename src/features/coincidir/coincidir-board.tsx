@@ -107,7 +107,7 @@ export function CoincidirBoard({
     <div className="space-y-6">
       {/* CUÁNDO COINCIDÍS: la estrella */}
       <section className="overflow-hidden rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/8 via-paper to-paper p-5 shadow-card">
-        <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
+        <p className="flex items-center gap-2 text-2xs font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
           <Sparkles className="h-4 w-4" /> Cuándo coincidís
         </p>
         {overlaps.length === 0 ? (
@@ -151,7 +151,7 @@ export function CoincidirBoard({
 
       {/* MARCAR FRANJAS */}
       <section className="rounded-2xl border border-sand-deep bg-paper p-5 shadow-card">
-        <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
+        <p className="flex items-center gap-2 text-2xs font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
           <CalendarClock className="h-4 w-4" /> Marca cuándo estás libre
         </p>
         <div className="mt-3 flex flex-wrap gap-2">

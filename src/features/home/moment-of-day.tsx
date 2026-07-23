@@ -80,7 +80,7 @@ export function MomentOfDay({
   return (
     <section className="overflow-hidden rounded-3xl border border-rose/20 bg-gradient-to-br from-rose-faint via-paper to-paper shadow-card">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-rose/10 px-5 py-3">
-        <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-rose-deep">
+        <p className="flex items-center gap-2 text-2xs font-bold uppercase tracking-widest text-rose-deep">
           <Sparkles className="h-4 w-4" /> El momento de hoy
         </p>
         {streak > 0 && (
@@ -105,7 +105,7 @@ export function MomentOfDay({
                   alt={`El momento de ${partnerName}`}
                   className="h-full w-full object-cover"
                 />
-                <span className="absolute left-2 top-2 rounded-full bg-black/50 px-2.5 py-0.5 text-[11px] font-medium text-white backdrop-blur-sm">
+                <span className="absolute left-2 top-2 rounded-full bg-black/50 px-2.5 py-0.5 text-2xs font-medium text-white backdrop-blur-sm">
                   {partnerName}
                 </span>
                 {partnerPhoto.caption && (
@@ -145,7 +145,7 @@ export function MomentOfDay({
               <div className="relative aspect-square overflow-hidden rounded-2xl border border-sand">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={myPhoto.imageUrl} alt="Tu momento" className="h-full w-full object-cover" />
-                <span className="absolute left-2 top-2 rounded-full bg-black/50 px-2.5 py-0.5 text-[11px] font-medium text-white backdrop-blur-sm">
+                <span className="absolute left-2 top-2 rounded-full bg-black/50 px-2.5 py-0.5 text-2xs font-medium text-white backdrop-blur-sm">
                   Tú
                 </span>
                 {myPhoto.caption && (
@@ -181,7 +181,7 @@ export function MomentOfDay({
                   <ImagePlus className="h-4 w-4" />
                   {uploading ? "Enviando…" : "Compartir mi momento"}
                 </button>
-                <p className="mt-2 text-center text-[11px] text-ink-soft">
+                <p className="mt-2 text-center text-2xs text-ink-soft">
                   Una foto de tu día, ahora
                 </p>
               </div>

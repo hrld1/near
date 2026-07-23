@@ -70,7 +70,7 @@ export function AppreciationBox({
   return (
     <div>
       <div className="rounded-2xl border border-rose/20 bg-gradient-to-br from-rose-faint via-paper to-paper p-4 shadow-card">
-        <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-rose-deep">
+        <p className="flex items-center gap-2 text-2xs font-bold uppercase tracking-widest text-rose-deep">
           <HeartHandshake className="h-4 w-4" /> Dile algo que admiras de {partnerName}
         </p>
         <Textarea
@@ -117,7 +117,7 @@ export function AppreciationBox({
                   )}
                 >
                   <p className="text-sm leading-relaxed text-ink">“{a.body}”</p>
-                  <p className="mt-1.5 text-[11px] text-ink-soft">
+                  <p className="mt-1.5 text-2xs text-ink-soft">
                     <span className={cn("font-semibold", mine ? "text-ink" : "text-rose-deep")}>
                       {mine ? "Tú" : a.fromName}
                     </span>{" "}

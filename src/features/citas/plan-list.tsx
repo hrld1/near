@@ -82,7 +82,7 @@ export function PlanList({ items, myId, partnerName }: { items: PlanListItemDto[
               </span>
               <span
                 className={cn(
-                  "shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide",
+                  "shrink-0 rounded-full px-2.5 py-0.5 text-2xs font-bold uppercase tracking-wide",
                   item.status === "ACEPTADA"
                     ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                     : "bg-amber-500/10 text-amber-600 dark:text-amber-400"

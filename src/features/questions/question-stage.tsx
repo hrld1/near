@@ -25,7 +25,7 @@ export function QuestionStage({
   return (
     <div className="rounded-3xl border border-rose/20 bg-gradient-to-br from-rose-faint to-paper p-5 shadow-card sm:p-6">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-rose-deep">{eyebrow}</p>
+        <p className="text-2xs font-semibold uppercase tracking-[0.12em] text-rose-deep">{eyebrow}</p>
         {counter && (
           <span className="rounded-full bg-rose/10 px-2.5 py-0.5 text-xs font-medium tabular-nums text-rose-deep">
             {counter}
@@ -59,12 +59,12 @@ export function Reveal({
   return (
     <div className="space-y-2.5">
       <div className="rounded-2xl bg-sand px-4 py-3">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-soft">Tú</p>
+        <p className="text-2xs font-semibold uppercase tracking-wider text-ink-soft">Tú</p>
         <p className="mt-0.5 whitespace-pre-wrap text-sm leading-relaxed text-ink">{myAnswer}</p>
       </div>
       {partnerAnswer ? (
         <div className="rounded-2xl bg-rose-faint px-4 py-3">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-rose-deep">{name}</p>
+          <p className="text-2xs font-semibold uppercase tracking-wider text-rose-deep">{name}</p>
           <p className="mt-0.5 whitespace-pre-wrap text-sm leading-relaxed text-ink">{partnerAnswer}</p>
         </div>
       ) : (

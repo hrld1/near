@@ -43,7 +43,7 @@ export function Countdown({ target }: { target: string }) {
           <div className="min-w-[3.25rem] rounded-xl bg-rose-faint px-2 py-2 font-display text-3xl tabular-nums text-rose-deep">
             {cell.value}
           </div>
-          <div className="mt-1 text-[11px] uppercase tracking-wider text-ink-soft">
+          <div className="mt-1 text-2xs uppercase tracking-wider text-ink-soft">
             {cell.label}
           </div>
         </div>

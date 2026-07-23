@@ -129,12 +129,12 @@ export function CallStage() {
             )}
           />
         ) : (
-          <span className="absolute bottom-3 right-3 rounded-full bg-black/50 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur-sm">
+          <span className="absolute bottom-3 right-3 rounded-full bg-black/50 px-2.5 py-1 text-2xs font-medium text-white backdrop-blur-sm">
             {mediaMode === "audio" ? "Solo audio" : "Espectador"}
           </span>
         )}
         {notice && state !== "active" && (
-          <span className="absolute inset-x-3 bottom-3 rounded-xl bg-black/50 px-3 py-1.5 text-center text-[11px] text-white/90 backdrop-blur-sm">
+          <span className="absolute inset-x-3 bottom-3 rounded-xl bg-black/50 px-3 py-1.5 text-center text-2xs text-white/90 backdrop-blur-sm">
             {notice}
           </span>
         )}

@@ -25,7 +25,7 @@ export function FirstDay({
   return (
     <section className="overflow-hidden rounded-3xl border border-plum/25 bg-gradient-to-br from-plum/10 via-paper to-rose-faint shadow-card">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-plum/10 px-5 py-3">
-        <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-plum">
+        <p className="flex items-center gap-2 text-2xs font-bold uppercase tracking-widest text-plum">
           <Sparkles className="h-4 w-4" /> Vuestro primer día
         </p>
         <p className="text-xs font-medium text-ink-soft">

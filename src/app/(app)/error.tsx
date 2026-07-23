@@ -23,7 +23,7 @@ export default function AppError({
         Ha fallado algo al preparar la página. Puedes reintentarlo o volver al inicio.
       </p>
       {error.digest && (
-        <p className="mt-2 text-[11px] uppercase tracking-wider text-ink-soft/60">
+        <p className="mt-2 text-2xs uppercase tracking-wider text-ink-soft/60">
           ref: {error.digest}
         </p>
       )}

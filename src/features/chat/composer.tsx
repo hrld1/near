@@ -136,7 +136,7 @@ export function Composer({
             }}
             rows={1}
             placeholder={partnerName ? `Escribe a ${partnerName}...` : "Escribe un mensaje..."}
-            className="max-h-32 min-h-[40px] flex-1 resize-none bg-transparent px-2 py-2.5 text-[15px] text-ink placeholder:text-ink-soft/60 focus:outline-none"
+            className="max-h-32 min-h-[40px] flex-1 resize-none bg-transparent px-2 py-2.5 text-read text-ink placeholder:text-ink-soft/60 focus:outline-none"
           />
           <button
             onClick={sendText}

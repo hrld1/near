@@ -53,8 +53,8 @@ export default async function QuizPage() {
       {questions.length === 0 ? (
         <EmptyState
           icon={Gamepad2}
-          title="No hay preguntas cargadas"
-          description="Ejecuta el seed de la base de datos: npm run db:seed"
+          title="Aún no hay preguntas"
+          description="Este juego todavía no tiene su baraja preparada."
         />
       ) : (
         <Quiz items={items} myName={user.name} partnerName={partner?.name ?? "tu pareja"} />

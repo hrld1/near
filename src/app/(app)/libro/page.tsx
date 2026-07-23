@@ -55,7 +55,7 @@ function Chapter({
         className
       )}
     >
-      <p className="mb-4 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-rose-deep">
+      <p className="mb-4 flex items-center gap-2 text-2xs font-bold uppercase tracking-[0.16em] text-rose-deep">
         <Icon className="h-4 w-4" /> {eyebrow}
       </p>
       {children}
@@ -128,7 +128,7 @@ export default async function LibroPage({ searchParams }: { searchParams: { p?: 
         {/* PORTADA */}
         <section className="print-page relative overflow-hidden rounded-3xl bg-gradient-to-br from-rose via-rose-deep to-plum p-8 text-white shadow-lift md:p-10">
           <Sparkles className="absolute -right-6 -top-6 h-36 w-36 opacity-10" />
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/75">Vuestro libro</p>
+          <p className="text-2xs font-bold uppercase tracking-[0.2em] text-white/75">Vuestro libro</p>
           <h2 className="mt-2 font-display text-4xl font-semibold tracking-tight md:text-5xl">
             {portada.meName} <span className="font-normal italic opacity-80">&</span> {portada.partnerName}
           </h2>

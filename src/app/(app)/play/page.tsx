@@ -157,7 +157,7 @@ export default async function PlayPage() {
           )}
         >
           <DailyIcon className="absolute -right-6 -top-6 h-40 w-40 opacity-15 transition duration-500 group-hover:rotate-12 group-hover:scale-110" />
-          <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-white/85">
+          <p className="flex items-center gap-2 text-2xs font-bold uppercase tracking-widest text-white/85">
             <Swords className="h-4 w-4" /> Reto del día
           </p>
           <h2 className="mt-1 font-display text-3xl">{daily.name}</h2>
@@ -323,7 +323,7 @@ export default async function PlayPage() {
                   <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-rose/10 text-rose-deep">
                     <duel.Icon className="h-5 w-5" />
                   </span>
-                  <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
+                  <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-2xs font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
                     En vivo
                   </span>
                 </div>
@@ -366,7 +366,7 @@ export default async function PlayPage() {
                     <Icon className="h-5 w-5" />
                   </span>
                   <h3 className="font-display text-sm leading-tight text-ink">{def.name}</h3>
-                  <p className="text-[11px] text-ink-soft">
+                  <p className="text-2xs text-ink-soft">
                     {myBest !== null ? <b className="text-ink">{def.format(myBest)}</b> : "—"}
                   </p>
                 </Card>
@@ -379,7 +379,7 @@ export default async function PlayPage() {
                 <HeartHandshake className="h-5 w-5" />
               </span>
               <h3 className="font-display text-sm leading-tight text-ink">¿Nos conocemos?</h3>
-              <p className="text-[11px] text-ink-soft">Cooperativo</p>
+              <p className="text-2xs text-ink-soft">Cooperativo</p>
             </Card>
           </Link>
         </div>
@@ -411,7 +411,7 @@ export default async function PlayPage() {
                     unlocked ? "text-amber-600 dark:text-amber-400" : "text-ink-soft"
                   )}
                 />
-                <p className="text-[11px] font-medium leading-tight text-ink">{achievement.name}</p>
+                <p className="text-2xs font-medium leading-tight text-ink">{achievement.name}</p>
               </div>
             );
           })}

@@ -82,7 +82,7 @@ export function EventForm() {
             <Input id="e-ends" name="endsAt" type="datetime-local" />
           </div>
         </div>
-        <p className="-mt-2 text-[11px] text-ink-soft">Se guarda en tu zona horaria local.</p>
+        <p className="-mt-2 text-2xs text-ink-soft">Se guarda en tu zona horaria local.</p>
         <div>
           <Label htmlFor="e-desc">Detalles (opcional)</Label>
           <Textarea id="e-desc" name="description" rows={2} maxLength={500} />

@@ -42,7 +42,7 @@ export function PulseCard({
 
   return (
     <div className="rounded-2xl border border-sand-deep bg-paper p-4 shadow-card">
-      <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-plum">
+      <p className="flex items-center gap-2 text-2xs font-bold uppercase tracking-widest text-plum">
         <Waves className="h-4 w-4" /> El pulso de la semana
       </p>
       <p className="mt-1 font-display text-lg text-ink">¿Cómo de cerca te has sentido esta semana?</p>

@@ -94,7 +94,7 @@ export function GameHost(props: GameHostProps) {
             <VisualIcon className="h-5 w-5" />
             {props.name}
             {props.isDaily && (
-              <span className="rounded-full bg-white/20 px-2.5 py-0.5 text-[11px] font-sans font-semibold uppercase tracking-wide backdrop-blur-sm">
+              <span className="rounded-full bg-white/20 px-2.5 py-0.5 text-2xs font-sans font-semibold uppercase tracking-wide backdrop-blur-sm">
                 Reto del día
               </span>
             )}

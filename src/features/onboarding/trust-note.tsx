@@ -14,7 +14,7 @@ const POINTS = [
 export function TrustNote() {
   return (
     <div className="rounded-2xl border border-sand bg-paper/60 p-5">
-      <p className="text-[11px] font-bold uppercase tracking-widest text-ink-soft">
+      <p className="text-2xs font-bold uppercase tracking-widest text-ink-soft">
         Vuestro espacio, y de nadie más
       </p>
       <ul className="mt-3 space-y-2">

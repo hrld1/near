@@ -110,7 +110,7 @@ export function LettersView({
           rows={4}
           maxLength={4000}
           placeholder={`Escribe a ${partnerName}…`}
-          className="w-full resize-none rounded-xl border border-sand-deep bg-cream/40 px-3 py-2.5 text-[15px] leading-relaxed text-ink placeholder:text-ink-soft/60 focus:border-rose/50 focus:outline-none focus:ring-2 focus:ring-rose/10"
+          className="w-full resize-none rounded-xl border border-sand-deep bg-cream/40 px-3 py-2.5 text-read leading-relaxed text-ink placeholder:text-ink-soft/60 focus:border-rose/50 focus:outline-none focus:ring-2 focus:ring-rose/10"
         />
 
         {kind === "CAPSULE" && (
@@ -214,7 +214,7 @@ function LetterCard({
         <p className="mb-1.5 flex items-center gap-2 text-xs font-medium text-ink-soft">
           <MailOpen className="h-4 w-4" /> De {partnerName} · {whenLabel(letter.deliverAt)}
         </p>
-        <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-ink">{letter.body}</p>
+        <p className="whitespace-pre-wrap text-read leading-relaxed text-ink">{letter.body}</p>
       </li>
     );
   }

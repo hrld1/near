@@ -47,7 +47,7 @@ export function MoodCheck({
             )}
           >
             <span className="text-xl">{mood.emoji}</span>
-            <span className="text-[11px] font-medium text-ink-soft">{mood.label}</span>
+            <span className="text-2xs font-medium text-ink-soft">{mood.label}</span>
           </button>
         ))}
       </div>

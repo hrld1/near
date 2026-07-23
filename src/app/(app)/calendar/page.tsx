@@ -72,7 +72,7 @@ export default async function CalendarPage() {
           {highlight && HighlightIcon && (
             <section className="overflow-hidden rounded-3xl border border-rose/20 bg-gradient-to-br from-rose-faint via-paper to-paper shadow-card">
               <div className="p-6 md:p-7">
-                <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-rose-deep">
+                <p className="flex items-center gap-2 text-2xs font-bold uppercase tracking-widest text-rose-deep">
                   <HighlightIcon className="h-4 w-4" />
                   {kindLabel(highlight.kind)} · lo siguiente
                 </p>
