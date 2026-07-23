@@ -82,6 +82,43 @@ export function LetterIllustration({ className }: { className?: string }) {
   );
 }
 
+// Álbum vacío, antes de la primera foto: una polaroid ligeramente ladeada con
+// un corazón dentro, como una instantánea recién sacada esperando compañía.
+export function AlbumIllustration({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 120 120" fill="none" className={className} aria-hidden="true">
+      <defs>
+        <linearGradient id="album-fill" x1="39" y1="34" x2="81" y2="74" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="rgb(var(--c-rose))" stopOpacity="0.28" />
+          <stop offset="1" stopColor="rgb(var(--c-plum))" stopOpacity="0.2" />
+        </linearGradient>
+      </defs>
+      <g transform="rotate(-5 60 62)">
+        {/* el papel de la polaroid */}
+        <rect
+          x="33"
+          y="28"
+          width="54"
+          height="66"
+          rx="4"
+          fill="rgb(var(--c-paper))"
+          stroke="rgb(var(--c-plum))"
+          strokeOpacity="0.4"
+          strokeWidth="2"
+        />
+        {/* la ventana de la foto */}
+        <rect x="39" y="34" width="42" height="40" rx="2" fill="url(#album-fill)" />
+        {/* el corazón dentro: lo que guarda el álbum */}
+        <path
+          d="M60 62 C 55 57, 49 54, 49 49 C 49 46, 51 44, 54 44 C 56.5 44, 58.5 45.5, 60 47.5 C 61.5 45.5, 63.5 44, 66 44 C 69 44, 71 46, 71 49 C 71 54, 65 57, 60 62 Z"
+          fill="rgb(var(--c-rose))"
+          opacity="0.85"
+        />
+      </g>
+    </svg>
+  );
+}
+
 // Racha en cero: una llama apagada, dibujada con el mismo trazo que el icono
 // Flame de la cabecera — para que el primer día se sienta como un inicio, no
 // como un hueco vacío.

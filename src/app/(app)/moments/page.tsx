@@ -7,6 +7,7 @@ import { monthLabel, dateShort } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/ui/avatar";
 import { EmptyState } from "@/components/ui/empty-state";
+import { AlbumIllustration } from "@/components/illustrations";
 import { LiveRefresh } from "@/components/live-refresh";
 import { MomentForm } from "@/features/moments/moment-form";
 import { MultiUpload } from "@/features/moments/multi-upload";
@@ -107,7 +108,7 @@ export default async function MomentsPage({
       {view === "album" ? (
         photos.length === 0 ? (
           <EmptyState
-            icon={Images}
+            illustration={<AlbumIllustration className="h-20 w-20" />}
             title="El album esta esperando su primera foto"
             description="Subid varias a la vez: se comprimen automáticamente y solo las veis vosotros dos. Marcad favoritas y dejad notas en cada una."
           />
@@ -153,7 +154,7 @@ export default async function MomentsPage({
                             <h3 className="font-display text-xl text-ink">{moment.title}</h3>
                           )}
                           {moment.body && (
-                            <p className="mt-1.5 whitespace-pre-wrap text-sm leading-relaxed text-ink">
+                            <p className="mt-1.5 whitespace-pre-wrap text-read text-ink">
                               {moment.body}
                             </p>
                           )}
