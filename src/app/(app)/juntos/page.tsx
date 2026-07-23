@@ -10,7 +10,7 @@ import { skyForHour } from "@/lib/sky";
 import { agoLabel, dayInTz, timeInTz } from "@/lib/format";
 import { futureIntervals, overlapIntervals } from "@/lib/overlap";
 import { PartnerOnline } from "@/features/presence/partner-online";
-import { HubCard, type HubItem } from "@/features/hub/hub-card";
+import { HubGrid, type HubItem } from "@/features/hub/hub-card";
 
 export const metadata: Metadata = { title: "Juntos" };
 export const dynamic = "force-dynamic";
@@ -147,11 +147,7 @@ export default async function JuntosPage() {
         </div>
       )}
 
-      <div className="grid gap-3 md:grid-cols-2">
-        {items.map((item) => (
-          <HubCard key={item.href} item={item} />
-        ))}
-      </div>
+      <HubGrid items={items} />
     </div>
   );
 }

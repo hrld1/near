@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { BarChart3, BookHeart, CalendarHeart, Mail, MapPin } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { requireCouple } from "@/lib/couple";
-import { HubCard, type HubItem } from "@/features/hub/hub-card";
+import { HubGrid, type HubItem } from "@/features/hub/hub-card";
 
 export const metadata: Metadata = { title: "Recuerdos" };
 export const dynamic = "force-dynamic";
@@ -84,11 +84,7 @@ export default async function RecuerdosPage() {
         </div>
         <p className="mt-2 text-sm text-ink-soft">Vuestra historia, a un toque.</p>
       </header>
-      <div className="grid gap-3 md:grid-cols-2">
-        {items.map((item) => (
-          <HubCard key={item.href} item={item} />
-        ))}
-      </div>
+      <HubGrid items={items} />
     </div>
   );
 }
