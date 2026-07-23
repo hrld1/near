@@ -74,7 +74,7 @@ export default async function RecuerdosPage() {
   ];
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-6 md:max-w-4xl md:px-8 md:py-10">
+    <div className="mx-auto max-w-2xl px-4 py-6 md:max-w-5xl md:px-8 md:py-10">
       <header className="mb-6">
         <div className="flex items-center gap-2.5">
           <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-rose/12 text-rose-deep">

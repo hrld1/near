@@ -38,48 +38,59 @@ function LiveSignal({ text }: { text: string }) {
   );
 }
 
-// El destino principal del hub (it37): en vez de N tarjetas iguales que se leen
-// como un menú, el primero —el más importante, según el orden de la página—
-// gana presencia: icono grande en el chip de marca, título mayor y una llamada
-// explícita. Da un foco claro ("empieza por aquí") y llena el lienzo con
-// intención en vez de dejar el hub como un grupo pequeño arriba del todo.
+// El destino protagonista del hub (it37, rediseño). No es una "tarjeta
+// destacada" más: es una pieza alta que ancla la composición y llena el lienzo
+// en vertical, para que el hub deje de ser un grupito de tarjetas flotando
+// arriba. Recursos: la marca de agua de icono gigante y tenue (el mismo gesto
+// que el hero del "reto del día" en /play), el chip de marca con resplandor, el
+// título en Fraunces con cuerpo, y una llamada explícita anclada abajo.
 export function HubHero({ item }: { item: HubItem }) {
   const Icon = item.icon;
   return (
-    <Link href={item.href} className="group block">
-      <Card className="flex items-center gap-5 border-rose/15 bg-gradient-to-br from-rose-faint via-paper to-paper p-6 transition group-hover:-translate-y-0.5 group-hover:shadow-lift">
-        <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-rose to-plum text-white shadow-glow">
-          <Icon className="h-8 w-8" />
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="flex items-center gap-2 font-display text-2xl leading-tight text-ink">
+    <Link href={item.href} className="group block h-full">
+      <Card className="relative flex h-full min-h-[15rem] flex-col justify-between overflow-hidden border-rose/15 bg-gradient-to-br from-rose-faint via-paper to-paper p-6 transition group-hover:-translate-y-0.5 group-hover:shadow-lift md:p-7">
+        <Icon
+          aria-hidden
+          strokeWidth={1.25}
+          className="pointer-events-none absolute -bottom-10 -right-8 h-64 w-64 text-rose/[0.07]"
+        />
+        <div className="relative">
+          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-rose to-plum text-white shadow-glow">
+            <Icon className="h-6 w-6" />
+          </span>
+          <h2 className="mt-4 flex flex-wrap items-center gap-2 font-display text-3xl leading-tight text-ink">
             {item.title}
             {item.badge && (
               <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-2xs font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
                 {item.badge}
               </span>
             )}
-          </p>
-          <p className="mt-1 text-sm text-ink-soft">{item.description}</p>
+          </h2>
+          <p className="mt-2 max-w-sm text-sm leading-relaxed text-ink-soft">{item.description}</p>
           {item.live && <LiveSignal text={item.live} />}
         </div>
-        <span className="hidden shrink-0 items-center gap-1.5 rounded-full bg-paper/70 px-4 py-2 text-sm font-medium text-rose-deep shadow-card transition group-hover:gap-2.5 sm:flex">
-          Entrar <ArrowRight className="h-4 w-4" />
-        </span>
+        <div className="relative mt-6">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-rose to-rose-deep px-5 py-2.5 text-sm font-medium text-white shadow-card transition group-hover:gap-2.5">
+            Entrar <ArrowRight className="h-4 w-4" />
+          </span>
+        </div>
       </Card>
     </Link>
   );
 }
 
-// La rejilla de un hub: el primer destino como hero, el resto en dos columnas.
+// La composición de un hub: el destino protagonista (alto) a la izquierda y un
+// raíl de destinos de apoyo a la derecha que iguala su altura. Asimétrico, de
+// revista: llena el ancho Y el alto, y crea jerarquía real en vez de una
+// rejilla de tarjetas idénticas. En móvil se apila: protagonista y luego raíl.
 export function HubGrid({ items }: { items: HubItem[] }) {
   if (items.length === 0) return null;
   const [hero, ...rest] = items;
   return (
-    <div className="space-y-3">
+    <div className="grid items-stretch gap-3 lg:grid-cols-[1.35fr_1fr]">
       <HubHero item={hero} />
       {rest.length > 0 && (
-        <div className="grid gap-3 md:grid-cols-2">
+        <div className="flex flex-col gap-3">
           {rest.map((item) => (
             <HubCard key={item.href} item={item} />
           ))}
