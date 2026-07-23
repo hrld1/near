@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, Gamepad2 } from "lucide-react";
+import { ArrowLeft, Gamepad2, HeartHandshake } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { requireCouple } from "@/lib/couple";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -44,8 +44,13 @@ export default async function QuizPage() {
         <ArrowLeft className="h-4 w-4" /> Arcade
       </Link>
       <header className="mb-6">
-        <h1 className="font-display text-3xl text-ink">¿Cuánto nos conocemos?</h1>
-        <p className="mt-1 text-sm text-ink-soft">
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-rose/12 text-rose-deep">
+            <HeartHandshake className="h-5 w-5" />
+          </span>
+          <h1 className="font-display text-3xl text-ink">¿Cuánto nos conocemos?</h1>
+        </div>
+        <p className="mt-2 text-sm text-ink-soft">
           Cada uno responde por si misma/o y apuesta por la respuesta del otro.
         </p>
       </header>

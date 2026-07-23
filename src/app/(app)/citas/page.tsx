@@ -20,7 +20,12 @@ export default async function CitasPage() {
     return (
       <div className="mx-auto max-w-2xl px-4 py-6 md:py-10">
         <header className="mb-6">
-          <h1 className="font-display text-3xl text-ink">Citas</h1>
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-rose/12 text-rose-deep">
+              <WandSparkles className="h-5 w-5" />
+            </span>
+            <h1 className="font-display text-3xl text-ink">Citas</h1>
+          </div>
         </header>
         <div className="rounded-2xl border border-dashed border-sand-deep bg-paper/60 p-8 text-center">
           <WandSparkles className="mx-auto h-9 w-9 text-ink-soft/50" />

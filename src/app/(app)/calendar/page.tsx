@@ -43,8 +43,13 @@ export default async function CalendarPage() {
       <LiveRefresh types={["event"]} />
       <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-display text-3xl text-ink">Fechas</h1>
-          <p className="mt-1 text-sm text-ink-soft">
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-rose/12 text-rose-deep">
+              <CalendarHeart className="h-5 w-5" />
+            </span>
+            <h1 className="font-display text-3xl text-ink">Fechas</h1>
+          </div>
+          <p className="mt-2 text-sm text-ink-soft">
             Lo que os espera y lo que ya habéis vivido.
           </p>
           {milestone && (

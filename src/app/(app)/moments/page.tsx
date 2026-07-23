@@ -74,8 +74,13 @@ export default async function MomentsPage({
       <LiveRefresh types={["moment"]} />
       <header className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="font-display text-3xl text-ink">Momentos</h1>
-          <p className="mt-1 text-sm text-ink-soft">
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-rose/12 text-rose-deep">
+              <BookHeart className="h-5 w-5" />
+            </span>
+            <h1 className="font-display text-3xl text-ink">Momentos</h1>
+          </div>
+          <p className="mt-2 text-sm text-ink-soft">
             El album y el diario de {user.name} y {partner?.name ?? "..."}. Solo vuestro.
           </p>
         </div>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Mail } from "lucide-react";
 import { requireCouple } from "@/lib/couple";
 import { prisma } from "@/lib/db";
 import { deliverDueLetters } from "@/lib/letters";
@@ -37,8 +38,13 @@ export default async function LettersPage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-6 md:px-8 md:py-8">
       <header className="mb-5">
-        <h1 className="font-display text-3xl text-ink">Cartas</h1>
-        <p className="mt-1 text-sm text-ink-soft">
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-rose/12 text-rose-deep">
+            <Mail className="h-5 w-5" />
+          </span>
+          <h1 className="font-display text-3xl text-ink">Cartas</h1>
+        </div>
+        <p className="mt-2 text-sm text-ink-soft">
           Lo que escribes hoy llega mañana. La espera es parte del regalo.
         </p>
       </header>

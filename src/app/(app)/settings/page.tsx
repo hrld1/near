@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { requireCouple } from "@/lib/couple";
 import { Card, CardTitle } from "@/components/ui/card";
-import { Download } from "lucide-react";
+import { Download, Settings as SettingsIcon } from "lucide-react";
 import { PushToggle } from "@/features/settings/push-toggle";
 import { SoundToggle } from "@/features/settings/sound-toggle";
 import { AnniversaryForm } from "@/features/settings/anniversary-form";
@@ -19,8 +19,13 @@ export default async function SettingsPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 md:py-10">
       <header className="mb-6">
-        <h1 className="font-display text-3xl text-ink">Ajustes</h1>
-        <p className="mt-1 text-sm text-ink-soft">
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-rose/12 text-rose-deep">
+            <SettingsIcon className="h-5 w-5" />
+          </span>
+          <h1 className="font-display text-3xl text-ink">Ajustes</h1>
+        </div>
+        <p className="mt-2 text-sm text-ink-soft">
           Tu cuenta y este dispositivo. Lo compartido se decide entre los dos.
         </p>
       </header>
