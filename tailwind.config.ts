@@ -87,6 +87,13 @@ const config: Config = {
           from: { opacity: "0", transform: "translateY(6px)" },
           to: { opacity: "1", transform: "translateY(0)" }
         },
+        // entrada de página (it39): SOLO opacidad, sin transform — un transform
+        // en el wrapper de la página convertiría a los overlays `position:fixed`
+        // (constelación, modales, llamada) en relativos a él y los rompería.
+        "page-in": {
+          from: { opacity: "0" },
+          to: { opacity: "1" }
+        },
         "pulse-heart": {
           "0%, 100%": { transform: "scale(1)" },
           "30%": { transform: "scale(1.25)" }
@@ -114,6 +121,7 @@ const config: Config = {
       },
       animation: {
         "fade-up": "fade-up 0.35s ease-out both",
+        "page-in": "page-in 0.3s ease-out both",
         "pulse-heart": "pulse-heart 0.6s ease-in-out",
         heartbeat: "heartbeat 3.6s ease-in-out infinite",
         "pop-in": "pop-in 0.25s ease-out both",

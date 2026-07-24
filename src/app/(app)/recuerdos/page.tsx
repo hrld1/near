@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { BarChart3, BookHeart, CalendarHeart, Mail, MapPin } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, BarChart3, BookHeart, CalendarHeart, Mail, MapPin, Sparkles } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { requireCouple } from "@/lib/couple";
 import { HubGrid, type HubItem } from "@/features/hub/hub-card";
@@ -84,6 +85,32 @@ export default async function RecuerdosPage() {
         </div>
         <p className="mt-2 text-sm text-ink-soft">Vuestra historia, a un toque.</p>
       </header>
+
+      {/* La constelación: la experiencia inmersiva de toda vuestra historia como
+          un cielo por el que navegar. Se presenta con su propia estética de
+          noche para que se note que es algo aparte. */}
+      <Link
+        href="/constelacion"
+        className="group mb-3 block overflow-hidden rounded-3xl"
+      >
+        <div className="relative flex items-center gap-4 bg-[radial-gradient(120%_140%_at_15%_-20%,#2a1f45_0%,#150f28_55%,#0d0a18_100%)] p-6 shadow-lift transition group-hover:-translate-y-0.5 md:p-7">
+          <div className="pointer-events-none absolute inset-0 opacity-70 [background-image:radial-gradient(1px_1px_at_20%_35%,#fff,transparent),radial-gradient(1px_1px_at_65%_20%,#fff,transparent),radial-gradient(1px_1px_at_80%_70%,#fff,transparent),radial-gradient(1px_1px_at_40%_80%,#fff,transparent),radial-gradient(1px_1px_at_92%_40%,#fff,transparent),radial-gradient(1px_1px_at_10%_65%,#fff,transparent)]" />
+          <span className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-rose to-plum text-white shadow-glow">
+            <Sparkles className="h-7 w-7" />
+          </span>
+          <div className="relative min-w-0 flex-1">
+            <p className="font-display text-2xl leading-tight text-white">Vuestra constelación</p>
+            <p className="mt-1 max-w-md text-sm text-white/70">
+              Toda vuestra historia como un cielo. Alejaos para ver los años; acercaos y aparecen los
+              meses, las fotos, las citas y vuestras frases.
+            </p>
+          </div>
+          <span className="relative hidden shrink-0 items-center gap-1.5 rounded-full bg-white/12 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm transition group-hover:gap-2.5 sm:flex">
+            Explorar <ArrowRight className="h-4 w-4" />
+          </span>
+        </div>
+      </Link>
+
       <HubGrid items={items} />
     </div>
   );
