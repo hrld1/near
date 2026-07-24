@@ -76,6 +76,10 @@ export function MomentOfDay({
   }
 
   const bothDone = revealed && !!partnerPhoto;
+  // Nadie ha compartido todavía: no hay nada que enseñar, así que no se pintan
+  // dos cajas vacías de 450px (it42) — basta la invitación. Las cajas aparecen
+  // en cuanto uno de los dos comparte y hay contenido real.
+  const nothingYet = !myPhoto && !partnerPosted;
 
   return (
     <section className="overflow-hidden rounded-3xl border border-rose/20 bg-gradient-to-br from-rose-faint via-paper to-paper shadow-card">
@@ -94,6 +98,28 @@ export function MomentOfDay({
       <div className="p-5">
         <p className="font-display text-xl leading-snug text-ink md:text-2xl">{theme}</p>
 
+        {nothingYet ? (
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
+            <input
+              value={caption}
+              onChange={(e) => setCaption(e.target.value)}
+              maxLength={140}
+              placeholder="Unas palabras (opcional)…"
+              className="min-w-0 flex-1 rounded-xl border border-sand-deep bg-paper px-3 py-2.5 text-sm text-ink placeholder:text-ink-soft/60 focus:border-rose/50 focus:outline-none focus:ring-2 focus:ring-rose/10"
+            />
+            <button
+              onClick={() => fileRef.current?.click()}
+              disabled={uploading}
+              className={cn(
+                "flex shrink-0 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-white transition",
+                uploading ? "bg-sand-deep text-ink-soft" : "bg-rose hover:bg-rose-deep"
+              )}
+            >
+              <ImagePlus className="h-4 w-4" />
+              {uploading ? "Enviando…" : "Compartir mi momento"}
+            </button>
+          </div>
+        ) : (
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           {/* el momento de tu pareja: revelado solo si ya compartiste el tuyo */}
           <div className="relative aspect-square overflow-hidden rounded-2xl border border-sand bg-sand">
@@ -186,19 +212,26 @@ export function MomentOfDay({
                 </p>
               </div>
             )}
-
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) void onPick(file);
-              }}
-            />
           </div>
         </div>
+        )}
+
+        {nothingYet && (
+          <p className="mt-2 text-xs text-ink-soft">
+            Una foto de tu día, ahora. La de {partnerName} se abre con la tuya.
+          </p>
+        )}
+
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) void onPick(file);
+          }}
+        />
 
         {bothDone && (
           <p className="mt-3 text-center text-sm font-medium text-rose-deep">

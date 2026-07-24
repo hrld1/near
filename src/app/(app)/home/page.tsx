@@ -221,6 +221,71 @@ export default async function HomePage() {
   }
   const discovery = partner && !firstDay ? discoveryOfDay(ageDays) : null;
 
+  // Los rituales de hoy, ordenados por lo que falta (it42). Hoy era una pila
+  // fija de tarjetas del mismo peso donde nada decía "haz esto ahora"; ahora el
+  // primero es siempre el siguiente gesto pendiente y lo hecho baja.
+  const ritualsToday: { key: string; done: boolean; node: React.ReactNode }[] = [];
+  if (prompt) {
+    ritualsToday.push({
+      key: "pregunta",
+      done: !!myPromptAnswer,
+      node: (
+        <PromptCard
+          promptId={prompt.id}
+          question={prompt.text}
+          myAnswer={myPromptAnswer?.answer ?? null}
+          partnerAnswer={partnerPromptAnswer?.answer ?? null}
+          partnerName={partner?.name ?? null}
+        />
+      )
+    });
+  } else {
+    ritualsToday.push({
+      key: "pregunta",
+      done: true,
+      node: (
+        <Card>
+          <CardTitle>Pregunta de hoy</CardTitle>
+          <p className="mt-3 text-sm text-ink-soft">
+            Hoy no hay pregunta que compartir. Mañana habrá una nueva.
+          </p>
+        </Card>
+      )
+    });
+  }
+  if (partner) {
+    ritualsToday.push({
+      key: "momento",
+      done: !!myPhotoRow,
+      node: (
+        <MomentOfDay
+          myId={user.id}
+          theme={momentTheme}
+          partnerName={partner.name}
+          streak={momentStreak}
+          initialMyPhoto={myPhoto}
+          initialPartnerPhoto={iRevealed ? partnerPhoto : null}
+          partnerPostedInitial={!!partnerPhotoRow}
+        />
+      )
+    });
+  }
+  ritualsToday.push({
+    key: "animo",
+    done: !!myMood,
+    node: (
+      <Card>
+        <CardTitle>¿Cómo estás hoy?</CardTitle>
+        <div className="mt-3">
+          <MoodCheck currentMood={myMood?.mood ?? null} currentNote={myMood?.note ?? null} />
+        </div>
+      </Card>
+    )
+  });
+  // pendientes primero, conservando el orden relativo dentro de cada grupo
+  ritualsToday.sort((a, b) => Number(a.done) - Number(b.done));
+  const allRitualsDone = ritualsToday.every((r) => r.done);
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 md:px-8 md:py-8">
       <LiveRefresh types={["presence", "mood", "note", "prompt", "event", "moment", "nudge", "box:opened", "season", "game:score"]} />
@@ -369,49 +434,20 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* EL RITUAL DEL DÍA: el corazón de Hoy, antes que nada más */}
-      {partner && (
-        <div className="mb-4">
-          <MomentOfDay
-            myId={user.id}
-            theme={momentTheme}
-            partnerName={partner.name}
-            streak={momentStreak}
-            initialMyPhoto={myPhoto}
-            initialPartnerPhoto={iRevealed ? partnerPhoto : null}
-            partnerPostedInitial={!!partnerPhotoRow}
-          />
+      {/* EL RITUAL DE HOY, ADAPTATIVO (it42): lo que falta va primero y lo ya
+          hecho baja. Así Hoy siempre abre por lo siguiente que hacer en vez de
+          por una lista fija en el mismo orden todos los días. */}
+      {ritualsToday.map((r) => (
+        <div key={r.key} className="mb-4">
+          {r.node}
         </div>
-      )}
+      ))}
 
-      {/* RITUAL, parte 2: la pregunta del día como protagonista (una sola
-          pregunta en grande), y tu ánimo debajo. */}
-      {prompt ? (
-        <div className="mb-4">
-          <PromptCard
-            promptId={prompt.id}
-            question={prompt.text}
-            myAnswer={myPromptAnswer?.answer ?? null}
-            partnerAnswer={partnerPromptAnswer?.answer ?? null}
-            partnerName={partner?.name ?? null}
-          />
-        </div>
-      ) : (
-        <Card className="mb-4">
-          <CardTitle>Pregunta de hoy</CardTitle>
-          <p className="mt-3 text-sm text-ink-soft">
-            Hoy no hay pregunta que compartir. Mañana habrá una nueva.
-          </p>
-        </Card>
+      {allRitualsDone && (
+        <p className="mb-4 text-center text-sm font-medium text-rose-deep">
+          Hoy está completo. Lo demás es estar.
+        </p>
       )}
-      <div className="mb-4">
-        <Card>
-          <CardTitle>¿Cómo estás hoy?</CardTitle>
-          <div className="mt-3">
-            <MoodCheck currentMood={myMood?.mood ?? null} currentNote={myMood?.note ?? null} />
-          </div>
-        </Card>
-      </div>
 
       {/* Cuidaros y quereros, a un toque (compacto) */}
       {partner && (

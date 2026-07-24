@@ -31,7 +31,9 @@ export function MoodCheck({
 
   return (
     <div>
-      <div className="grid grid-cols-3 gap-1.5">
+      {/* it42: una fila compacta en vez de una rejilla de botones grandes — es
+          un gesto de un toque al día, no merece una tarjeta entera. */}
+      <div className="flex flex-wrap gap-1.5">
         {MOODS.map((mood) => (
           <button
             key={mood.key}
@@ -40,14 +42,14 @@ export function MoodCheck({
               setDirty(true);
             }}
             className={cn(
-              "flex flex-col items-center gap-1 rounded-xl border px-2 py-2.5 transition",
+              "flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm transition active:scale-95",
               selected === mood.key
-                ? "border-rose bg-rose-faint"
-                : "border-sand bg-paper hover:bg-sand"
+                ? "border-rose bg-rose-faint text-ink"
+                : "border-sand bg-paper text-ink-soft hover:bg-sand"
             )}
           >
-            <span className="text-xl">{mood.emoji}</span>
-            <span className="text-2xs font-medium text-ink-soft">{mood.label}</span>
+            <span className="text-base leading-none">{mood.emoji}</span>
+            <span className="font-medium">{mood.label}</span>
           </button>
         ))}
       </div>
