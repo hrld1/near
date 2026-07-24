@@ -306,9 +306,9 @@ export default async function PlayPage() {
 
       {/* Cara a cara: duelos 1v1 en vivo (lo que hace que Near se juegue juntos) */}
       <section className="mt-7">
-        <h2 className="mb-1 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-ink-soft">
+        <h2 className="mb-1 flex items-center gap-2 font-display text-xl text-ink">
           Cara a cara
-          <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+          <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-2xs font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
             en vivo
           </span>
         </h2>
@@ -343,7 +343,7 @@ export default async function PlayPage() {
           solo la marca de HOY cuando hay una. La descripción de cada juego
           sigue estando a un toque, en su propia página. */}
       <section className="mt-7">
-        <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-ink-soft">
+        <h2 className="mb-3 font-display text-xl text-ink">
           Sala de juegos
         </h2>
         <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4 md:grid-cols-5">
@@ -356,7 +356,7 @@ export default async function PlayPage() {
               <Link key={def.key} href={`/play/${def.key}`} className="group" title={def.tagline}>
                 <Card className="relative flex h-full flex-col items-center gap-1.5 p-3 text-center transition group-hover:-translate-y-0.5 group-hover:shadow-lift">
                   {isDaily ? (
-                    <span className="absolute -right-1.5 -top-1.5 rounded-full bg-rose-deep px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white shadow-card">
+                    <span className="absolute -right-1.5 -top-1.5 rounded-full bg-rose-deep px-2 py-0.5 text-2xs font-bold uppercase tracking-wide text-white shadow-card">
                       Hoy
                     </span>
                   ) : attemptsLeft === 0 ? (
@@ -387,7 +387,7 @@ export default async function PlayPage() {
 
       {/* Logros */}
       <section className="mt-7">
-        <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-ink-soft">
+        <h2 className="mb-3 font-display text-xl text-ink">
           Logros ({unlockedKeys.size}/{ACHIEVEMENTS.length})
         </h2>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">

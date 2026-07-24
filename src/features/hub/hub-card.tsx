@@ -66,7 +66,7 @@ export function HubHero({ item }: { item: HubItem }) {
               </span>
             )}
           </h2>
-          <p className="mt-2 max-w-sm text-sm leading-relaxed text-ink-soft">{item.description}</p>
+          <p className="mt-2 max-w-sm text-read text-ink-soft">{item.description}</p>
           {item.live && <LiveSignal text={item.live} />}
         </div>
         <div className="relative mt-6">
@@ -112,7 +112,7 @@ export function HubCard({ item }: { item: HubItem }) {
           <p className="flex items-center gap-2 font-display text-lg text-ink">
             {item.title}
             {item.badge && (
-              <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
+              <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-2xs font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
                 {item.badge}
               </span>
             )}

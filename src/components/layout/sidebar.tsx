@@ -136,7 +136,7 @@ export function Sidebar({ userName, unreadChat = 0 }: { userName: string; unread
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex flex-1 flex-col items-center gap-0.5 rounded-2xl py-2 text-[10px] font-semibold transition-all duration-200",
+                  "flex flex-1 flex-col items-center gap-0.5 rounded-2xl py-2 text-2xs font-semibold transition-all duration-200",
                   active
                     ? "bg-gradient-to-b from-rose to-rose-deep text-white shadow-glow"
                     : "text-ink-soft active:scale-95"

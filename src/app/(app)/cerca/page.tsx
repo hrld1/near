@@ -77,7 +77,7 @@ export default async function CercaPage() {
           </span>
           <h1 className="font-display text-3xl text-ink">Cerca</h1>
         </div>
-        <p className="mt-2 text-sm text-ink-soft">
+        <p className="mt-2 text-read text-ink-soft">
           Un rincón para quereros y conoceros más — no para pasar el rato.
         </p>
       </header>
@@ -90,12 +90,12 @@ export default async function CercaPage() {
         />
 
         <section>
-          <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-ink-soft">Mazos de preguntas</h2>
+          <h2 className="mb-2 font-display text-xl text-ink">Mazos de preguntas</h2>
           <DeckGrid items={deckItems} />
         </section>
 
         <section>
-          <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-ink-soft">El frasco de aprecio</h2>
+          <h2 className="mb-2 font-display text-xl text-ink">El frasco de aprecio</h2>
           <AppreciationBox myId={user.id} myName={user.name} partnerName={partnerName} initial={initialAppr} />
         </section>
       </div>

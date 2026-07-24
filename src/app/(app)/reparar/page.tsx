@@ -34,7 +34,7 @@ export default async function RepararPage() {
           </span>
           <h1 className="font-display text-3xl text-ink">Reparar</h1>
         </div>
-        <p className="mt-2 text-sm text-ink-soft">
+        <p className="mt-2 text-read text-ink-soft">
           Discutir a distancia duele el doble. Aquí tenéis con qué parar a tiempo, tender la mano y, en calma,
           entenderos.
         </p>

@@ -43,7 +43,7 @@ export default async function JoinPage({ params }: { params: { code: string } })
             <h1 className="mt-5 font-display text-3xl text-ink">
               {inviterName} te invita a Near
             </h1>
-            <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-ink-soft">
+            <p className="mx-auto mt-2 max-w-sm text-read text-ink-soft">
               Near es un espacio para dos: vuestro hogar cuando la distancia se
               interpone. Al entrar, vuestras cuentas quedan vinculadas.
             </p>
@@ -51,7 +51,7 @@ export default async function JoinPage({ params }: { params: { code: string } })
         ) : (
           <>
             <h1 className="mt-5 font-display text-3xl text-ink">Este enlace ya no vale</h1>
-            <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-ink-soft">
+            <p className="mx-auto mt-2 max-w-sm text-read text-ink-soft">
               La invitación ha caducado o ya se usó. Pídele a quien te invitó que
               genere una nueva.
             </p>

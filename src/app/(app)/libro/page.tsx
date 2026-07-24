@@ -152,7 +152,7 @@ export default async function LibroPage({ searchParams }: { searchParams: { p?: 
         {!hasAnything && (
           <Chapter eyebrow="Por escribir" icon={BookHeart}>
             <p className="font-display text-2xl text-ink">Este período aún está en blanco.</p>
-            <p className="mt-2 text-sm text-ink-soft">
+            <p className="mt-2 text-read text-ink-soft">
               Cada foto, mensaje, aprecio o duelo que compartáis irá llenando estas páginas solo.
             </p>
           </Chapter>

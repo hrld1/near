@@ -46,7 +46,7 @@ export function StatusCard() {
 
       <div className="mt-3 flex items-start gap-2.5 rounded-2xl border border-sand-deep bg-paper/60 px-4 py-3">
         <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-ink-soft" />
-        <p className="text-sm leading-relaxed text-ink-soft">
+        <p className="text-read text-ink-soft">
           Vuestra cuenta va con contraseña y solo vosotros dos veis lo vuestro. Con sinceridad: el
           chat <strong className="text-ink">aún no está cifrado de extremo a extremo</strong>, así
           que en teoría el servidor podría leer los mensajes. No lo hacemos, y estamos trabajando en

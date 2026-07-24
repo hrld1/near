@@ -50,7 +50,7 @@ export default async function QuizPage() {
           </span>
           <h1 className="font-display text-3xl text-ink">¿Cuánto nos conocemos?</h1>
         </div>
-        <p className="mt-2 text-sm text-ink-soft">
+        <p className="mt-2 text-read text-ink-soft">
           Cada uno responde por si misma/o y apuesta por la respuesta del otro.
         </p>
       </header>

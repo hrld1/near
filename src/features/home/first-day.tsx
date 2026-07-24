@@ -62,7 +62,7 @@ export function FirstDay({
                   {!done && <span className="block text-xs text-ink-soft">{step.hint}</span>}
                 </span>
                 {partner[step.key] && (
-                  <span className="shrink-0 rounded-full bg-plum/10 px-2 py-0.5 text-[10px] font-semibold text-plum">
+                  <span className="shrink-0 rounded-full bg-plum/10 px-2 py-0.5 text-2xs font-semibold text-plum">
                     {partnerName} ✓
                   </span>
                 )}

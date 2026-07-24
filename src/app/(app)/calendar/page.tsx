@@ -50,7 +50,7 @@ export default async function CalendarPage() {
             </span>
             <h1 className="font-display text-3xl text-ink">Fechas</h1>
           </div>
-          <p className="mt-2 text-sm text-ink-soft">
+          <p className="mt-2 text-read text-ink-soft">
             Lo que os espera y lo que ya habéis vivido.
           </p>
           {milestone && (
@@ -95,7 +95,7 @@ export default async function CalendarPage() {
                   )}
                 </p>
                 {highlight.description && (
-                  <p className="mt-2 max-w-md text-sm leading-relaxed text-ink">
+                  <p className="mt-2 max-w-md text-read text-ink">
                     {highlight.description}
                   </p>
                 )}
@@ -108,7 +108,7 @@ export default async function CalendarPage() {
 
           {rest.length > 0 && (
             <section>
-              <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-ink-soft">
+              <h2 className="mb-3 font-display text-xl text-ink">
                 Después de eso
               </h2>
               <div className="space-y-2.5">
@@ -123,7 +123,7 @@ export default async function CalendarPage() {
                         <span className="font-display text-lg leading-none text-ink">
                           {format(event.startsAt, "d")}
                         </span>
-                        <span className="text-[9px] font-bold uppercase tracking-wide text-ink-soft">
+                        <span className="text-2xs font-bold uppercase tracking-wide text-ink-soft">
                           {format(event.startsAt, "MMM", { locale: es })}
                         </span>
                       </div>
@@ -151,8 +151,8 @@ export default async function CalendarPage() {
 
           {past.length > 0 && (
             <section>
-              <h2 className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-ink-soft">
-                <History className="h-3.5 w-3.5" />
+              <h2 className="mb-3 flex items-center gap-2 font-display text-xl text-ink">
+                <History className="h-4 w-4 text-ink-soft" />
                 Ya vividas ({past.length})
               </h2>
               <div className="rounded-2xl border border-sand bg-paper/50 px-2 py-1">

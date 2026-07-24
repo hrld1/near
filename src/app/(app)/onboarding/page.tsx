@@ -15,7 +15,7 @@ export default async function OnboardingPage() {
     <div className="mx-auto max-w-md px-4 py-10 md:py-16">
       <div className="mb-8 text-center animate-fade-up">
         <h1 className="font-display text-3xl text-ink">Hola, {user.name}</h1>
-        <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-ink-soft">
+        <p className="mx-auto mt-2 max-w-sm text-read text-ink-soft">
           Near es vuestro rincón cuando la distancia se interpone: hablar, veros,
           jugar y guardar recuerdos, solo para los dos. Para empezar, vincula tu
           cuenta con la de tu pareja.

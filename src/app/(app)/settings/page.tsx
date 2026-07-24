@@ -25,7 +25,7 @@ export default async function SettingsPage() {
           </span>
           <h1 className="font-display text-3xl text-ink">Ajustes</h1>
         </div>
-        <p className="mt-2 text-sm text-ink-soft">
+        <p className="mt-2 text-read text-ink-soft">
           Tu cuenta y este dispositivo. Lo compartido se decide entre los dos.
         </p>
       </header>
@@ -37,7 +37,7 @@ export default async function SettingsPage() {
           la misma información cabe en la mitad del scroll. */}
       <div className="space-y-8">
         <section>
-          <h2 className="mb-2.5 text-xs font-semibold uppercase tracking-wider text-ink-soft">
+          <h2 className="mb-2.5 font-display text-xl text-ink">
             Preferencias
           </h2>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -57,7 +57,7 @@ export default async function SettingsPage() {
         </section>
 
         <section>
-          <h2 className="mb-2.5 text-xs font-semibold uppercase tracking-wider text-ink-soft">
+          <h2 className="mb-2.5 font-display text-xl text-ink">
             Vuestro espacio
           </h2>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -87,7 +87,7 @@ export default async function SettingsPage() {
         </section>
 
         <section>
-          <h2 className="mb-2.5 text-xs font-semibold uppercase tracking-wider text-ink-soft">
+          <h2 className="mb-2.5 font-display text-xl text-ink">
             Cuenta
           </h2>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -122,7 +122,7 @@ export default async function SettingsPage() {
         </section>
 
         <section>
-          <h2 className="mb-2.5 text-xs font-semibold uppercase tracking-wider text-ink-soft">
+          <h2 className="mb-2.5 font-display text-xl text-ink">
             Confianza
           </h2>
           <div className="space-y-4">
@@ -137,7 +137,7 @@ export default async function SettingsPage() {
         </section>
 
         <section>
-          <h2 className="mb-2.5 text-xs font-semibold uppercase tracking-wider text-ink-soft">
+          <h2 className="mb-2.5 font-display text-xl text-ink">
             Zona delicada
           </h2>
           <Card>

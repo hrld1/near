@@ -19,7 +19,7 @@ export default function RootError({
           <HeartCrack className="h-7 w-7 text-rose" />
         </span>
         <h1 className="mt-4 font-display text-2xl text-ink">Algo se ha torcido</h1>
-        <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+        <p className="mt-2 text-read text-ink-soft">
           No eres tu, somos nosotros. Vuelve a intentarlo; si sigue pasando,
           recarga la página.
         </p>

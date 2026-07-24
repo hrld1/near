@@ -44,7 +44,7 @@ export default async function LettersPage() {
           </span>
           <h1 className="font-display text-3xl text-ink">Cartas</h1>
         </div>
-        <p className="mt-2 text-sm text-ink-soft">
+        <p className="mt-2 text-read text-ink-soft">
           Lo que escribes hoy llega mañana. La espera es parte del regalo.
         </p>
       </header>

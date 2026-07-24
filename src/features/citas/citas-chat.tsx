@@ -188,7 +188,7 @@ export function CitasChat({
               {m.content && (
                 <div
                   className={cn(
-                    "inline-block whitespace-pre-wrap rounded-2xl px-4 py-2.5 text-left text-sm leading-relaxed text-ink",
+                    "inline-block whitespace-pre-wrap rounded-2xl px-4 py-2.5 text-left text-read text-ink",
                     m.role === "user" ? "rounded-br-md bg-sand" : "rounded-bl-md bg-rose-faint"
                   )}
                 >

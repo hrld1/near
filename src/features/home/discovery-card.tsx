@@ -37,7 +37,7 @@ export function DiscoveryCard({ discovery }: { discovery: Discovery }) {
         <Compass className="h-5 w-5" />
       </span>
       <div className="min-w-0 flex-1">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-plum">
+        <p className="text-2xs font-bold uppercase tracking-widest text-plum">
           Día {discovery.day} · descubrid hoy
         </p>
         <p className="text-sm font-medium text-ink">{discovery.title}</p>

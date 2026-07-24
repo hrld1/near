@@ -83,7 +83,7 @@ export default async function RecuerdosPage() {
           </span>
           <h1 className="font-display text-3xl text-ink">Recuerdos</h1>
         </div>
-        <p className="mt-2 text-sm text-ink-soft">Vuestra historia, a un toque.</p>
+        <p className="mt-2 text-read text-ink-soft">Vuestra historia, a un toque.</p>
       </header>
 
       {/* La constelación: la experiencia inmersiva de toda vuestra historia como

@@ -79,7 +79,7 @@ export default async function CitasPage() {
           </span>
           <h1 className="font-display text-3xl text-ink">Citas</h1>
         </div>
-        <p className="mt-2 text-sm text-ink-soft">
+        <p className="mt-2 text-read text-ink-soft">
           Cuéntale la cita que os apetece y os la deja planeada: sitios reales si estáis juntos, o una cita a
           distancia con lo mejor de Near. Hasta {AI_DAILY_LIMIT} mensajes al día.
         </p>
@@ -88,7 +88,7 @@ export default async function CitasPage() {
       <CitasChat partnerName={partnerName} myCity={user.city} partnerCity={partner?.city ?? null} />
 
       <section className="mt-7">
-        <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-ink-soft">Vuestras citas planeadas</h2>
+        <h2 className="mb-3 font-display text-xl text-ink">Vuestras citas planeadas</h2>
         <PlanList items={items} myId={user.id} partnerName={partnerName} />
       </section>
     </div>

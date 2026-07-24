@@ -80,7 +80,7 @@ export default async function MomentsPage({
             </span>
             <h1 className="font-display text-3xl text-ink">Momentos</h1>
           </div>
-          <p className="mt-2 text-sm text-ink-soft">
+          <p className="mt-2 text-read text-ink-soft">
             El album y el diario de {user.name} y {partner?.name ?? "..."}. Solo vuestro.
           </p>
         </div>
@@ -130,7 +130,7 @@ export default async function MomentsPage({
         <div className="space-y-8">
           {groups.map((group) => (
             <section key={group.label}>
-              <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-ink-soft">
+              <h2 className="mb-3 font-display text-xl text-ink">
                 {group.label}
               </h2>
               <div className="space-y-4">

@@ -76,7 +76,7 @@ export function LinkPartner() {
     <div className="space-y-4">
       <Card className="p-6">
         <h2 className="font-display text-xl text-ink">Invita a tu pareja</h2>
-        <p className="mt-1 text-sm leading-relaxed text-ink-soft">
+        <p className="mt-1 text-read text-ink-soft">
           Genera un código y compártelo. Cuando lo use, vuestro espacio se
           creará automáticamente.
         </p>

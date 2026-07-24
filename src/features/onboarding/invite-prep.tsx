@@ -37,7 +37,7 @@ export function InvitePrep({ code }: { code: string }) {
   return (
     <div className="rounded-2xl border border-sand bg-paper p-5 shadow-card">
       <h2 className="font-display text-xl text-ink">Mientras esperáis</h2>
-      <p className="mt-1 text-sm leading-relaxed text-ink-soft">
+      <p className="mt-1 text-read text-ink-soft">
         Prepara vuestro hogar. Cuando tu pareja entre, se lo encontrará ya hecho.
       </p>
 

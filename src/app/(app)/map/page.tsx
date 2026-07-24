@@ -25,7 +25,7 @@ export default async function MapPage() {
           </span>
           <h1 className="font-display text-3xl text-ink">La distancia entre vosotros</h1>
         </div>
-        <p className="mt-2 text-sm text-ink-soft">
+        <p className="mt-2 text-read text-ink-soft">
           El cielo que os separa, en kilómetros y en días. Y el tiempo que hace ahora mismo
           donde está cada uno.
         </p>

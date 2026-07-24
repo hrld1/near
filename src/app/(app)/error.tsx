@@ -19,7 +19,7 @@ export default function AppError({
         <HeartCrack className="h-7 w-7 text-rose" />
       </span>
       <h1 className="mt-4 font-display text-2xl text-ink">No hemos podido cargar esto</h1>
-      <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+      <p className="mt-2 text-read text-ink-soft">
         Ha fallado algo al preparar la página. Puedes reintentarlo o volver al inicio.
       </p>
       {error.digest && (

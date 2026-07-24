@@ -22,7 +22,7 @@ export default async function RecoverPage({ searchParams }: { searchParams: { to
           <KeyRound className="h-7 w-7" />
         </span>
         <h1 className="mt-5 font-display text-3xl text-ink">Recuperar tu acceso</h1>
-        <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-ink-soft">
+        <p className="mx-auto mt-2 max-w-sm text-read text-ink-soft">
           {valid
             ? "Elige una contraseña nueva y vuelve a entrar en vuestro espacio."
             : "Este enlace no es válido o ha caducado. Pídele a tu pareja que te genere uno nuevo desde Ajustes."}

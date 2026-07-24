@@ -29,7 +29,7 @@ export function EmptyState({
       ) : null}
       <h3 className="font-display text-xl text-ink">{title}</h3>
       {description && (
-        <p className="mt-2 max-w-sm text-sm leading-relaxed text-ink-soft">{description}</p>
+        <p className="mt-2 max-w-sm text-read text-ink-soft">{description}</p>
       )}
       {children && <div className="mt-5">{children}</div>}
     </div>

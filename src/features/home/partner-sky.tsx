@@ -61,7 +61,7 @@ export function PartnerSky({ name, timezone }: { name: string; timezone: string 
       <span className="absolute inset-0 bg-gradient-to-r from-black/35 via-black/10 to-transparent" />
       <span className="relative flex items-center justify-between gap-3 px-4 py-3">
         <span className="min-w-0">
-          <span className="block text-[10px] font-bold uppercase tracking-[0.14em] text-white/75">
+          <span className="block text-2xs font-bold uppercase tracking-[0.14em] text-white/75">
             En el cielo de {name}
           </span>
           <span className="block font-display text-lg leading-tight text-white [text-shadow:0_1px_8px_rgba(0,0,0,0.35)]">
