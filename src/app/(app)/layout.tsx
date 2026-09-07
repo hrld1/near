@@ -4,6 +4,8 @@ import { CallProvider } from "@/features/call/call-context";
 import { LiveRefresh } from "@/components/live-refresh";
 import { LiveConnection } from "@/components/live-connection";
 import { Sidebar } from "@/components/layout/sidebar";
+import { AppBadge } from "@/components/app-badge";
+import { InstallPrompt } from "@/components/install-prompt";
 import { NudgeToast } from "@/components/layout/nudge-toast";
 import { RepairToast } from "@/components/layout/repair-toast";
 import { TouchInvite } from "@/features/touch/touch-invite";
@@ -45,6 +47,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div className="min-h-dvh md:flex">
       <Sidebar userName={user.name} unreadChat={unreadChat} />
       <main className="min-w-0 flex-1 pb-24 md:pb-0">{children}</main>
+      <AppBadge count={unreadChat} />
+      <InstallPrompt />
       {user.coupleId && <NudgeToast myId={user.id} />}
       {user.coupleId && <RepairToast myId={user.id} />}
       {user.coupleId && <TouchInvite myId={user.id} />}
