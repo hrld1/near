@@ -54,85 +54,34 @@
 }
 
 /* ---------------------------------------------------------------------------
-   El FONDO LÍQUIDO de Near (it38). Cuatro manchas de gradiente suave en el
-   rosa→rojo de la marca (con una de ciruela para dar profundidad) que derivan
-   CADA UNA POR SU CUENTA, muy despacio y con duraciones distintas para que
-   nunca se sincronicen: al solaparse y separarse, el color respira y se mezcla
-   como un fluido lento. Evolución de la antigua "aurora", que se movía como un
-   bloque rígido; esto se mueve como agua.
+   El FONDO de Near (it44). Manchas suaves en el rosa→rojo de la marca (con una
+   de ciruela para dar profundidad) que tiñen los márgenes y llenan el vacío.
 
-   Rinde bien: solo se anima `transform` sobre una capa de compositor propia
-   (will-change), así que el desenfoque se calcula una vez y luego la GPU solo
-   la desplaza. Fijo detrás de todo, sin bloquear clics. La regla global de
-   prefers-reduced-motion lo congela en su posición inicial.
+   Antes (it38) eran cuatro capas con `filter: blur(56px)` a media pantalla que
+   se ANIMABAN sin parar: el desenfoque grande es lo caro, y animarlo obliga al
+   navegador a rerasterizarlo en cada frame — iba lento en equipos normales, y
+   el movimiento apenas se notaba. Ahora es un ÚNICO gradiente radial estático,
+   pintado una sola vez: mismos colores, coste casi nulo, cero animación. Los
+   gradientes radiales con caída a transparente dan la misma suavidad que el
+   blur sin el filtro caro.
 --------------------------------------------------------------------------- */
 .liquid-bg {
   position: fixed;
   inset: 0;
   z-index: -1;
-  overflow: hidden;
   pointer-events: none;
+  background:
+    radial-gradient(40vw 40vw at 14% 8%, rgb(var(--c-rose) / 0.30), transparent 62%),
+    radial-gradient(34vw 34vw at 88% 22%, rgb(var(--c-rose-deep) / 0.24), transparent 62%),
+    radial-gradient(44vw 44vw at 30% 88%, rgb(var(--c-plum) / 0.20), transparent 64%),
+    radial-gradient(32vw 32vw at 74% 104%, rgb(var(--c-rose) / 0.24), transparent 62%);
 }
+/* las <span> del componente ya no se usan: el color vive en el fondo del div */
 .liquid-bg span {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(56px);
-  will-change: transform;
-}
-.liquid-bg .b1 {
-  width: 48vw;
-  height: 48vw;
-  left: -8vw;
-  top: -12vh;
-  background: radial-gradient(circle, rgb(var(--c-rose) / 0.5), transparent 60%);
-  animation: liquid1 26s ease-in-out infinite alternate;
-}
-.liquid-bg .b2 {
-  width: 42vw;
-  height: 42vw;
-  right: -6vw;
-  top: 6vh;
-  background: radial-gradient(circle, rgb(var(--c-rose-deep) / 0.44), transparent 60%);
-  animation: liquid2 33s ease-in-out infinite alternate;
-}
-.liquid-bg .b3 {
-  width: 50vw;
-  height: 50vw;
-  left: 10vw;
-  bottom: -20vh;
-  background: radial-gradient(circle, rgb(var(--c-plum) / 0.36), transparent 62%);
-  animation: liquid3 40s ease-in-out infinite alternate;
-}
-.liquid-bg .b4 {
-  width: 36vw;
-  height: 36vw;
-  right: 12vw;
-  bottom: 0;
-  background: radial-gradient(circle, rgb(var(--c-rose) / 0.4), transparent 60%);
-  animation: liquid4 30s ease-in-out infinite alternate;
+  display: none;
 }
 .dark .liquid-bg {
-  opacity: 0.55;
-}
-@keyframes liquid1 {
-  0% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(12vw, 10vh) scale(1.12); }
-  100% { transform: translate(-4vw, 14vh) scale(1.04); }
-}
-@keyframes liquid2 {
-  0% { transform: translate(0, 0) scale(1.06); }
-  50% { transform: translate(-14vw, 8vh) scale(1); }
-  100% { transform: translate(-6vw, -8vh) scale(1.16); }
-}
-@keyframes liquid3 {
-  0% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(10vw, -10vh) scale(1.1); }
-  100% { transform: translate(16vw, -4vh) scale(1.02); }
-}
-@keyframes liquid4 {
-  0% { transform: translate(0, 0) scale(1.1); }
-  50% { transform: translate(-10vw, -12vh) scale(1); }
-  100% { transform: translate(-16vw, -2vh) scale(1.12); }
+  opacity: 0.6;
 }
 /* grano de papel: textura casi imperceptible que quita lo "plano" */
 body::after {
@@ -214,6 +163,23 @@ body::after {
    juegos: cualquier canvas que entre en pantalla completa se beneficia solo. */
 :fullscreen canvas {
   max-height: 92vh !important;
+}
+
+/* Videollamada en pantalla completa (it44): se pone en fullscreen TODA la
+   tarjeta (vídeo + controles), no solo el <video>, para que el botón de colgar
+   y los demás controles sigan visibles. El vídeo crece a ocupar el espacio y la
+   barra de controles queda anclada abajo sobre negro. */
+.call-stage:fullscreen {
+  width: 100vw;
+  height: 100vh;
+  border: 0;
+  border-radius: 0;
+  background: #000;
+}
+.call-stage:fullscreen .call-video {
+  flex: 1 1 auto;
+  aspect-ratio: auto;
+  min-height: 0;
 }
 
 /* Ficha del 4 en raya: cae desde arriba con un pequeno rebote. */

@@ -130,6 +130,24 @@ export function DateRoom({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [videoId, mode]);
 
+  // Latido de sincronía (it44): mientras algo se reproduce, cada 3s se difunde
+  // la posición actual. Antes solo se enviaba en play/pausa, así que el
+  // seguidor quedaba por detrás tras cada acción y NUNCA se ponía al día. Con
+  // el latido, ambos convergen a la posición del que va más adelantado (la
+  // corrección asimétrica de arriba evita que se arrastren mutuamente).
+  useEffect(() => {
+    if (mode !== "YOUTUBE") return;
+    const id = setInterval(() => {
+      const player = playerRef.current;
+      const YTNS = window.YT;
+      if (!player?.getPlayerState || !YTNS || applyingRemoteRef.current) return;
+      if (player.getPlayerState() !== YTNS.PlayerState.PLAYING) return;
+      lastSentRef.current = Date.now();
+      void updatePlaybackAction({ playing: true, positionSec: player.getCurrentTime?.() ?? 0 });
+    }, 3000);
+    return () => clearInterval(id);
+  }, [mode]);
+
   useCoupleStream((event) => {
     if (event.type === "room:mode") {
       setMode(event.payload.mode);
@@ -151,10 +169,20 @@ export function DateRoom({
 
     applyingRemoteRef.current = true;
     try {
-      const drift = Math.abs(player.getCurrentTime() - state.positionSec);
-      if (drift > 1.5) player.seekTo(state.positionSec, true);
-      if (state.playing) player.playVideo();
-      else player.pauseVideo();
+      const local = player.getCurrentTime();
+      const behind = state.positionSec - local; // >0 = voy por detrás del otro
+      if (state.playing) {
+        // Corrección ASIMÉTRICA (it44): me pongo al día si voy claramente por
+        // detrás; pero si voy "por delante" tolero mucho más antes de saltar
+        // atrás, porque la posición que me llega ya es vieja por la latencia —
+        // sin esto, cada latido del seguidor arrastraría al host hacia atrás.
+        if (behind > 1 || behind < -2.5) player.seekTo(state.positionSec, true);
+        player.playVideo();
+      } else {
+        // en pausa sí sincronizamos fino en ambos sentidos
+        if (Math.abs(behind) > 0.7) player.seekTo(state.positionSec, true);
+        player.pauseVideo();
+      }
     } finally {
       setTimeout(() => {
         applyingRemoteRef.current = false;

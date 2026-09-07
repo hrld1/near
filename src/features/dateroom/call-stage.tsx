@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { Mic, MicOff, Moon, Phone, PhoneOff, ScreenShare, ScreenShareOff, Video, VideoOff } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Maximize2, Mic, MicOff, Minimize2, Moon, Phone, PhoneOff, ScreenShare, ScreenShareOff, Video, VideoOff } from "lucide-react";
 import { useCall } from "@/features/call/call-context";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -34,6 +34,27 @@ export function CallStage() {
 
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
+  // Pantalla completa de TODA la tarjeta (vídeo + controles), no solo del
+  // <video>: así el botón de colgar y los demás controles siguen visibles.
+  const stageRef = useRef<HTMLDivElement>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const canFullscreen =
+    typeof document !== "undefined" && !!document.documentElement.requestFullscreen;
+
+  useEffect(() => {
+    const onChange = () => setIsFullscreen(document.fullscreenElement === stageRef.current);
+    document.addEventListener("fullscreenchange", onChange);
+    return () => document.removeEventListener("fullscreenchange", onChange);
+  }, []);
+
+  async function toggleFullscreen() {
+    try {
+      if (document.fullscreenElement) await document.exitFullscreen();
+      else await stageRef.current?.requestFullscreen();
+    } catch {
+      // algunos navegadores lo bloquean fuera de un gesto directo: sin ruido
+    }
+  }
 
   // Mientras compartes, tu propia miniatura enseña la pantalla que se está
   // retransmitiendo (para que veas exactamente lo que ve tu pareja), no tu
@@ -84,8 +105,11 @@ export function CallStage() {
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-sand bg-paper shadow-card">
-      <div className="relative aspect-video w-full bg-black">
+    <div
+      ref={stageRef}
+      className="call-stage flex flex-col overflow-hidden rounded-2xl border border-sand bg-paper shadow-card"
+    >
+      <div className="call-video relative aspect-video w-full bg-black">
         <video
           ref={remoteVideoRef}
           autoPlay
@@ -188,6 +212,15 @@ export function CallStage() {
             title="Dormir juntos"
           >
             <Moon className="h-4 w-4" />
+          </button>
+        )}
+        {canFullscreen && (
+          <button
+            onClick={() => void toggleFullscreen()}
+            className="rounded-full bg-sand p-3 text-ink transition hover:bg-sand-deep"
+            title={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
+          >
+            {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
           </button>
         )}
         <button

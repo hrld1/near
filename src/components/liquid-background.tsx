@@ -1,14 +1,7 @@
-// El fondo líquido de Near (it38): cuatro manchas de gradiente en el rosa→rojo
-// de la marca que derivan por su cuenta detrás de toda la app. Todo el estilo y
-// el movimiento vive en globals.css (.liquid-bg); aquí solo van los elementos.
-// Sin estado ni JS: es puro CSS, así que es un Server Component.
+// El fondo de Near (it44): un gradiente estático en el rosa→rojo de la marca,
+// pintado una sola vez detrás de toda la app. Todo el color vive en globals.css
+// (.liquid-bg); antes esto tenía cuatro manchas animadas con desenfoque que
+// iban lentas — ahora es una sola capa sin animación ni filtro. Server Component.
 export function LiquidBackground() {
-  return (
-    <div className="liquid-bg" aria-hidden="true">
-      <span className="b1" />
-      <span className="b2" />
-      <span className="b3" />
-      <span className="b4" />
-    </div>
-  );
+  return <div className="liquid-bg" aria-hidden="true" />;
 }
