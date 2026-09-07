@@ -36,12 +36,28 @@ export function InvitePrep({ code }: { code: string }) {
 
   return (
     <div className="rounded-2xl border border-sand bg-paper p-5 shadow-card">
-      <h2 className="font-display text-xl text-ink">Mientras esperáis</h2>
+      <h2 className="font-display text-xl text-ink">Déjale algo para cuando entre</h2>
       <p className="mt-1 text-read text-ink-soft">
-        Prepara vuestro hogar. Cuando tu pareja entre, se lo encontrará ya hecho.
+        Lo mejor que le puedes dejar es un primer mensaje: al entrar se lo encontrará esperando y
+        su primer gesto será responderte, no empezar de cero.
       </p>
 
       <div className="mt-4 space-y-4">
+        <label className="block">
+          <span className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-rose-deep">
+            <StickyNote className="h-3.5 w-3.5" /> Tu primer mensaje
+          </span>
+          <input
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            maxLength={2000}
+            placeholder="Lo primero que quieres que lea nada más entrar"
+            className="mt-1.5 w-full rounded-xl border border-rose/40 bg-rose-faint/40 px-3 py-2.5 text-sm text-ink placeholder:text-ink-soft/60 focus:border-rose focus:outline-none focus:ring-2 focus:ring-rose/10"
+          />
+        </label>
+
+        <p className="text-xs font-semibold uppercase tracking-wider text-ink-soft/70">Y si te apetece</p>
+
         <label className="block">
           <span className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-ink-soft">
             <CalendarHeart className="h-3.5 w-3.5 text-rose" /> Vuestra fecha
@@ -57,19 +73,6 @@ export function InvitePrep({ code }: { code: string }) {
 
         <label className="block">
           <span className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-ink-soft">
-            <StickyNote className="h-3.5 w-3.5 text-rose" /> Una nota
-          </span>
-          <input
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            maxLength={2000}
-            placeholder="Algo que quieras que lea nada más entrar"
-            className="mt-1.5 w-full rounded-xl border border-sand-deep bg-paper px-3 py-2 text-sm text-ink placeholder:text-ink-soft/60 focus:border-rose focus:outline-none"
-          />
-        </label>
-
-        <label className="block">
-          <span className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-ink-soft">
             <Mail className="h-3.5 w-3.5 text-rose" /> Carta de bienvenida
           </span>
           <textarea
@@ -77,7 +80,7 @@ export function InvitePrep({ code }: { code: string }) {
             onChange={(e) => setLetter(e.target.value)}
             maxLength={4000}
             rows={3}
-            placeholder="Una carta que le estará esperando ya entregada"
+            placeholder="Una carta más larga que le estará esperando ya entregada"
             className="mt-1.5 w-full resize-none rounded-xl border border-sand-deep bg-paper px-3 py-2 text-sm text-ink placeholder:text-ink-soft/60 focus:border-rose focus:outline-none"
           />
         </label>

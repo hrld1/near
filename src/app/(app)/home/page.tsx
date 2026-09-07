@@ -29,6 +29,7 @@ import { PromptCard } from "@/features/home/prompt-card";
 import { NoteForm } from "@/features/home/note-form";
 import { StreakMissions } from "@/features/home/streak-missions";
 import { ReachOut } from "@/features/home/reach-out";
+import { WelcomeArrival } from "@/features/home/welcome-arrival";
 import { DailyBox } from "@/features/home/daily-box";
 import { MomentOfDay } from "@/features/home/moment-of-day";
 import { MoreOfToday } from "@/features/home/more-of-today";
@@ -232,6 +233,14 @@ export default async function HomePage() {
   }
   const discovery = partner && !firstDay ? discoveryOfDay(ageDays) : null;
 
+  // La llegada (it47): a quien acaba de entrar y su pareja le dejó una nota,
+  // antes de que haya aportado su primer gesto. Quien INVITÓ escribió esa nota
+  // él mismo (es su propia nota, no la de la pareja), así que nunca ve esto; lo
+  // ve solo quien llega y se encuentra algo esperando. Se apaga en cuanto aporta
+  // cualquier cosa (mood, respuesta, foto o su propia nota).
+  const iEngagedEver = !!(myMood || myPromptAnswer || myPhotoRow || myNote);
+  const showWelcome = !!partner && !!partnerNote && ageDays <= 2 && !iEngagedEver;
+
   // Los rituales de hoy, ordenados por lo que falta (it42). Hoy era una pila
   // fija de tarjetas del mismo peso donde nada decía "haz esto ahora"; ahora el
   // primero es siempre el siguiente gesto pendiente y lo hecho baja.
@@ -317,6 +326,14 @@ export default async function HomePage() {
           <PresencePicker current={effectivePresence(user.presence, user.presenceUpdatedAt)} />
         </div>
       </header>
+
+      {/* LA LLEGADA (it47): solo para quien acaba de entrar y su pareja le dejó
+          una nota esperando, antes de su primer gesto. El pacto de arranque. */}
+      {showWelcome && partner && partnerNote && (
+        <div className="mb-4">
+          <WelcomeArrival partnerName={partner.name} note={partnerNote.body} />
+        </div>
+      )}
 
       {/* VUESTRO PRIMER DÍA / LA PRIMERA SEMANA (it30): el mismo hueco, arriba
           del todo — la lista el día 1, un descubrimiento al día después */}
