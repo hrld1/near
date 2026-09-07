@@ -131,7 +131,32 @@ export const answerPromptAction = coupleFormAction(async ({ user, couple, couple
   });
   // reeditar la respuesta no vuelve a puntuar
   await addPoints(coupleId, user.id, existing ? 0 : POINTS.prompt, dayKeyIn(user.timezone));
-  publish(coupleId, { type: "prompt", payload: { userId: user.id } });
+
+  // Rescate recíproco (it46): la foto del día ya avisaba al otro, pero
+  // responder la pregunta —el otro gancho recíproco— no enviaba nada, así que
+  // quien se descuelga nunca se enteraba de que tenía algo esperando. Ahora, si
+  // la pareja aún no ha respondido hoy y está desconectada, le llega un push
+  // que la trae de vuelta. Si ya respondió, solo se publica el evento (su UI se
+  // actualiza) y no hay push que sobre.
+  const partnerId = couple.members.find((m) => m.id !== user.id)?.id ?? null;
+  const partnerAnswered = partnerId
+    ? !!(await prisma.promptAnswer.findUnique({
+        where: { userId_dateKey: { userId: partnerId, dateKey } }
+      }))
+    : false;
+  notifyPartner(
+    coupleId,
+    partnerId,
+    { type: "prompt", payload: { userId: user.id } },
+    partnerAnswered
+      ? undefined
+      : {
+          title: `${user.name} ha respondido la pregunta de hoy`,
+          body: "Respóndela tú para ver lo que dijo",
+          url: "/home",
+          tag: "near-prompt"
+        }
+  );
   revalidatePath("/home");
   return { success: "Respuesta guardada" };
 });

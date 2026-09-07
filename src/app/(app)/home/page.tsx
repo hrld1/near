@@ -28,6 +28,7 @@ import { PartnerOnline } from "@/features/presence/partner-online";
 import { PromptCard } from "@/features/home/prompt-card";
 import { NoteForm } from "@/features/home/note-form";
 import { StreakMissions } from "@/features/home/streak-missions";
+import { ReachOut } from "@/features/home/reach-out";
 import { DailyBox } from "@/features/home/daily-box";
 import { MomentOfDay } from "@/features/home/moment-of-day";
 import { MoreOfToday } from "@/features/home/more-of-today";
@@ -148,6 +149,16 @@ export default async function HomePage() {
     ? couple.members.find((m) => m.id === dailyBox.openedById)?.name ?? null
     : null;
   const milestone = couple.anniversary ? nextAnniversary(couple.anniversary, now) : null;
+
+  // Tender la mano (it46): mostrar el gesto SOLO cuando yo ya he pasado hoy y mi
+  // pareja no — y no está conectada ahora ni le he mandado ya un guiño hace poco
+  // (para no repetir). Es el momento en que el sector pierde a la gente.
+  const iEngagedToday = !!(myMood || myPromptAnswer || myPhotoRow);
+  const partnerIdleToday = !partnerMood && !partnerPromptAnswer && !partnerPhotoRow;
+  const partnerAway = !!partner && !isUserOnline(partner.id) && partnerEffective === "NONE";
+  const nudgedRecently =
+    !!myLastNudge && now.getTime() - myLastNudge.createdAt.getTime() < 6 * 60 * 60 * 1000;
+  const showReachOut = !!partner && iEngagedToday && partnerIdleToday && partnerAway && !nudgedRecently;
   const CountdownIcon = countdownEvent ? eventIcon(countdownEvent.kind) : null;
   const myPhoto = myPhotoRow ? { imageUrl: myPhotoRow.imageUrl, caption: myPhotoRow.caption } : null;
   const partnerPhoto = partnerPhotoRow
@@ -433,6 +444,12 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {showReachOut && partner && (
+        <div className="mb-4">
+          <ReachOut partnerName={partner.name} />
+        </div>
+      )}
 
       {/* EL RITUAL DE HOY, ADAPTATIVO (it42): lo que falta va primero y lo ya
           hecho baja. Así Hoy siempre abre por lo siguiente que hacer en vez de
