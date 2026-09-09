@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { requireCouple } from "@/lib/couple";
 import { deckByKey, makeCardId } from "@/lib/decks";
 import { DeckView } from "@/features/cerca/deck-view";
+import { IntimateDeck } from "@/features/cerca/intimate-deck";
 
 export const dynamic = "force-dynamic";
 
@@ -40,13 +41,24 @@ export default async function DeckPage({ params }: { params: { deckKey: string }
     };
   });
 
+  const meta = { deckKey: deck.key, name: deck.name, accent: deck.accent, tagline: deck.tagline };
+
   return (
     <div className="mx-auto max-w-2xl px-4 py-6 md:py-10">
-      <DeckView
-        deck={{ deckKey: deck.key, name: deck.name, accent: deck.accent, tagline: deck.tagline, intimate: deck.intimate }}
-        partnerName={partner?.name ?? "tu pareja"}
-        initial={initial}
-      />
+      {deck.intimate && deck.levels ? (
+        <IntimateDeck
+          deck={meta}
+          partnerName={partner?.name ?? "tu pareja"}
+          levels={deck.levels}
+          initial={initial}
+        />
+      ) : (
+        <DeckView
+          deck={{ ...meta, intimate: deck.intimate }}
+          partnerName={partner?.name ?? "tu pareja"}
+          initial={initial}
+        />
+      )}
     </div>
   );
 }

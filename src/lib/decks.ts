@@ -7,6 +7,12 @@
 import type { LucideIcon } from "lucide-react";
 import { Camera, Flame, HeartHandshake, Home, Sparkles } from "lucide-react";
 
+// Nivel de confianza dentro de un mazo íntimo (it50): las cartas se ordenan de
+// más suave a más explícita y se agrupan en niveles que se abren de uno en uno,
+// SOLO si la persona elige bajar más. `count` = cuántas cartas (consecutivas)
+// cubre el nivel; la suma debe igualar cards.length.
+export type DeckLevel = { name: string; note: string; count: number };
+
 export type Deck = {
   key: string;
   name: string;
@@ -15,7 +21,8 @@ export type Deck = {
   accent: string; // gradiente tailwind "from-x to-y"
   soft: string;
   text: string;
-  intimate?: boolean; // se abre con aviso (opt-in)
+  intimate?: boolean; // se abre con consentimiento (opt-in)
+  levels?: DeckLevel[]; // solo los íntimos: cartas por niveles de confianza
   cards: string[];
 };
 
@@ -100,21 +107,64 @@ export const DECKS: Deck[] = [
     key: "intimidad",
     name: "Intimidad",
     icon: Flame,
-    tagline: "Más cerca, con confianza. Se abre con permiso.",
+    tagline: "Más cerca, con confianza. Se abre con permiso y a vuestro ritmo.",
     accent: "from-rose to-plum",
     soft: "bg-rose/12",
     text: "text-rose-deep",
     intimate: true,
+    // tres niveles, de lo más tierno a lo más explícito; cada uno se abre solo
+    // si eliges bajar más. La reciprocidad a ciegas hace el resto: solo ves lo
+    // del otro en un nivel si tú también has llegado hasta ahí.
+    levels: [
+      {
+        name: "Cercanía",
+        note: "Ternura y contacto. Suave, para empezar.",
+        count: 4
+      },
+      {
+        name: "Deseo",
+        note: "Un paso más directo. Sobre lo que os apetece.",
+        count: 4
+      },
+      {
+        name: "Sin filtros",
+        note: "Lo más explícito. Solo si os apetece a los dos.",
+        count: 4
+      }
+    ],
     cards: [
-      "¿Qué te hace sentir más deseado/a por mí?",
-      "¿Qué te gustaría que hiciéramos la próxima vez que nos veamos?",
-      "¿Hay algo que te dé un poco de vergüenza pedirme y te gustaría?",
-      "¿Cuándo te has sentido más conectado/a conmigo físicamente?",
+      // Nivel 1 · Cercanía
+      "¿Qué gesto mío te hace sentir deseado/a sin necesidad de palabras?",
+      "¿Qué es lo que más echas de menos de mi contacto físico?",
+      "¿Cuándo te has sentido más conectado/a conmigo, piel con piel?",
       "¿Qué detalle mío te resulta irresistible?",
-      "¿Cómo te gusta que te demuestre que te deseo, incluso a distancia?"
+      // Nivel 2 · Deseo
+      "¿Qué te apetece que hagamos la próxima vez que estemos a solas?",
+      "¿Cómo te gusta que te demuestre que te deseo, incluso a distancia?",
+      "¿Hay algo que te dé un poco de vergüenza pedirme y te gustaría?",
+      "¿Qué fantasía nuestra te haría ilusión cumplir?",
+      // Nivel 3 · Sin filtros
+      "¿Qué es lo que más te enciende de mí?",
+      "Descríbeme, sin filtros, algo que te gustaría que te hiciera.",
+      "¿Qué te apetece probar conmigo que aún no hayamos hecho?",
+      "¿Qué palabras o mensajes míos te encienden cuando estamos lejos?"
     ]
   }
 ];
+
+// Rangos [start,end) de cada nivel de un mazo por niveles (íntimo). El orden de
+// las cartas coincide con el de los niveles, así que basta acumular counts.
+export function levelRanges(
+  levels: DeckLevel[]
+): { name: string; note: string; start: number; end: number }[] {
+  const out: { name: string; note: string; start: number; end: number }[] = [];
+  let start = 0;
+  for (const l of levels) {
+    out.push({ name: l.name, note: l.note, start, end: start + l.count });
+    start += l.count;
+  }
+  return out;
+}
 
 export function deckByKey(key: string): Deck | null {
   return DECKS.find((d) => d.key === key) ?? null;
