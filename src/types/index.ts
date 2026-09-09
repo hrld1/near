@@ -210,7 +210,7 @@ export type StreamEvent =
   // accept = aceptar la mano; aftermath = "he compartido como me senti".
   | {
       type: "repair:signal";
-      payload: { kind: "pause" | "reach" | "accept" | "aftermath"; byId: string; byName: string; message?: string };
+      payload: { kind: "pause" | "reach" | "accept" | "aftermath" | "close"; byId: string; byName: string; message?: string };
     }
   // --- iteracion 11 ---
   // juegos del lienzo: "dibujad a la vez" (blind duel) y "dibuja y adivina".

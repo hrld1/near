@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useServerState } from "@/hooks/use-server-state";
-import { Cloudy, Sun } from "lucide-react";
-import { submitRepairEntryAction } from "@/actions/repair";
+import { Cloudy, HeartHandshake, Sun } from "lucide-react";
+import { closeRepairCircleAction, submitRepairEntryAction } from "@/actions/repair";
 import { REPAIR_FEELINGS } from "@/lib/repair";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/input";
@@ -13,19 +13,26 @@ type Entry = { feelings: string[]; perspective: string; need: string };
 
 // "Después de la tormenta": en calma, cada uno deja cómo se sintió, su punto de
 // vista (sin culpar) y qué necesita. Ves la reflexión del otro solo cuando
-// compartes la tuya. Convierte una discusión en entendimiento.
+// compartes la tuya. Y cuando los dos la habéis compartido se abre el paso más
+// hondo —"cerrar el círculo" (it49)—: tras leeros, cada uno dice qué se lleva y
+// un gesto que hará distinto. Ese cierre NO es a ciegas: responde a haber leído
+// al otro, así que se ve en cuanto existe. Convierte una discusión en un paso.
 export function AftermathTool({
   partnerName,
   initialRepairId,
   initialMine,
   initialPartner,
-  partnerAnswered
+  partnerAnswered,
+  initialMyClosing,
+  initialPartnerClosing
 }: {
   partnerName: string;
   initialRepairId: string | null;
   initialMine: Entry | null;
   initialPartner: Entry | null;
   partnerAnswered: boolean;
+  initialMyClosing: string | null;
+  initialPartnerClosing: string | null;
 }) {
   const [repairId, setRepairId] = useServerState<string | null>(initialRepairId);
   const [mine, setMine] = useServerState<Entry | null>(initialMine);
@@ -37,6 +44,13 @@ export function AftermathTool({
   const [need, setNeed] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // "cerrar el círculo"
+  const [myClosing, setMyClosing] = useServerState<string | null>(initialMyClosing);
+  const [partnerClosing, setPartnerClosing] = useServerState<string | null>(initialPartnerClosing);
+  const [closingDraft, setClosingDraft] = useState("");
+  const [closingSaving, setClosingSaving] = useState(false);
+  const [closingError, setClosingError] = useState<string | null>(null);
 
   function toggle(f: string) {
     setFeelings((s) => (s.includes(f) ? s.filter((x) => x !== f) : [...s, f]));
@@ -62,6 +76,22 @@ export function AftermathTool({
     setSaving(false);
   }
 
+  async function closeCircle() {
+    const text = closingDraft.trim();
+    if (!text || closingSaving || !repairId) return;
+    setClosingSaving(true);
+    setClosingError(null);
+    const res = await closeRepairCircleAction({ repairId, closing: text });
+    if (res.ok && res.data) {
+      setMyClosing(text);
+      setPartnerClosing(res.data.partnerClosing);
+      setClosingDraft("");
+    } else if (!res.ok) {
+      setClosingError(res.error);
+    }
+    setClosingSaving(false);
+  }
+
   function startNew() {
     setMine(null);
     setPartner(null);
@@ -70,6 +100,9 @@ export function AftermathTool({
     setFeelings([]);
     setPerspective("");
     setNeed("");
+    setMyClosing(null);
+    setPartnerClosing(null);
+    setClosingDraft("");
   }
 
   return (
@@ -89,9 +122,58 @@ export function AftermathTool({
             </p>
           )}
           {partner && (
-            <p className="flex items-center gap-1.5 text-sm font-medium text-emerald-700 dark:text-emerald-400">
-              <Sun className="h-4 w-4" /> Os habéis contado cómo os sentisteis. Eso ya es reparar.
-            </p>
+            <>
+              <p className="flex items-center gap-1.5 text-sm font-medium text-emerald-700 dark:text-emerald-400">
+                <Sun className="h-4 w-4" /> Os habéis contado cómo os sentisteis. Eso ya es reparar.
+              </p>
+
+              {/* Paso más hondo: cerrar el círculo (visible solo cuando ambos han compartido) */}
+              <div className="mt-1 rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-3.5">
+                <p className="flex items-center gap-2 text-2xs font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
+                  <HeartHandshake className="h-4 w-4" /> Cerrar el círculo
+                </p>
+
+                {myClosing ? (
+                  <div className="mt-2.5 space-y-2.5">
+                    <ClosingCard label="Tú" text={myClosing} tone="me" />
+                    {partnerClosing ? (
+                      <>
+                        <ClosingCard label={partnerName} text={partnerClosing} tone="them" />
+                        <p className="flex items-center gap-1.5 text-sm font-medium text-emerald-700 dark:text-emerald-400">
+                          <Sun className="h-4 w-4" /> El círculo está cerrado. Una discusión se ha vuelto un paso adelante.
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-xs text-ink-soft">
+                        {partnerName} aún no ha cerrado su parte. Su gesto aparecerá aquí.
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="mt-2.5 space-y-2.5">
+                    <p className="text-sm text-ink-soft">
+                      Ya sabéis cómo se sintió el otro. Cerrad con lo que te llevas y una cosa que harás
+                      distinto — pequeña y de verdad.
+                    </p>
+                    {partnerClosing && <ClosingCard label={partnerName} text={partnerClosing} tone="them" />}
+                    <Textarea
+                      value={closingDraft}
+                      onChange={(e) => setClosingDraft(e.target.value)}
+                      rows={2}
+                      maxLength={1000}
+                      placeholder="Lo que me llevo, y un gesto que haré distinto…"
+                    />
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-xs text-ink-soft">Aquí sí lo veis los dos: es vuestra respuesta al otro.</p>
+                      <Button size="sm" onClick={closeCircle} loading={closingSaving} disabled={!closingDraft.trim()}>
+                        Cerrar el círculo
+                      </Button>
+                    </div>
+                    {closingError && <p className="text-xs text-red-700 dark:text-red-400">{closingError}</p>}
+                  </div>
+                )}
+              </div>
+            </>
           )}
           <button onClick={startNew} className="text-xs font-medium text-rose transition hover:underline">
             Procesar otra discusión
@@ -180,6 +262,17 @@ function EntryCard({ entry, label, tone }: { entry: Entry; label: string; tone: 
         <span className="text-xs font-semibold uppercase tracking-wide text-ink-soft">Necesito: </span>
         {entry.need}
       </p>
+    </div>
+  );
+}
+
+function ClosingCard({ label, text, tone }: { label: string; text: string; tone: "me" | "them" }) {
+  return (
+    <div className={cn("rounded-xl px-4 py-3", tone === "me" ? "bg-sand" : "bg-emerald-500/10")}>
+      <p className={cn("text-2xs font-semibold uppercase tracking-wider", tone === "me" ? "text-ink-soft" : "text-emerald-700 dark:text-emerald-400")}>
+        {label}
+      </p>
+      <p className="mt-1 whitespace-pre-wrap text-sm text-ink">{text}</p>
     </div>
   );
 }

@@ -94,3 +94,47 @@ export const submitRepairEntryAction = coupleAction<
     }
   };
 });
+
+const closeSchema = z.object({
+  repairId: z.string(),
+  closing: z.string().trim().min(1, "Escribe con qué te quedas").max(1000)
+});
+
+// "Cerrar el círculo" (it49): el paso más hondo del aftermath. Solo tiene sentido
+// cuando AMBOS han compartido su reflexión; a diferencia de esta, el cierre NO
+// es a ciegas —es una respuesta a haber leído al otro— así que la del otro se ve
+// en cuanto exista. Actualiza el closing de tu propia RepairEntry.
+export const closeRepairCircleAction = coupleAction<
+  [input: { repairId: string; closing: string }],
+  { partnerClosing: string | null }
+>(async ({ user, coupleId, partnerId }, input) => {
+  const parsed = closeSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0].message };
+
+  const mine = await prisma.repairEntry.findFirst({
+    where: { repairId: parsed.data.repairId, userId: user.id, repair: { coupleId } },
+    select: { id: true }
+  });
+  if (!mine) return { ok: false, error: "Primero comparte tu reflexión" };
+
+  await prisma.repairEntry.update({
+    where: { id: mine.id },
+    data: { closing: parsed.data.closing }
+  });
+
+  notifyPartner(
+    coupleId,
+    partnerId,
+    { type: "repair:signal", payload: { kind: "close", byId: user.id, byName: user.name } },
+    { title: `${user.name} ha cerrado su parte del círculo`, body: "Mira lo que se lleva en Reparar", url: "/reparar", tag: "near-repair" }
+  );
+
+  const partner = partnerId
+    ? await prisma.repairEntry.findFirst({
+        where: { repairId: parsed.data.repairId, userId: partnerId },
+        select: { closing: true }
+      })
+    : null;
+  revalidatePath("/reparar");
+  return { ok: true, data: { partnerClosing: partner?.closing ?? null } };
+});

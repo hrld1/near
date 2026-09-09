@@ -39,6 +39,19 @@ test("tender la mano + aftermath recíproco", async ({ browser }) => {
     // ahora B ve AMBAS reflexiones
     await expect(b.getByText(/no me escuchabas/)).toBeVisible();
     await expect(b.getByText(/Os habéis contado cómo os sentisteis/)).toBeVisible();
+
+    // Cerrar el círculo (it49): con ambas reflexiones a la vista, B cierra su parte
+    await b.getByPlaceholder(/haré distinto/).fill("Me llevo que tú también lo pasaste mal. Te escribiré antes de que estalle.");
+    await b.getByRole("button", { name: "Cerrar el círculo" }).click();
+    await expect(b.getByText(/aún no ha cerrado su parte/)).toBeVisible();
+
+    // A recarga: ve la reflexión de B y su cierre (el cierre NO es a ciegas), y cierra el suyo
+    await a.goto("/reparar");
+    await expect(a.getByText(/estaba agotado/)).toBeVisible();
+    await expect(a.getByText(/antes de que estalle/)).toBeVisible();
+    await a.getByPlaceholder(/haré distinto/).fill("Me llevo tu cansancio. Preguntaré cómo estás antes de soltar lo mío.");
+    await a.getByRole("button", { name: "Cerrar el círculo" }).click();
+    await expect(a.getByText(/El círculo está cerrado/)).toBeVisible();
   } finally {
     await couple.dispose();
   }

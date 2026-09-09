@@ -538,6 +538,9 @@ model RepairEntry {
   feelings    String[] @default([])
   perspective String
   need        String
+  // "cerrar el círculo" (it49): tras leer la reflexión del otro, lo que te
+  // llevas y un gesto que harás distinto. Se escribe después, por eso nullable.
+  closing     String?
   createdAt   DateTime @default(now())
 
   @@unique([repairId, userId])

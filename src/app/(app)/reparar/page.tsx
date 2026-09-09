@@ -24,6 +24,9 @@ export default async function RepararPage() {
     perspective: e.perspective,
     need: e.need
   });
+  // el cierre del círculo NO es a ciegas (se responde tras leer al otro), pero
+  // solo se alcanza cuando ambos han compartido su reflexión
+  const bothShared = !!(myEntry && partnerRaw);
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-6 md:py-10">
@@ -48,6 +51,8 @@ export default async function RepararPage() {
           initialMine={myEntry ? toEntry(myEntry) : null}
           initialPartner={myEntry && partnerRaw ? toEntry(partnerRaw) : null}
           partnerAnswered={!!partnerRaw}
+          initialMyClosing={myEntry?.closing ?? null}
+          initialPartnerClosing={bothShared ? partnerRaw?.closing ?? null : null}
         />
       </div>
     </div>

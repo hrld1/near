@@ -7,7 +7,7 @@ import { repairSignalAction } from "@/actions/repair";
 import { useCoupleStream } from "@/hooks/use-stream";
 import { sfx } from "@/lib/sound";
 
-type Toast = { kind: "pause" | "reach" | "accept" | "aftermath"; name: string; message?: string };
+type Toast = { kind: "pause" | "reach" | "accept" | "aftermath" | "close"; name: string; message?: string };
 
 // Aviso global y calmado de los gestos de reparación: llega esté donde esté la
 // otra persona. Paleta verde salvia (distinta del rosa) para marcar el tono.
@@ -38,18 +38,20 @@ export function RepairToast({ myId }: { myId: string }) {
     setToast(null);
   }
 
-  const Icon = { pause: Wind, reach: HeartHandshake, accept: Sun, aftermath: MessagesSquare }[toast.kind];
+  const Icon = { pause: Wind, reach: HeartHandshake, accept: Sun, aftermath: MessagesSquare, close: HeartHandshake }[toast.kind];
   const title = {
     pause: `${toast.name} necesita un respiro`,
     reach: `${toast.name} te tiende la mano`,
     accept: `${toast.name} ha aceptado tu mano`,
-    aftermath: `${toast.name} ha compartido cómo se sintió`
+    aftermath: `${toast.name} ha compartido cómo se sintió`,
+    close: `${toast.name} ha cerrado su parte del círculo`
   }[toast.kind];
   const sub = {
     pause: "Volverá — no es que se vaya",
     reach: toast.message ?? "Quiere acercarse",
     accept: "Estáis más cerca",
-    aftermath: "Ábrelo en Reparar cuando estés listo/a"
+    aftermath: "Ábrelo en Reparar cuando estés listo/a",
+    close: "Mira lo que se lleva en Reparar"
   }[toast.kind];
 
   return (
@@ -71,7 +73,7 @@ export function RepairToast({ myId }: { myId: string }) {
             Acepto
           </button>
         )}
-        {toast.kind === "aftermath" && (
+        {(toast.kind === "aftermath" || toast.kind === "close") && (
           <Link
             href="/reparar"
             onClick={() => setToast(null)}
