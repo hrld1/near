@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { CalendarClock, Gamepad2, HeartHandshake, MonitorPlay, Moon, Paintbrush, Sparkles, Users, WandSparkles } from "lucide-react";
+import { CalendarClock, Compass, Gamepad2, HeartHandshake, MonitorPlay, Moon, Paintbrush, Sparkles, Users, WandSparkles } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { requireCouple } from "@/lib/couple";
 import { aiEnabled } from "@/lib/ai";
+import { JOURNEYS, journeyStepCardId } from "@/lib/journeys";
 import { isUserOnline } from "@/lib/realtime";
 import { dayKeyIn } from "@/lib/dates";
 import { gameOfDay } from "@/lib/games";
@@ -24,7 +25,8 @@ export default async function JuntosPage() {
   const partnerOnline = partner ? isUserOnline(partner.id) : false;
   const now = new Date();
 
-  const [freeSlots, roomState, lastAppreciation] = await Promise.all([
+  const journeyCardIds = JOURNEYS.flatMap((j) => j.steps.map((_, i) => journeyStepCardId(j.key, i)));
+  const [freeSlots, roomState, lastAppreciation, journeyAnswers] = await Promise.all([
     partner
       ? prisma.freeSlot.findMany({
           where: { coupleId: couple.id, endsAt: { gte: now } },
@@ -37,8 +39,27 @@ export default async function JuntosPage() {
           where: { coupleId: couple.id, fromId: partner.id },
           orderBy: { createdAt: "desc" }
         })
-      : null
+      : null,
+    prisma.cardAnswer.findMany({
+      where: { coupleId: couple.id, cardId: { in: journeyCardIds } },
+      select: { cardId: true, userId: true }
+    })
   ]);
+
+  // señal viva de Viajes: el primer viaje empezado donde os toca a vosotros (o
+  // esperáis a la pareja). Un viaje "vivo" es motivo para volver hoy.
+  const journeyAnswered = new Set(journeyAnswers.map((a) => `${a.cardId}|${a.userId}`));
+  const journeyLive = (() => {
+    for (const j of JOURNEYS) {
+      const mine = (i: number) => journeyAnswered.has(`${journeyStepCardId(j.key, i)}|${user.id}`);
+      const theirs = (i: number) => !!partner && journeyAnswered.has(`${journeyStepCardId(j.key, i)}|${partner.id}`);
+      const started = j.steps.some((_, i) => mine(i) || theirs(i));
+      const cur = j.steps.findIndex((_, i) => !(mine(i) && theirs(i)));
+      if (!started || cur === -1) continue; // sin empezar o ya completo
+      return mine(cur) ? `Esperáis a ${partnerName} en «${j.title}»` : `Os toca en «${j.title}»`;
+    }
+    return undefined;
+  })();
 
   // la próxima ventana en común (misma intersección UTC que Hoy y /coincidir)
   const nowMs = now.getTime();
@@ -79,6 +100,13 @@ export default async function JuntosPage() {
       live: lastAppreciation
         ? `Aprecio de ${partnerName} ${agoLabel(lastAppreciation.createdAt)}`
         : undefined
+    },
+    {
+      href: "/viajes",
+      title: "Viajes",
+      description: "Recorridos de varios días sobre un tema: volver a conoceros, el reencuentro, lo difícil.",
+      icon: Compass,
+      live: journeyLive
     },
     {
       href: "/coincidir",
