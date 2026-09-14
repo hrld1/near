@@ -2,11 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Anchor, ArrowLeft, Crosshair, Waves, Wifi } from "lucide-react";
+import { Anchor, ArrowLeft, Check, Crosshair, RotateCw, Shuffle, Undo2, Waves, Wifi } from "lucide-react";
 import { bsSignalAction } from "@/actions/battleship";
 import { useCoupleStream } from "@/hooks/use-stream";
 import { sfx, vibrate } from "@/lib/sound";
-import { GRID, cellKey, placeFleet, totalShipCells } from "@/lib/battleship";
+import { GRID, SHIP_SIZES, cellKey, placeFleet, totalShipCells, tryPlace } from "@/lib/battleship";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Confetti } from "@/features/play/confetti";
@@ -14,11 +14,13 @@ import { cn } from "@/lib/utils";
 
 // Hundir la flota, 1v1 EN VIVO por turnos (el bus SSE añade latencia, así que
 // nada de tiempo real: cada disparo lo resuelve el defensor, que sabe dónde
-// están sus barcos, y responde). Colocación aleatoria; en acierto repites, en
-// fallo pasa el turno; ganas al hundir toda la flota rival.
+// están sus barcos, y responde). Colocación MANUAL de la flota (it53): cada uno
+// coloca sus barcos antes de empezar y solo se juega cuando ambos están listos.
+// En acierto repites, en fallo pasa el turno; ganas al hundir toda la flota.
 
-type Phase = "lobby" | "inviting" | "incoming" | "playing" | "over";
+type Phase = "lobby" | "inviting" | "incoming" | "placing" | "playing" | "over";
 type Shot = "hit" | "miss" | "sunk";
+type Flash = { text: string; tone: "hit" | "miss" | "sunk" };
 
 export function Battleship({ myId, partnerName }: { myId: string; partnerName: string }) {
   const [phase, setPhase] = useState<Phase>("lobby");
@@ -27,6 +29,15 @@ export function Battleship({ myId, partnerName }: { myId: string; partnerName: s
   const [onMe, setOnMe] = useState<Record<string, "hit" | "miss">>({}); // disparos que recibo
   const [result, setResult] = useState<"win" | "lose" | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+
+  // colocación manual
+  const [placed, setPlaced] = useState<string[][]>([]);
+  const [horiz, setHoriz] = useState(true);
+  const [hover, setHover] = useState<{ r: number; c: number } | null>(null);
+
+  // aviso volador de "¡Tocado!/¡Hundido!/¡Agua!"
+  const [flash, setFlash] = useState<Flash | null>(null);
+  const flashTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const phaseRef = useRef<Phase>("lobby");
   const turnRef = useRef(false);
@@ -37,6 +48,8 @@ export function Battleship({ myId, partnerName }: { myId: string; partnerName: s
   const pendingRef = useRef<string | null>(null);
   const iInvitedRef = useRef(false);
   const seedRef = useRef(0);
+  const iReadyRef = useRef(false);
+  const partnerReadyRef = useRef(false);
 
   function setPhaseAll(p: Phase) {
     phaseRef.current = p;
@@ -46,19 +59,37 @@ export function Battleship({ myId, partnerName }: { myId: string; partnerName: s
     turnRef.current = v;
     setMyTurn(v);
   }
+  function showFlash(text: string, tone: Flash["tone"]) {
+    setFlash({ text, tone });
+    if (flashTimer.current) clearTimeout(flashTimer.current);
+    flashTimer.current = setTimeout(() => setFlash(null), 1600);
+  }
 
-  function startGame(seed: number) {
-    fleetRef.current = placeFleet();
+  // Tras aceptar: cada uno coloca su flota. Solo se juega cuando ambos avisan.
+  function beginPlacement(seed: number) {
+    seedRef.current = seed;
+    fleetRef.current = [];
     myHitsRef.current = new Set();
     enemyRef.current = {};
     onMeRef.current = {};
     pendingRef.current = null;
+    iReadyRef.current = false;
+    partnerReadyRef.current = false;
     setEnemy({});
     setOnMe({});
     setResult(null);
     setNotice(null);
+    setPlaced([]);
+    setHoriz(true);
+    setHover(null);
+    setFlash(null);
+    setPhaseAll("placing");
+  }
+
+  function startPlay() {
+    setNotice(null);
     // quien empieza lo decide la semilla del que invita (misma cuenta en ambos)
-    setTurn(iInvitedRef.current ? seed % 2 === 0 : seed % 2 === 1);
+    setTurn(iInvitedRef.current ? seedRef.current % 2 === 0 : seedRef.current % 2 === 1);
     setPhaseAll("playing");
   }
 
@@ -75,6 +106,32 @@ export function Battleship({ myId, partnerName }: { myId: string; partnerName: s
   function cancel() {
     void bsSignalAction({ kind: "quit" });
     setPhaseAll("lobby");
+  }
+
+  // ---- colocación ----
+  function placeAt(r: number, c: number) {
+    const size = SHIP_SIZES[placed.length];
+    if (size === undefined) return;
+    const cells = tryPlace(new Set(placed.flat()), r, c, size, horiz);
+    if (!cells) {
+      showFlash("Ahí no cabe", "miss");
+      return;
+    }
+    setPlaced((prev) => [...prev, cells]);
+  }
+  function undoShip() {
+    setPlaced((prev) => prev.slice(0, -1));
+  }
+  function randomFleet() {
+    setPlaced(placeFleet());
+  }
+  function ready() {
+    if (placed.length !== SHIP_SIZES.length) return;
+    fleetRef.current = placed;
+    iReadyRef.current = true;
+    void bsSignalAction({ kind: "ready" });
+    if (partnerReadyRef.current) startPlay();
+    else setNotice(`Esperando a que ${partnerName} coloque su flota…`);
   }
 
   function fireAt(r: number, c: number) {
@@ -102,7 +159,15 @@ export function Battleship({ myId, partnerName }: { myId: string; partnerName: s
       return;
     }
     if (p.kind === "accept") {
-      if (phaseRef.current === "inviting" || phaseRef.current === "incoming") startGame(seedRef.current);
+      if (phaseRef.current === "inviting" || phaseRef.current === "incoming") beginPlacement(seedRef.current);
+      return;
+    }
+    if (p.kind === "ready") {
+      if (!mine) {
+        partnerReadyRef.current = true;
+        if (iReadyRef.current) startPlay();
+        else if (phaseRef.current === "placing") setNotice(`${p.byName} ya tiene su flota lista. Coloca la tuya.`);
+      }
       return;
     }
     if (p.kind === "quit") {
@@ -130,9 +195,13 @@ export function Battleship({ myId, partnerName }: { myId: string; partnerName: s
       }
       void bsSignalAction({ kind: "result", r: p.r, c: p.c, hit, sunk, allSunk });
       if (allSunk) {
+        showFlash("Tu flota se ha hundido…", "sunk");
         setResult("lose");
         setPhaseAll("over");
       } else {
+        if (sunk) showFlash("Te han hundido un barco", "sunk");
+        else if (hit) showFlash("¡Te han dado!", "hit");
+        else showFlash("¡Han fallado!", "miss");
         setTurn(!hit); // fallo → ahora disparo yo; acierto → sigue el rival
       }
       return;
@@ -148,20 +217,27 @@ export function Battleship({ myId, partnerName }: { myId: string; partnerName: s
       pendingRef.current = null;
       if (p.hit) sfx.pulse();
       if (p.allSunk) {
+        showFlash("¡Flota rival hundida! ¡Ganaste!", "sunk");
         setResult("win");
         setPhaseAll("over");
         sfx.success();
       } else {
+        if (p.sunk) showFlash("¡Hundido!", "sunk");
+        else if (p.hit) showFlash("¡Tocado!", "hit");
+        else showFlash("¡Agua!", "miss");
         setTurn(!!p.hit); // acierto → repites; fallo → pasa el turno
       }
       return;
     }
   });
 
-  // salir de la página en plena partida = abandonar
+  // salir de la página con la partida en marcha = abandonar
   useEffect(() => {
     return () => {
-      if (phaseRef.current === "playing") void bsSignalAction({ kind: "quit" });
+      if (phaseRef.current === "playing" || phaseRef.current === "placing") {
+        void bsSignalAction({ kind: "quit" });
+      }
+      if (flashTimer.current) clearTimeout(flashTimer.current);
     };
   }, []);
 
@@ -178,8 +254,8 @@ export function Battleship({ myId, partnerName }: { myId: string; partnerName: s
               <div>
                 <h2 className="font-display text-2xl text-ink">Hundir la flota</h2>
                 <p className="mx-auto mt-1 max-w-sm text-sm text-ink-soft">
-                  Duelo por turnos en directo con {partnerName}. Encuentra sus barcos
-                  antes de que encuentre los tuyos.
+                  Duelo por turnos en directo con {partnerName}. Coloca tu flota y encuentra la suya
+                  antes de que encuentre la tuya.
                 </p>
               </div>
               {notice && <p className="text-sm text-ink-soft">{notice}</p>}
@@ -210,6 +286,71 @@ export function Battleship({ myId, partnerName }: { myId: string; partnerName: s
     );
   }
 
+  // ---- colocación de la flota ----
+  if (phase === "placing") {
+    const occupied = new Set(placed.flat());
+    const nextSize = SHIP_SIZES[placed.length];
+    const done = placed.length === SHIP_SIZES.length;
+    const preview =
+      hover && nextSize !== undefined ? tryPlace(occupied, hover.r, hover.c, nextSize, horiz) : null;
+    const previewSet = new Set(preview ?? []);
+    const previewBad = !!hover && nextSize !== undefined && !preview;
+
+    return (
+      <Shell>
+        <div className="p-4">
+          <div className="mb-3">
+            <p className="font-display text-lg text-ink">Coloca tu flota</p>
+            <p className="text-xs text-ink-soft">
+              {done
+                ? "Flota lista. Pulsa “Listo” cuando quieras empezar."
+                : `Te quedan ${SHIP_SIZES.length - placed.length} barcos. Toca el tablero para colocar uno de ${nextSize} casillas.`}
+            </p>
+          </div>
+
+          <Board
+            interactive={!done}
+            onFire={placeAt}
+            onHover={(r, c) => setHover({ r, c })}
+            onLeaveBoard={() => setHover(null)}
+            render={(r, c) => {
+              const k = cellKey(r, c);
+              const isShip = occupied.has(k);
+              const isPreview = previewSet.has(k);
+              return (
+                <div
+                  className={cn(
+                    "flex h-full w-full items-center justify-center rounded-[3px] bg-gradient-to-br transition-colors",
+                    !isShip && !isPreview && "from-sky-400/10 to-sky-500/10",
+                    isShip && "from-slate-300 to-slate-500 shadow-inner",
+                    isPreview && !previewBad && "from-emerald-300 to-emerald-500",
+                    isPreview && previewBad && "from-red-300 to-red-500"
+                  )}
+                />
+              );
+            }}
+          />
+
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+            <Button size="sm" variant="secondary" onClick={() => setHoriz((h) => !h)} disabled={done}>
+              <RotateCw className="h-4 w-4" /> {horiz ? "Horizontal" : "Vertical"}
+            </Button>
+            <Button size="sm" variant="secondary" onClick={randomFleet}>
+              <Shuffle className="h-4 w-4" /> Aleatorio
+            </Button>
+            <Button size="sm" variant="secondary" onClick={undoShip} disabled={placed.length === 0}>
+              <Undo2 className="h-4 w-4" /> Deshacer
+            </Button>
+            <Button size="sm" onClick={ready} disabled={!done}>
+              <Check className="h-4 w-4" /> Listo
+            </Button>
+          </div>
+          {notice && <p className="mt-3 text-center text-sm text-ink-soft">{notice}</p>}
+        </div>
+      </Shell>
+    );
+  }
+
   const won = result === "win";
   const enemyShots = Object.keys(enemy).filter((k) => enemy[k] !== "miss").length;
   const enemyHitsNeeded = totalShipCells();
@@ -217,7 +358,21 @@ export function Battleship({ myId, partnerName }: { myId: string; partnerName: s
   return (
     <Shell>
       {phase === "over" && won && <Confetti />}
-      <div className="p-4">
+      <div className="relative p-4">
+        {flash && (
+          <div className="pointer-events-none absolute inset-x-0 top-16 z-20 flex justify-center">
+            <span
+              className={cn(
+                "animate-pop-in rounded-full px-5 py-2 font-display text-lg font-semibold text-white shadow-lift",
+                flash.tone === "hit" && "bg-orange-500",
+                flash.tone === "sunk" && "bg-red-600",
+                flash.tone === "miss" && "bg-sky-600"
+              )}
+            >
+              {flash.text}
+            </span>
+          </div>
+        )}
         <div className="mb-3 flex items-center justify-between">
           {phase === "over" ? (
             <p className="font-display text-lg text-ink">
@@ -311,14 +466,21 @@ function Shell({ children }: { children: React.ReactNode }) {
 function Board({
   interactive,
   onFire,
+  onHover,
+  onLeaveBoard,
   render
 }: {
   interactive: boolean;
   onFire?: (r: number, c: number) => void;
+  onHover?: (r: number, c: number) => void;
+  onLeaveBoard?: () => void;
   render: (r: number, c: number) => React.ReactNode;
 }) {
   return (
-    <div className="mx-auto grid aspect-square w-full max-w-[360px] grid-cols-8 gap-0.5 rounded-lg bg-gradient-to-br from-sky-800/40 to-blue-950/50 p-1 shadow-inner">
+    <div
+      onMouseLeave={onLeaveBoard}
+      className="mx-auto grid aspect-square w-full max-w-[360px] grid-cols-8 gap-0.5 rounded-lg bg-gradient-to-br from-sky-800/40 to-blue-950/50 p-1 shadow-inner"
+    >
       {Array.from({ length: GRID * GRID }, (_, i) => {
         const r = Math.floor(i / GRID);
         const c = i % GRID;
@@ -327,6 +489,7 @@ function Board({
             key={i}
             disabled={!interactive}
             onClick={() => onFire?.(r, c)}
+            onMouseEnter={() => onHover?.(r, c)}
             className={cn("aspect-square", interactive ? "cursor-crosshair" : "cursor-default")}
           >
             {render(r, c)}

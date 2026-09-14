@@ -11,7 +11,7 @@ import { coupleAction } from "@/lib/safe-action";
 // El primer "invite" manda push si la pareja tiene la app cerrada.
 
 const schema = z.object({
-  kind: z.enum(["invite", "accept", "fire", "result", "quit", "rematch"]),
+  kind: z.enum(["invite", "accept", "ready", "fire", "result", "quit", "rematch"]),
   seed: z.number().int().min(0).max(1_000_000).optional(),
   r: z.number().int().min(0).max(15).optional(),
   c: z.number().int().min(0).max(15).optional(),
@@ -23,7 +23,7 @@ const schema = z.object({
 export const bsSignalAction = coupleAction<
   [
     input: {
-      kind: "invite" | "accept" | "fire" | "result" | "quit" | "rematch";
+      kind: "invite" | "accept" | "ready" | "fire" | "result" | "quit" | "rematch";
       seed?: number;
       r?: number;
       c?: number;

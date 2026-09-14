@@ -154,7 +154,7 @@ export type StreamEvent =
   | {
       type: "bs:signal";
       payload: {
-        kind: "invite" | "accept" | "fire" | "result" | "quit" | "rematch";
+        kind: "invite" | "accept" | "ready" | "fire" | "result" | "quit" | "rematch";
         byId: string;
         byName: string;
         seed?: number;
