@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { requireCouple } from "@/lib/couple";
 import { journeyByKey, journeyStepCardId } from "@/lib/journeys";
 import { JourneyView } from "@/features/viajes/journey-view";
+import { LiveRefresh } from "@/components/live-refresh";
 
 export const dynamic = "force-dynamic";
 
@@ -46,6 +47,8 @@ export default async function JourneyPage({ params }: { params: { journeyKey: st
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-6 md:py-10">
+      {/* el paso que responde la pareja avanza el viaje en vivo (it51) */}
+      <LiveRefresh types={["event"]} />
       <JourneyView
         journey={{
           journeyKey: journey.key,

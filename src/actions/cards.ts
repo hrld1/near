@@ -6,6 +6,7 @@ import { prisma } from "@/lib/db";
 import { coupleAction } from "@/lib/safe-action";
 import { dayKeyIn, dayRangeUtc } from "@/lib/dates";
 import { addPoints, POINTS } from "@/lib/engagement";
+import { notifyPartner } from "@/lib/notify";
 import { resolveCard } from "@/lib/decks";
 
 // Mazos de preguntas: guardas TU respuesta a una carta. Reciprocidad por carta:
@@ -47,6 +48,11 @@ export const answerCardAction = coupleAction<
         where: { userId_cardId: { userId: partnerId, cardId: parsed.data.cardId } }
       })
     : null;
+  // avisa a la pareja para que su mazo abierto se ponga al día en vivo (sin
+  // recargar a mano): si YA respondió esta carta, mi respuesta acaba de revelar
+  // la suya en su pantalla. Solo SSE, sin push: la recompensa es la revelación,
+  // no una notificación por cada carta.
+  notifyPartner(coupleId, partnerId, { type: "event", payload: { byId: user.id } });
   revalidatePath(`/cerca/${parsed.data.cardId.split(":")[0]}`);
   return { ok: true, data: { partnerAnswer: partner?.answer ?? null } };
 });

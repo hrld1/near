@@ -5,6 +5,7 @@ import { requireCouple } from "@/lib/couple";
 import { deckByKey, makeCardId } from "@/lib/decks";
 import { DeckView } from "@/features/cerca/deck-view";
 import { IntimateDeck } from "@/features/cerca/intimate-deck";
+import { LiveRefresh } from "@/components/live-refresh";
 
 export const dynamic = "force-dynamic";
 
@@ -45,6 +46,8 @@ export default async function DeckPage({ params }: { params: { deckKey: string }
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-6 md:py-10">
+      {/* la respuesta de la pareja a una carta se refleja en vivo (it51) */}
+      <LiveRefresh types={["event"]} />
       {deck.intimate && deck.levels ? (
         <IntimateDeck
           deck={meta}
