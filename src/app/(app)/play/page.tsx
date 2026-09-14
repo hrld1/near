@@ -382,6 +382,15 @@ export default async function PlayPage() {
               <p className="text-2xs text-ink-soft">Cooperativo</p>
             </Card>
           </Link>
+          <Link href="/play/ingenio" className="group" title="Acertijos y trivia: quién acierta más">
+            <Card className="flex h-full flex-col items-center gap-1.5 p-3 text-center transition group-hover:-translate-y-0.5 group-hover:shadow-lift">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose/10 text-rose-deep">
+                <Swords className="h-5 w-5" />
+              </span>
+              <h3 className="font-display text-sm leading-tight text-ink">Duelo de ingenio</h3>
+              <p className="text-2xs text-ink-soft">Quién acierta más</p>
+            </Card>
+          </Link>
         </div>
       </section>
 

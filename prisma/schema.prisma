@@ -91,6 +91,7 @@ model User {
   moments       Moment[]
   events        CalendarEvent[]
   quizAnswers   QuizAnswer[]
+  triviaAnswers TriviaAnswer[]
   activityDays    ActivityDay[]
   gameScores      GameScore[]
   dailyClaims     DailyClaim[]
@@ -132,6 +133,7 @@ model Couple {
   events        CalendarEvent[]
   dateRoom      DateRoomState?
   quizAnswers   QuizAnswer[]
+  triviaAnswers TriviaAnswer[]
   activityDays ActivityDay[]
   gameScores   GameScore[]
   dailyBoxes   DailyBox[]
@@ -324,6 +326,24 @@ model QuizAnswer {
   createdAt  DateTime     @default(now())
 
   @@unique([questionId, userId])
+}
+
+// Duelo de ingenio (it52): elección de cada persona en una pregunta de trivia.
+// Las preguntas viven en código (src/lib/trivia.ts), así que questionId es su
+// id de contenido (String), no una FK. El acierto se deriva del `correct` del
+// contenido; aquí solo se guarda la opción elegida.
+model TriviaAnswer {
+  id         String   @id @default(cuid())
+  coupleId   String
+  couple     Couple   @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questionId String
+  choice     Int
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, questionId])
+  @@index([coupleId])
 }
 
 // ---- Engagement ----
